@@ -2,31 +2,40 @@
 import logging
 import subprocess
 import re
+import collections
 
 # Extra
 
 
-def get_active_window_title():
+def get_active_window_info():
+
     root = subprocess.Popen(
         ["xprop", "-root", "_NET_ACTIVE_WINDOW"], stdout=subprocess.PIPE
     )
     stdout, stderr = root.communicate()
 
     m = re.search(b"^_NET_ACTIVE_WINDOW.* ([\w]+)$", stdout)
+
     if m != None:
         window_id = m.group(1)
         window = subprocess.Popen(
-            ["xprop", "-id", window_id, "WM_NAME"], stdout=subprocess.PIPE
+            ["xprop", "-id", window_id, "WM_NAME", "WM_CLASS"], stdout=subprocess.PIPE
         )
         stdout, stderr = window.communicate()
     else:
         return None
 
-    match = re.match(b"WM_NAME\(\w+\) = (?P<name>.+)$", stdout)
-    if match != None:
-        return match.group("name").strip(b'"').decode("utf8")
+    wm_name = wm_class = None
 
-    return None
+    match = re.search(b'WM_NAME\(\w+\) = "(?P<name>.+)"', stdout)
+    if match != None:
+        wm_name = match.group("name").decode("utf8")
+
+    match = re.search(b'WM_CLASS\(\w+\) = "(?P<class>.+?)"', stdout)
+    if match != None:
+        wm_class = match.group("class").decode("utf8")
+
+    return wm_name, wm_class
 
 
 def get_something():
@@ -40,7 +49,7 @@ def init_logging(name: str, log_level: int, to_file: bool = False) -> logging.Lo
 
     Arguments:
         log_level {logging._Level} -- Desired loglevel
-        to_file {bool} -- Log also to file on disk
+        to_file {bool} -- Log also to file on disk, 
 
     Returns:
         logging.Logger -- Formatted logger with desired level

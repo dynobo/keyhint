@@ -1,12 +1,12 @@
 [
     {
         "name": "Firefox",
-        "regex": "^.*Firefox$",
+        "wm_class": "firefox",
         "json": "firefox.json"
     },
     {
         "name": "VS Code",
-        "regex": "^.*Visual Studio Code$",
+        "wm_class": "code",
         "json": "vscode.json"
     }
 ]

@@ -5,4 +5,4 @@ test:
 	pytest tests
 
 run:
-	.venv/bin/python -m pyshortcut
+	.venv/bin/python -m pyshortcuts

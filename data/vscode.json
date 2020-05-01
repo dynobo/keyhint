@@ -1,6 +1,7 @@
 [
     {
-        "window_title_regex": ".*",
+        "context": "general",
+        "wm_name": ".*",
         "shortcuts": {
             "general": {
                 "alt + up/down": "Move current line up/down"
