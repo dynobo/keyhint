@@ -1,0 +1,10 @@
+[
+    {
+        "window_title_regex": ".*",
+        "shortcuts": {
+            "general": {
+                "alt + up/down": "Move current line up/down"
+            }
+        }
+    }
+]

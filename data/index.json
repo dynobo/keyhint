@@ -1,0 +1,12 @@
+[
+    {
+        "name": "Firefox",
+        "regex": "^.*Firefox$",
+        "json": "firefox.json"
+    },
+    {
+        "name": "VS Code",
+        "regex": "^.*Visual Studio Code$",
+        "json": "vscode.json"
+    }
+]
