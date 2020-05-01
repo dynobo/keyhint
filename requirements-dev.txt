@@ -1,0 +1,12 @@
+
+-r requirements-prod.txt
+pytest
+pytest-cov
+flake8
+isort
+mypy
+pre-commit
+rope 
+black
+bumpversion
+twine
