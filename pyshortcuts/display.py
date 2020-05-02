@@ -1,23 +1,22 @@
 # standard
 import logging
+from typing import List
 
 # extra
 import PySimpleGUI as sg
 
 
 class Display:
-    layout = []
-
     def __init__(
         self,
-        title="Unknown",
-        keys=None,
-        theme="Black",
-        font_family=None,
-        font_size=14,
-        beautify=False,
-        bg_color=None,
-        text_color=None,
+        title: str = "Unknown",
+        keys: dict = None,
+        theme: str = "Black",
+        font_family: str = None,
+        font_size: int = 14,
+        beautify: bool = False,
+        bg_color: str = None,
+        text_color: str = None,
     ):
         self.logger = logging.getLogger(__name__)
 
@@ -38,7 +37,7 @@ class Display:
         self._create_layout(self.keys)
         self._show_window(self.keys["context"])
 
-    def _show_window(self, title):
+    def _show_window(self, title: str):
         self.window = sg.Window(
             title,
             self.layout,
@@ -57,7 +56,7 @@ class Display:
                 self.logger.debug("Event detected: '%s'", event)
         self.window.close()
 
-    def _create_layout(self, keys):
+    def _create_layout(self, keys: dict):
         self.layout = []
 
         # self.layout.append(
@@ -76,14 +75,14 @@ class Display:
             self.layout.append(layout_heading)
             self.layout.append(layout_keys)
 
-    def _create_layout_heading(self, text):
+    def _create_layout_heading(self, text: str) -> List[sg.Text]:
         if self.group_counter == 0:
             pad = (0, 0)
         else:
             pad = self.heading_pad
         return [sg.Text(text, font=self.heading_font, pad=pad)]
 
-    def _create_layout_keys(self, shortcuts):
+    def _create_layout_keys(self, shortcuts: dict) -> List[sg.Column]:
         left = []
         right = []
 
@@ -98,7 +97,7 @@ class Display:
 
         return [col_left, col_right]
 
-    def _beautify_keys(self, text):
+    def _beautify_keys(self, text: str) -> str:
         text = text.replace("up", "↑")
         text = text.replace("down", "↓")
         text = text.replace("left", "←")
