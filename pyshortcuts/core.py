@@ -6,6 +6,7 @@ import logging
 # Own
 from . import helpers
 from .shortcuts import Shortcuts
+from .display import Display
 
 __author__ = "dynobo"
 __email__ = "dynobo@mailbox.org"
@@ -19,9 +20,12 @@ def main():
     logger.info(
         "Active window name: '%s', active window class: '%s'", wm_name, wm_class
     )
-    shortcuts = Shortcuts()
-    keys = shortcuts.get_shortcuts(wm_name, wm_class)
-    logger.info("Current contexts' shortcuts:\n%s", keys)
+    shortcuts = Shortcuts(wm_name, wm_class)
+
+    display = Display(shortcuts.app["name"], shortcuts.keys)
+    display.show()
+
+    logger.info("Current contexts' shortcuts:\n%s", shortcuts.keys)
     return 0
 
 

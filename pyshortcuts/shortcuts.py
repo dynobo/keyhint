@@ -11,19 +11,16 @@ class Shortcuts:
     data_path = Path(__file__).parent.parent / "data"
     apps_index = {}
     app = {}
-    app_shortcuts = []
-    context_shortcuts = {}
+    keys = {}
 
-    def __init__(self):
+    def __init__(self, wm_name, wm_class):
         self.logger = logging.getLogger(__name__)
+
         with open(self.data_path / "index.json") as f:
             self.apps_index = json.load(f)
 
-    def get_shortcuts(self, wm_name, wm_class):
         self.app = self._get_app(wm_class)
-        self.app_shortcuts = self._get_app_shortcuts()
-        self.app_context_shortcuts = self._get_context_shortcuts(wm_name)
-        return self.app_context_shortcuts
+        self.keys = self._get_shortcuts(wm_name)
 
     def _get_app(self, wm_class):
         for app in self.apps_index:
@@ -37,11 +34,10 @@ class Shortcuts:
                 self.logger.debug("This application is not open!")
         return None
 
-    def _get_app_shortcuts(self):
+    def _get_shortcuts(self, wm_name):
         with open(self.data_path / self.app["json"]) as f:
-            return json.load(f)
+            self.app_shortcuts = json.load(f)
 
-    def _get_context_shortcuts(self, wm_name):
         for context in self.app_shortcuts:
             self.logger.debug(
                 "Applying regex '%s' for '%s'...",
