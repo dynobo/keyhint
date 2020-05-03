@@ -5,17 +5,17 @@ import os
 import subprocess
 
 # Own
-from ..data_model import ShortCutsData
+from ..data_model import HintsData
 from .abstract_handler import AbstractHandler
 
 
 class LoadIndexHandler(AbstractHandler):
-    def handle(self, request: ShortCutsData) -> ShortCutsData:
+    def handle(self, data: HintsData) -> HintsData:
         """Take multimon screenshots and add those images to session data.
 
         Arguments:
             AbstractHandler {class} -- self
-            request {NormcapData} -- NormCap's session data
+            data {NormcapData} -- NormCap's session data
 
         Returns:
             NormcapData -- Enriched NormCap's session data
@@ -23,11 +23,11 @@ class LoadIndexHandler(AbstractHandler):
         self._logger.debug("Loading index data...")
 
         # TODO: parametrize data_path
-        p = request.data_path / "index.json"
-        with open(request.data_path / "index.json") as f:
-            request.index = json.load(f)
+        p = data.data_path / "index.json"
+        with open(data.data_path / "index.json") as f:
+            data.index = json.load(f)
 
         if self._next_handler:
-            return super().handle(request)
+            return super().handle(data)
         else:
-            return request
+            return data

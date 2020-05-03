@@ -6,11 +6,11 @@ import logging
 # Own
 from . import helpers
 from .handlers.abstract_handler import AbstractHandler
-from .handlers.active_window_handler import ActiveWindowHandler
+from .handlers.detect_application_handler import DetectApplicationHandler
 from .handlers.load_index_handler import LoadIndexHandler
-from .handlers.load_shortcuts_handler import LoadShortcutsHandler
-from .handlers.show_window_handler import ShowWindowHandler
-from .data_model import ShortCutsData
+from .handlers.load_hints_handler import LoadHintsHandler
+from .handlers.show_hints_handler import ShowHintsHandler
+from .data_model import HintsData
 
 __author__ = "dynobo"
 __email__ = "dynobo@mailbox.org"
@@ -18,7 +18,7 @@ __repo__ = "https://github.com/dynobo/keyhint"
 __version__ = "0.1.0"
 
 
-def client_code(handler: AbstractHandler, data: ShortCutsData) -> ShortCutsData:
+def client_code(handler: AbstractHandler, data: HintsData) -> HintsData:
     """Wrapper around Chain of Responsibility classes.
 
     Arguments:
@@ -38,21 +38,21 @@ def main():
 
     try:
         # Central data model
-        data = ShortCutsData()
+        data = HintsData()
 
         # Define handlers
-        active_window = ActiveWindowHandler()
+        detect_application = DetectApplicationHandler()
         load_index = LoadIndexHandler()
-        load_shortcuts = LoadShortcutsHandler()
-        show_window = ShowWindowHandler()
+        load_hints = LoadHintsHandler()
+        show_hints = ShowHintsHandler()
 
         # Define chain of handlers
-        active_window.set_next(load_index).set_next(load_shortcuts).set_next(
-            show_window
+        detect_application.set_next(load_index).set_next(load_hints).set_next(
+            show_hints
         )
 
         # Run chain of handlers
-        data = client_code(active_window, data)
+        data = client_code(detect_application, data)
         logger.debug("Final Datamodel:%s", data)
 
     except Exception as error:
@@ -66,6 +66,7 @@ def main():
         )
         logger.error("If you do so, please include the information above.")
 
+    logger.info("Finished successfully.")
     return 0
 
 

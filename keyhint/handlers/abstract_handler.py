@@ -9,7 +9,7 @@ from typing import Any, Optional
 class Handler(abc.ABC):
     """
     The Handler interface declares a method for building the chain of handlers.
-    It also declares a method for executing a request.
+    It also declares a method for executing a data.
     """
 
     @abc.abstractmethod
@@ -17,7 +17,7 @@ class Handler(abc.ABC):
         """Define handler that is exectued next."""
 
     @abc.abstractmethod
-    def handle(self, request) -> Any:
+    def handle(self, data) -> Any:
         """Execute handler logic."""
 
 
@@ -36,8 +36,8 @@ class AbstractHandler(Handler):
         return handler
 
     @abc.abstractmethod
-    def handle(self, request: Any) -> Any:
+    def handle(self, data: Any) -> Any:
         if self._next_handler:
-            return self._next_handler.handle(request)
+            return self._next_handler.handle(data)
 
         return None

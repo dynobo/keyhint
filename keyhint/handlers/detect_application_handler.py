@@ -5,29 +5,29 @@ import subprocess
 import re
 
 # Own
-from ..data_model import ShortCutsData
+from ..data_model import HintsData
 from .abstract_handler import AbstractHandler
 
 
-class ActiveWindowHandler(AbstractHandler):
-    def handle(self, request: ShortCutsData) -> ShortCutsData:
+class DetectApplicationHandler(AbstractHandler):
+    def handle(self, data: HintsData) -> HintsData:
         """Take multimon screenshots and add those images to session data.
 
         Arguments:
             AbstractHandler {class} -- self
-            request {NormcapData} -- NormCap's session data
+            data {NormcapData} -- NormCap's session data
 
         Returns:
             NormcapData -- Enriched NormCap's session data
         """
         self._logger.debug("Detecting active window..")
 
-        request.wm_class, request.wm_name = self.get_active_window_info()
+        data.wm_class, data.wm_name = self.get_active_window_info()
 
         if self._next_handler:
-            return super().handle(request)
+            return super().handle(data)
         else:
-            return request
+            return data
 
     def get_active_window_info(self):
 

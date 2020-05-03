@@ -8,22 +8,22 @@ import re
 import PySimpleGUI as sg
 
 # Own
-from ..data_model import ShortCutsData
+from ..data_model import HintsData
 from .abstract_handler import AbstractHandler
 
 
-class ShowWindowHandler(AbstractHandler):
-    def handle(self, data: ShortCutsData) -> ShortCutsData:
+class ShowHintsHandler(AbstractHandler):
+    def handle(self, data: HintsData) -> HintsData:
         """Take multimon screenshots and add those images to session data.
 
         Arguments:
             AbstractHandler {class} -- self
-            request {NormcapData} -- NormCap's session data
+            data {NormcapData} -- NormCap's session data
 
         Returns:
             NormcapData -- Enriched NormCap's session data
         """
-        self._logger.debug("Loading index data...")
+        self._logger.info("Displaying hints...")
 
         self.data = data
         self._set_style()

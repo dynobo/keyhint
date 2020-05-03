@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 
 
 @dataclass()
-class ShortCutsData:
+class HintsData:
     """DataClass containing all information"""
 
     # Information about active info

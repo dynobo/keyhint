@@ -6,50 +6,50 @@ import subprocess
 import re
 
 # Own
-from ..data_model import ShortCutsData
+from ..data_model import HintsData
 from .abstract_handler import AbstractHandler
 
 
-class LoadShortcutsHandler(AbstractHandler):
-    def handle(self, request: ShortCutsData) -> ShortCutsData:
+class LoadHintsHandler(AbstractHandler):
+    def handle(self, data: HintsData) -> HintsData:
         """Take multimon screenshots and add those images to session data.
 
         Arguments:
             AbstractHandler {class} -- self
-            request {NormcapData} -- NormCap's session data
+            data {NormcapData} -- NormCap's session data
 
         Returns:
             NormcapData -- Enriched NormCap's session data
         """
         self._logger.debug("Loading index data...")
 
-        app = self._get_app(request)
-        request.app_name = app["name"]
-        request.app_wm_class_regex = app["wm_class"]
+        app = self._get_app(data)
+        data.app_name = app["name"]
+        data.app_wm_class_regex = app["wm_class"]
 
-        with open(request.data_path / app["json"]) as f:
+        with open(data.data_path / app["json"]) as f:
             app_shortcuts = json.load(f)
 
-        context = self._get_context_shortcuts(request.wm_name, app_shortcuts)
-        request.shortcuts = context["shortcuts"]
-        request.context_wm_name_regex = context["wm_name"]
-        request.context_name = context["context"]
+        context = self._get_context_shortcuts(data.wm_name, app_shortcuts)
+        data.shortcuts = context["shortcuts"]
+        data.context_wm_name_regex = context["wm_name"]
+        data.context_name = context["context"]
 
         if self._next_handler:
-            return super().handle(request)
+            return super().handle(data)
         else:
-            return request
+            return data
 
-    def _get_app(self, request):
-        for app in request.index:
+    def _get_app(self, data):
+        for app in data.index:
             self._logger.debug(
                 "Applying regex '%s' for '%s'...", app["wm_class"], app["name"]
             )
-            if re.search(app["wm_class"], request.wm_class):
-                self._logger.debug("'%s' is open!", app["name"])
+            if re.search(app["wm_class"], data.wm_class):
+                self._logger.info("Application '%s' is active...", app["name"])
                 return app
             else:
-                self._logger.debug("This application is not open!")
+                self._logger.debug("This application is not open...")
         return None
 
     def _get_context_shortcuts(self, wm_name, app_shortcuts):
@@ -60,7 +60,7 @@ class LoadShortcutsHandler(AbstractHandler):
                 context["context"],
             )
             if re.search(context["wm_name"], wm_name):
-                self._logger.debug("'%s' is active!", context["context"])
+                self._logger.info("Context '%s' is active...", context["context"])
                 return context
             else:
                 self._logger.debug("This context is not active!")
