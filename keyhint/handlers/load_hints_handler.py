@@ -24,16 +24,17 @@ class LoadHintsHandler(AbstractHandler):
         self._logger.debug("Loading index data...")
 
         app = self._get_app(data)
-        data.app_name = app["name"]
-        data.app_wm_class_regex = app["wm_class"]
+        if app:
+            data.app_name = app["name"]
+            data.app_wm_class_regex = app["wm_class"]
 
-        with open(data.data_path / app["json"]) as f:
-            app_shortcuts = json.load(f)
+            with open(data.data_path / app["json"]) as f:
+                app_shortcuts = json.load(f)
 
-        context = self._get_context_shortcuts(data.wm_name, app_shortcuts)
-        data.shortcuts = context["shortcuts"]
-        data.context_wm_name_regex = context["wm_name"]
-        data.context_name = context["context"]
+            context = self._get_context_shortcuts(data.wm_name, app_shortcuts)
+            data.shortcuts = context["shortcuts"]
+            data.context_wm_name_regex = context["wm_name"]
+            data.context_name = context["context"]
 
         if self._next_handler:
             return super().handle(data)

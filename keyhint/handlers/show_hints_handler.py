@@ -37,16 +37,14 @@ class ShowHintsHandler(AbstractHandler):
     def _set_style(self):
         # Add dunmy data in case app or context not found
         if not self.data.app_name:
-            self.data.app_name = {
-                "name": "Application unknown!",
-            }
+            self.data.app_name = "Application unknown!"
 
         if not self.data.shortcuts:
-            self.data.context_name = "No shortcuts found"
+            self.data.context_name = "no shortcuts found"
             self.data.shortcuts = {
                 "Properties of active Window": {
-                    "wm_class": self.wm_class,
-                    "wm_name": self.wm_name,
+                    "wm_class": self.data.wm_class,
+                    "wm_name": self.data.wm_name,
                 },
             }
 
