@@ -4,7 +4,7 @@
 import pytest
 
 # Own
-from .context import pyshortcuts
+from .context import keyhint
 
 
 def test_core_return_code():

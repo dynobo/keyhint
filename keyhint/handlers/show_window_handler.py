@@ -102,7 +102,7 @@ class ShowWindowHandler(AbstractHandler):
 
     def _show_window(self):
         self.window = sg.Window(
-            "PyShortCuts",
+            "keyhint",
             self.layout,
             return_keyboard_events=True,
             keep_on_top=True,

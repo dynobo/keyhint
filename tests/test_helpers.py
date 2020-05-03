@@ -4,9 +4,9 @@
 import pytest
 
 # Own
-from .context import pyshortcuts
+from .context import keyhint
 
 
 def test_helpers_get_something():
     """Does the function retrieve what's expected?"""
-    assert pyshortcuts.helpers.get_something() == "Hello You!"
+    assert keyhint.helpers.get_something() == "Hello You!"

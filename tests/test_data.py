@@ -6,7 +6,7 @@ import json
 import pytest
 
 # Own
-from .context import pyshortcuts
+from .context import keyhint
 
 data_path = Path(__file__).parent.parent / "data"
 

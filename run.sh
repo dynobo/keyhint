@@ -1,2 +1,2 @@
-cd /home/holger/Coding/pyshortcuts/
-.venv/bin/python -m pyshortcuts 2>&1 | tee run.log
+cd /home/holger/Coding/keyhint/
+.venv/bin/python -m keyhint 2>&1 | tee run.log

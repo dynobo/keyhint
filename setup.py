@@ -1,6 +1,6 @@
 # Standard
 from setuptools import setup, find_packages
-from pyshortcuts.core import __repo__, __version__, __author__, __email__
+from keyhint.core import __repo__, __version__, __author__, __email__
 
 with open("README.md") as f:
     readme = f.read()

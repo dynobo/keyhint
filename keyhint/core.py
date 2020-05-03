@@ -34,7 +34,7 @@ def client_code(handler: AbstractHandler, data: ShortCutsData) -> ShortCutsData:
 
 def main():
     logger = helpers.init_logging(__name__, logging.DEBUG, to_file=False)
-    logger.info("Starting pyshortcuts v%s ...", __version__)
+    logger.info("Starting keyhint v%s ...", __version__)
 
     try:
         # Central data model
@@ -60,7 +60,7 @@ def main():
         logger.error("Stacktrace:")
         logger.exception(error)
         logger.error("Datamodel on Error:%s", data)
-        logger.error("Pyshortcuts Version: %s", __version__)
+        logger.error("keyhint Version: %s", __version__)
         logger.error(
             "If you like, submit an error report on %s/issues .", __repo__,
         )
