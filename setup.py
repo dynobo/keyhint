@@ -1,5 +1,6 @@
 # Standard
 from setuptools import setup, find_packages
+from pyshortcuts.core import __repo__, __version__, __author__, __email__
 
 with open("README.md") as f:
     readme = f.read()
@@ -8,13 +9,13 @@ with open("LICENSE") as f:
     license = f.read()
 
 setup(
-    name="sample",
-    version="0.1.0",
+    name="keyhint",
+    version=__version__,
     description="Sample package",
     long_description=readme,
-    author="Dynobo",
-    author_email="dynobo@mailbox.org",
-    url="https://github.com/dynobo/.template-python-module",
+    author=__author__,
+    author_email=__email__,
+    url=__repo__,
     license=license,
-    packages=find_packages(exclude=("tests", "docs")),
+    packages=find_packages(exclude=("tests", "data")),
 )
