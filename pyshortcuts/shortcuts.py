@@ -20,7 +20,14 @@ class Shortcuts:
             self.apps_index = json.load(f)
 
         self.app = self._get_app(wm_class)
-        self.keys = self._get_shortcuts(wm_name)
+
+        if self.app:
+            self.keys = self._get_shortcuts(wm_name)
+        else:
+            self.keys = None
+
+        self.wm_class = wm_class
+        self.wm_name = wm_name
 
     def _get_app(self, wm_class):
         for app in self.apps_index:

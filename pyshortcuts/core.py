@@ -21,8 +21,7 @@ def main():
         "Active window name: '%s', active window class: '%s'", wm_name, wm_class
     )
     shortcuts = Shortcuts(wm_name, wm_class)
-
-    display = Display(shortcuts.app["name"], shortcuts.keys)
+    display = Display(shortcuts)
     display.show()
 
     logger.info("Current contexts' shortcuts:\n%s", shortcuts.keys)
