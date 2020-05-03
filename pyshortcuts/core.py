@@ -5,8 +5,6 @@ import logging
 
 # Own
 from . import helpers
-from .shortcuts import Shortcuts
-from .display import Display
 from .handlers.abstract_handler import AbstractHandler
 from .handlers.active_window_handler import ActiveWindowHandler
 from .handlers.load_index_handler import LoadIndexHandler
