@@ -14,6 +14,7 @@ from .data_model import ShortCutsData
 
 __author__ = "dynobo"
 __email__ = "dynobo@mailbox.org"
+__repo__ = "https://github.com/dynobo/keyhint"
 __version__ = "0.1.0"
 
 
@@ -35,18 +36,35 @@ def main():
     logger = helpers.init_logging(__name__, logging.DEBUG, to_file=False)
     logger.info("Starting pyshortcuts v%s ...", __version__)
 
-    # Central data model
-    data = ShortCutsData()
+    try:
+        # Central data model
+        data = ShortCutsData()
 
-    # Define handlers
-    active_window = ActiveWindowHandler()
-    load_index = LoadIndexHandler()
-    load_shortcuts = LoadShortcutsHandler()
-    show_window = ShowWindowHandler()
-    active_window.set_next(load_index).set_next(load_shortcuts).set_next(show_window)
+        # Define handlers
+        active_window = ActiveWindowHandler()
+        load_index = LoadIndexHandler()
+        load_shortcuts = LoadShortcutsHandler()
+        show_window = ShowWindowHandler()
 
-    data = client_code(active_window, data)
-    print(data)
+        # Define chain of handlers
+        active_window.set_next(load_index).set_next(load_shortcuts).set_next(
+            show_window
+        )
+
+        # Run chain of handlers
+        data = client_code(active_window, data)
+        logger.debug("Final Datamodel:%s", data)
+
+    except Exception as error:
+        logger.error("================ An error occured! ============")
+        logger.error("Stacktrace:")
+        logger.exception(error)
+        logger.error("Datamodel on Error:%s", data)
+        logger.error("Pyshortcuts Version: %s", __version__)
+        logger.error(
+            "If you like, submit an error report on %s/issues .", __repo__,
+        )
+        logger.error("If you do so, please include the information above.")
 
     return 0
 
