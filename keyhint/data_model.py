@@ -9,7 +9,12 @@ from dataclasses import dataclass, field
 
 @dataclass()
 class HintsData:
-    """DataClass containing all information"""
+    """DataClass containing all information.
+    
+    It is instantiated "empty" and enriched step by step, before
+    the final hint window is rendered based on it's attributes.
+
+    """
 
     # Information about active info
     wm_class: str = ""
@@ -35,7 +40,7 @@ class HintsData:
 
     style_theme: str = "dark"
     style_alpha: float = 0.7
-    style_font_family: str = None
+    style_font_family: str = ""
     style_font_base_size: int = 14
     style_max_rows: int = 20
 

@@ -1,5 +1,5 @@
 # Standard
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages  # type: ignore
 from keyhint.core import __repo__, __version__, __author__, __email__
 
 with open("README.md") as f:

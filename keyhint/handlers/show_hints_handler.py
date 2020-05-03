@@ -5,7 +5,7 @@ import subprocess
 import re
 
 # extra
-import PySimpleGUI as sg
+import PySimpleGUI as sg  # type: ignore
 
 # Own
 from ..data_model import HintsData

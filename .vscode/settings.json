@@ -1,3 +1,8 @@
 {
-    "python.pythonPath": ".venv/bin/python"
+    "python.pythonPath": ".venv/bin/python",
+    "python.linting.mypyEnabled": true,
+    "python.linting.mypyCategorySeverity.error": "Information",
+    "python.linting.mypyArgs": [
+        "--show-column-numbers"
+    ]
 }

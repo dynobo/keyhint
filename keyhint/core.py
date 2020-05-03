@@ -1,7 +1,7 @@
+"""Top level logic of keyhint. Entry point for module."""
+
 # Standard
 import logging
-
-# Extra
 
 # Own
 from . import helpers
@@ -12,6 +12,7 @@ from .handlers.load_hints_handler import LoadHintsHandler
 from .handlers.show_hints_handler import ShowHintsHandler
 from .data_model import HintsData
 
+# Basic information, e.g used in setup.py or in error report
 __author__ = "dynobo"
 __email__ = "dynobo@mailbox.org"
 __repo__ = "https://github.com/dynobo/keyhint"
@@ -22,17 +23,19 @@ def client_code(handler: AbstractHandler, data: HintsData) -> HintsData:
     """Wrapper around Chain of Responsibility classes.
 
     Arguments:
-        handler {Handler} -- Most outer handler
-        normcap_data {NormcapData} -- NormCap's session data
+        handler {AbstractHandler} -- Most outer handler
+        data {HintsData} -- keyhint's session data
 
     Returns:
-        NormcapData -- Enriched NormCap's session data
+        HintsData -- Keyhint's session data processed by handler
     """
     result = handler.handle(data)
     return result
 
 
 def main():
+    """Orchestrates the sequence of execution from start to end."""
+
     logger = helpers.init_logging(__name__, logging.DEBUG, to_file=False)
     logger.info("Starting keyhint v%s ...", __version__)
 
@@ -54,8 +57,10 @@ def main():
         # Run chain of handlers
         data = client_code(detect_application, data)
         logger.debug("Final Datamodel:%s", data)
+        logger.info("Finished successfully.")
 
     except Exception as error:
+        # Print useful information for reporting
         logger.error("================ An error occured! ============")
         logger.error("Stacktrace:")
         logger.exception(error)
@@ -65,9 +70,6 @@ def main():
             "If you like, submit an error report on %s/issues .", __repo__,
         )
         logger.error("If you do so, please include the information above.")
-
-    logger.info("Finished successfully.")
-    return 0
 
 
 if __name__ == "__main__":
