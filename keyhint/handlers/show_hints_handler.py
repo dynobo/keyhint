@@ -120,8 +120,8 @@ class ShowHintsHandler(AbstractHandler):
         temp_column = []
         column_counter = 0
 
-        # Loop over shortcut groups
-        for group, shortcuts in self.data.shortcuts.items():
+        # Loop over hint groups
+        for group, hints in self.data.hints.items():
 
             # Start fresh column, if less than 4 rows left
             if column_counter > self.data.style_max_rows - 4:
@@ -135,7 +135,7 @@ class ShowHintsHandler(AbstractHandler):
 
             # Append keys
             left, right = [], []
-            for key, desc in shortcuts.items():
+            for key, desc in hints.items():
 
                 # If row is full, append what's in column and switch to next column
                 if column_counter >= self.data.style_max_rows:

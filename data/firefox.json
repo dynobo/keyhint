@@ -2,7 +2,7 @@
     {
         "context": "All",
         "wm_name": ".*",
-        "shortcuts": {
+        "hints": {
             "Navigating UI": {
                 "Ctrl + 0": "Focus sidebar",
                 "Ctrl + 1": "Focus editor 1",

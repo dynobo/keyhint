@@ -27,21 +27,25 @@ class LoadHintsHandler(AbstractHandler):
 
         """
         self._logger.debug("Loading index data...")
-
         self.data = data
+
+        # Try to find active window in app index json
         app = self._get_app()
+
+        # if found, update in data object
         if app:
             self.data.app_name = app["name"]
             self.data.app_wm_class_regex = app["wm_class"]
 
             with open(self.data.data_path / app["json"]) as file:
-                app_shortcuts = json.load(file)
+                app_hints = json.load(file)
 
-            context = self._get_context_shortcuts(self.data.wm_name, app_shortcuts)
-            self.data.shortcuts = context["shortcuts"]
+            context = self._get_context_hints(self.data.wm_name, app_hints)
+            self.data.hints = context["hints"]
             self.data.context_wm_name_regex = context["wm_name"]
             self.data.context_name = context["context"]
 
+        # replace missing data, in case app or context wasn't found
         self._replace_data_if_unkown()
 
         if self._next_handler:
@@ -60,9 +64,9 @@ class LoadHintsHandler(AbstractHandler):
             self._logger.debug("This application is not open...")
         return {}
 
-    def _get_context_shortcuts(self, wm_name, app_shortcuts):
+    def _get_context_hints(self, wm_name: str, app_hints: dict) -> dict:
         """Identify active context by comparing wm_name to regex in hints file."""
-        for context in app_shortcuts:
+        for context in app_hints:
             self._logger.debug(
                 "Applying regex '%s' for '%s'...",
                 context["wm_name"],
@@ -72,22 +76,22 @@ class LoadHintsHandler(AbstractHandler):
                 self._logger.info("Context '%s' is active...", context["context"])
                 return context
             self._logger.debug("This context is not active!")
-        return None
+        return {}
 
     def _replace_data_if_unkown(self):
         """Replace missing hint information with useful message.
 
         If no hints are found, the app/context to display is replaced
-        by a "Not Found" message and instead of shortcuts, the window
+        by a "Not Found" message and instead of hints, the window
         information is added.
 
         """
         if not self.data.app_name:
             self.data.app_name = "Application unknown!"
 
-        if not self.data.shortcuts:
-            self.data.context_name = "no shortcuts found"
-            self.data.shortcuts = {
+        if not self.data.hints:
+            self.data.context_name = "no hints found"
+            self.data.hints = {
                 "Properties of active Window": {
                     "wm_class": self.data.wm_class,
                     "wm_name": self.data.wm_name,

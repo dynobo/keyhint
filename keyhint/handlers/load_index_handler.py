@@ -1,8 +1,5 @@
 """Handler responsible for attaching screenshot(s) to session data."""
 
-# TODO: Docstrings
-# TODO: Types
-
 # Standard
 import json
 
@@ -12,23 +9,25 @@ from .abstract_handler import AbstractHandler
 
 
 class LoadIndexHandler(AbstractHandler):
+    """Load app index from json into central data object."""
+
     def handle(self, data: HintsData) -> HintsData:
         """Take multimon screenshots and add those images to session data.
 
-        Arguments:
+        Arguments
             AbstractHandler {class} -- self
             data {NormcapData} -- NormCap's session data
 
-        Returns:
+        Returns
             NormcapData -- Enriched NormCap's session data
+
         """
         self._logger.debug("Loading index data...")
 
         # TODO: parametrize data_path
-        with open(data.data_path / "index.json") as f:
-            data.index = json.load(f)
+        with open(data.data_path / "index.json") as file:
+            data.index = json.load(file)
 
         if self._next_handler:
             return super().handle(data)
-        else:
-            return data
+        return data

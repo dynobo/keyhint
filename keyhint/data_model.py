@@ -36,9 +36,9 @@ class HintsData:
     context_name: str = ""
     context_wm_name_regex: str = ""
 
-    # Contains grouped shortcuts, organized like
+    # Contains grouped hints, organized like
     # {group_a: {keys_1: description_1, keys_2: desc...}, group_b {...}, ...},
-    shortcuts: dict = field(default_factory=dict)
+    hints: dict = field(default_factory=dict)
 
     # Control visual appearance of hint
     style_theme: str = "dark"
@@ -66,7 +66,7 @@ class HintsData:
                 string += f"{attr}: \n"
                 for elem in getattr(self, attr):
                     string += f"  {elem}\n"
-            elif attr == "shortcuts":
+            elif attr == "hints":
                 string += f"{attr}:\n"
                 for group, keys in getattr(self, attr).items():
                     string += f"  {group}:\n"
