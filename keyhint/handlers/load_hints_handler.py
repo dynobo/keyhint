@@ -6,6 +6,7 @@ import re
 
 # Own
 from ..data_model import HintsData
+from .. import helpers
 from .abstract_handler import AbstractHandler
 
 
@@ -41,9 +42,10 @@ class LoadHintsHandler(AbstractHandler):
                 app_hints = json.load(file)
 
             context = self._get_context_hints(self.data.wm_name, app_hints)
-            self.data.hints = context["hints"]
-            self.data.context_wm_name_regex = context["wm_name"]
-            self.data.context_name = context["context"]
+            if context:
+                self.data.hints = context["hints"]
+                self.data.context_wm_name_regex = context["wm_name"]
+                self.data.context_name = context["context"]
 
         # replace missing data, in case app or context wasn't found
         self._replace_data_if_unkown()
@@ -91,6 +93,9 @@ class LoadHintsHandler(AbstractHandler):
 
         if not self.data.hints:
             self.data.context_name = "no hints found"
+
+            self.data.wm_name = helpers.remove_emojis(self.data.wm_name)
+
             self.data.hints = {
                 "Properties of active Window": {
                     "wm_class": self.data.wm_class,
