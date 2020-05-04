@@ -1,5 +1,4 @@
 """Define Abstract (base) handler for Chain of Responsibility Handlers."""
-# TODO: Can I move the next/return logic from individual handlers into AbstarctHandler?
 
 # Default
 import abc
