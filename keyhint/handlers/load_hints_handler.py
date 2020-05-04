@@ -1,8 +1,7 @@
 """Handler responsible for attaching screenshot(s) to session data."""
+
 # Standard
 import json
-import os
-import subprocess
 import re
 
 # Own
@@ -11,49 +10,58 @@ from .abstract_handler import AbstractHandler
 
 
 class LoadHintsHandler(AbstractHandler):
+    """Reads information from application specific json file."""
+
+    # Container for data object
+    data: HintsData
+
     def handle(self, data: HintsData) -> HintsData:
         """Take multimon screenshots and add those images to session data.
 
-        Arguments:
+        Arguments
             AbstractHandler {class} -- self
             data {NormcapData} -- NormCap's session data
 
-        Returns:
+        Returns
             NormcapData -- Enriched NormCap's session data
+
         """
         self._logger.debug("Loading index data...")
 
-        app = self._get_app(data)
+        self.data = data
+        app = self._get_app()
         if app:
-            data.app_name = app["name"]
-            data.app_wm_class_regex = app["wm_class"]
+            self.data.app_name = app["name"]
+            self.data.app_wm_class_regex = app["wm_class"]
 
-            with open(data.data_path / app["json"]) as f:
-                app_shortcuts = json.load(f)
+            with open(self.data.data_path / app["json"]) as file:
+                app_shortcuts = json.load(file)
 
-            context = self._get_context_shortcuts(data.wm_name, app_shortcuts)
-            data.shortcuts = context["shortcuts"]
-            data.context_wm_name_regex = context["wm_name"]
-            data.context_name = context["context"]
+            context = self._get_context_shortcuts(self.data.wm_name, app_shortcuts)
+            self.data.shortcuts = context["shortcuts"]
+            self.data.context_wm_name_regex = context["wm_name"]
+            self.data.context_name = context["context"]
+
+        self._replace_data_if_unkown()
 
         if self._next_handler:
-            return super().handle(data)
-        else:
-            return data
+            return super().handle(self.data)
+        return self.data
 
-    def _get_app(self, data):
-        for app in data.index:
+    def _get_app(self) -> dict:
+        """Identify active application by comparing wm_class to regex in index file."""
+        for app in self.data.index:
             self._logger.debug(
                 "Applying regex '%s' for '%s'...", app["wm_class"], app["name"]
             )
-            if re.search(app["wm_class"], data.wm_class):
+            if re.search(app["wm_class"], self.data.wm_class):
                 self._logger.info("Application '%s' is active...", app["name"])
                 return app
-            else:
-                self._logger.debug("This application is not open...")
-        return None
+            self._logger.debug("This application is not open...")
+        return {}
 
     def _get_context_shortcuts(self, wm_name, app_shortcuts):
+        """Identify active context by comparing wm_name to regex in hints file."""
         for context in app_shortcuts:
             self._logger.debug(
                 "Applying regex '%s' for '%s'...",
@@ -63,6 +71,25 @@ class LoadHintsHandler(AbstractHandler):
             if re.search(context["wm_name"], wm_name):
                 self._logger.info("Context '%s' is active...", context["context"])
                 return context
-            else:
-                self._logger.debug("This context is not active!")
+            self._logger.debug("This context is not active!")
         return None
+
+    def _replace_data_if_unkown(self):
+        """Replace missing hint information with useful message.
+
+        If no hints are found, the app/context to display is replaced
+        by a "Not Found" message and instead of shortcuts, the window
+        information is added.
+
+        """
+        if not self.data.app_name:
+            self.data.app_name = "Application unknown!"
+
+        if not self.data.shortcuts:
+            self.data.context_name = "no shortcuts found"
+            self.data.shortcuts = {
+                "Properties of active Window": {
+                    "wm_class": self.data.wm_class,
+                    "wm_name": self.data.wm_name,
+                },
+            }

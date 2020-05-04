@@ -3,18 +3,20 @@
 # Default
 import platform
 from pathlib import Path
-from typing import Optional
 from dataclasses import dataclass, field
 
 
 @dataclass()
 class HintsData:
     """DataClass containing all information.
-    
+
     It is instantiated "empty" and enriched step by step, before
     the final hint window is rendered based on it's attributes.
 
     """
+
+    # Many attributes are fina for a data class
+    # pylint: disable=too-many-instance-attributes
 
     # Information about active info
     wm_class: str = ""
@@ -38,6 +40,7 @@ class HintsData:
     # {group_a: {keys_1: description_1, keys_2: desc...}, group_b {...}, ...},
     shortcuts: dict = field(default_factory=dict)
 
+    # Control visual appearance of hint
     style_theme: str = "dark"
     style_alpha: float = 0.7
     style_font_family: str = ""
@@ -45,17 +48,21 @@ class HintsData:
     style_max_rows: int = 20
 
     def __repr__(self):
-        """
-        Returns:
+        """Create string representation of dataclass.
+
+        Returns
             str -- Representation of class
+
         """
         string = f"\n{'='*20} <dataclass> {'='*20}\n"
 
         for attr in dir(self):
-            # Skip internal classes
+            # Skip internal attributes
             if attr.startswith("_"):
                 continue
-            elif attr == "index":
+
+            # Convert other attributes to strings
+            if attr == "index":
                 string += f"{attr}: \n"
                 for elem in getattr(self, attr):
                     string += f"  {elem}\n"
@@ -72,6 +79,6 @@ class HintsData:
         return string
 
     @property
-    def os(self) -> str:
-        """ Returns either 'Linux', 'Darwin' or 'Windows' """
+    def platform_os(self) -> str:
+        """Return either 'Linux', 'Darwin' or 'Windows'."""
         return platform.system()

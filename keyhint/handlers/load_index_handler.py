@@ -1,8 +1,10 @@
 """Handler responsible for attaching screenshot(s) to session data."""
+
+# TODO: Docstrings
+# TODO: Types
+
 # Standard
 import json
-import os
-import subprocess
 
 # Own
 from ..data_model import HintsData
@@ -23,7 +25,6 @@ class LoadIndexHandler(AbstractHandler):
         self._logger.debug("Loading index data...")
 
         # TODO: parametrize data_path
-        p = data.data_path / "index.json"
         with open(data.data_path / "index.json") as f:
             data.index = json.load(f)
 

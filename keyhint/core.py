@@ -20,22 +20,22 @@ __version__ = "0.1.0"
 
 
 def client_code(handler: AbstractHandler, data: HintsData) -> HintsData:
-    """Wrapper around Chain of Responsibility classes.
+    """Wrap Chain of Responsibility classes.
 
-    Arguments:
+    Arguments
         handler {AbstractHandler} -- Most outer handler
         data {HintsData} -- keyhint's session data
 
-    Returns:
+    Returns
         HintsData -- Keyhint's session data processed by handler
+
     """
-    result = handler.handle(data)
-    return result
+    data = handler.handle(data)
+    return data
 
 
 def main():
     """Orchestrates the sequence of execution from start to end."""
-
     logger = helpers.init_logging(__name__, logging.DEBUG, to_file=False)
     logger.info("Starting keyhint v%s ...", __version__)
 
@@ -59,7 +59,7 @@ def main():
         logger.debug("Final Datamodel:%s", data)
         logger.info("Finished successfully.")
 
-    except Exception as error:
+    except Exception as error:  # noqa
         # Print useful information for reporting
         logger.error("================ An error occured! ============")
         logger.error("Stacktrace:")

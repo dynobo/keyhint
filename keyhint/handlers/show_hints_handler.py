@@ -1,8 +1,4 @@
 """Handler responsible for attaching screenshot(s) to session data."""
-# Standard
-import os
-import subprocess
-import re
 
 # extra
 import PySimpleGUI as sg  # type: ignore
@@ -13,92 +9,95 @@ from .abstract_handler import AbstractHandler
 
 
 class ShowHintsHandler(AbstractHandler):
+    """Display hints in own window."""
+
+    # Container for data object
+    data: HintsData
+
+    # Container for style info
+    style: dict = {}
+
+    # pySimplyGUI Window object
+    window: sg.Window
+
+    # Will contain the elements to be layed ou in window
+    layout: list = []
+
     def handle(self, data: HintsData) -> HintsData:
         """Take multimon screenshots and add those images to session data.
 
-        Arguments:
+        Arguments
             AbstractHandler {class} -- self
             data {NormcapData} -- NormCap's session data
 
-        Returns:
+        Returns
             NormcapData -- Enriched NormCap's session data
+
         """
         self._logger.info("Displaying hints...")
 
         self.data = data
+
         self._set_style()
         self.show()
 
         if self._next_handler:
             return super().handle(data)
-        else:
-            return data
+        return data
 
     def _set_style(self):
-        # Add dunmy data in case app or context not found
-        if not self.data.app_name:
-            self.data.app_name = "Application unknown!"
-
-        if not self.data.shortcuts:
-            self.data.context_name = "no shortcuts found"
-            self.data.shortcuts = {
-                "Properties of active Window": {
-                    "wm_class": self.data.wm_class,
-                    "wm_name": self.data.wm_name,
-                },
-            }
-
-        # Theme & Styling
-        # ==============================================
+        """Configure style for window."""
         if self.data.style_theme.lower() == "dark":
             sg.theme("Black")
-            self.bg_color = "black"
-            self.text_color = "white"
+            self.style["bg_color"] = "black"
+            self.style["text_color"] = "white"
         else:
             sg.theme("Default")
-            self.bg_color = "white"
-            self.text_color = "black"
+            self.style["bg_color"] = "white"
+            self.style["text_color"] = "black"
 
-        sg.theme_background_color(self.bg_color)
-        sg.theme_element_background_color(self.bg_color)
-        sg.theme_text_color(self.text_color)
+        sg.theme_background_color(self.style["bg_color"])
+        sg.theme_element_background_color(self.style["bg_color"])
+        sg.theme_text_color(self.style["text_color"])
 
-        self.titel_format = {
+        self.style["title_format"] = {
             "font": (
                 self.data.style_font_family,
                 int(self.data.style_font_base_size * 1.4),
             ),
-            "background_color": self.bg_color,
+            "background_color": self.style["bg_color"],
         }
-        self.group_title_format = {
+        self.style["group_title_format"] = {
             "font": (
                 self.data.style_font_family,
                 int(self.data.style_font_base_size * 1.125),
             ),
-            "background_color": self.bg_color,
+            "background_color": self.style["bg_color"],
             "pad": ((0, 0), (int(self.data.style_font_base_size * 0.75), 0)),
         }
-        self.text_format = {
+        self.style["text_format"] = {
             "font": (
                 self.data.style_font_family,
                 int(self.data.style_font_base_size * 0.85),
             ),
-            "background_color": self.bg_color,
+            "background_color": self.style["bg_color"],
         }
-        self.bold_text_format = {
+        self.style["bold_text_format"] = {
             "font": (
                 self.data.style_font_family,
                 int(self.data.style_font_base_size * 0.85),
                 "bold",
             ),
-            "background_color": self.bg_color,
+            "background_color": self.style["bg_color"],
         }
 
     def show(self):
+        """Create layout of elements and display them in window."""
         self._create_layout()
         self._show_window()
 
     def _show_window(self):
+        """Display the window, close on Esc or any other key."""
         self.window = sg.Window(
             "keyhint",
             self.layout,
@@ -110,7 +109,7 @@ class ShowHintsHandler(AbstractHandler):
             finalize=True,
         )
         while True:
-            event, values = self.window.read()
+            event, _ = self.window.read()
             if event in ["Escape:9"]:
                 break
         self.window.close()
@@ -131,7 +130,7 @@ class ShowHintsHandler(AbstractHandler):
                 column_counter = 0
 
             # Append group title
-            temp_column.append([sg.Text(group, **self.group_title_format)])
+            temp_column.append([sg.Text(group, **self.style["group_title_format"])])
             column_counter += 1
 
             # Append keys
@@ -145,8 +144,8 @@ class ShowHintsHandler(AbstractHandler):
                     temp_column, left, right = [], [], []
                     column_counter = 0
 
-                left.append([sg.Text(key, **self.bold_text_format)])
-                right.append([sg.Text(desc, **self.text_format)])
+                left.append([sg.Text(key, **self.style["bold_text_format"])])
+                right.append([sg.Text(desc, **self.style["text_format"])])
                 column_counter += 1
 
             temp_column.append([sg.Column(left), sg.Column(right)])
@@ -167,6 +166,8 @@ class ShowHintsHandler(AbstractHandler):
     def _create_layout_title(self):
         title = self.data.app_name + " (" + self.data.context_name + ")"
         layout = [
-            sg.Text(title, pad=(0, 0), justification="right", **self.titel_format),
+            sg.Text(
+                title, pad=(0, 0), justification="right", **self.style["title_format"]
+            ),
         ]
         return layout
