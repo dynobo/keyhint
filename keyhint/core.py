@@ -7,7 +7,6 @@ import logging
 from . import helpers
 from .handlers.abstract_handler import AbstractHandler
 from .handlers.detect_application_handler import DetectApplicationHandler
-from .handlers.load_index_handler import LoadIndexHandler
 from .handlers.load_hints_handler import LoadHintsHandler
 from .handlers.show_hints_handler import ShowHintsHandler
 from .data_model import HintsData
@@ -45,14 +44,12 @@ def main():
 
         # Define handlers
         detect_application = DetectApplicationHandler()
-        load_index = LoadIndexHandler()
+        # load_index = LoadIndexHandler()
         load_hints = LoadHintsHandler()
         show_hints = ShowHintsHandler()
 
         # Define chain of handlers
-        detect_application.set_next(load_index).set_next(load_hints).set_next(
-            show_hints
-        )
+        detect_application.set_next(load_hints).set_next(show_hints)
 
         # Run chain of handlers
         data = client_code(detect_application, data)

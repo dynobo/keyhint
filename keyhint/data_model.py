@@ -45,7 +45,7 @@ class HintsData:
     style_alpha: float = 0.7
     style_font_family: str = ""
     style_font_base_size: int = 14
-    style_max_rows: int = 20
+    style_max_rows: int = 15
 
     def __repr__(self):
         """Create string representation of dataclass.
