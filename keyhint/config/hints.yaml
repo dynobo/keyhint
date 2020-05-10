@@ -1,11 +1,10 @@
 applications:
-
-# VISUAL STUDIO CODE
-# ---------------------------
+  # VISUAL STUDIO CODE
+  # ---------------------------
   - app_name: VS Code
     wm_class: code
     contexts:
-      - context_name: All
+      - context_name: Default
         wm_name_regex: .*
         hints:
           Navigating UI:
@@ -25,7 +24,7 @@ applications:
             Ctrl+ Alt + Shift + Up/Down: Duplicate line
             Shift + Alt + Left/Right: Expand/shrink selection
             Ctrl + h: Search and replace
-          
+
           Language Editing:
             Ctrl + Space: Trigger IntelliSense and Hint
             Ctrl + Shift + o: Search and jump to symbol
@@ -46,8 +45,8 @@ applications:
             Ctrl + Tab: Switch between tabs
             Ctrl + p: Quick open file
 
-# FIREFOX BROWSER
-# ---------------------------
+  # FIREFOX BROWSER
+  # ---------------------------
   - app_name: Firefox
     wm_class: Firefox
     contexts:
@@ -75,7 +74,7 @@ applications:
             i: Toggle comments on diffs
             b: Open blame view
 
-      - context_name: All
+      - context_name: Default
         wm_name_regex: .*
         hints:
           URL Navigation:
@@ -113,24 +112,24 @@ applications:
           Vimium - Tabs:
             t: Create new tab
             J, K: Next/previous tab
-            yt: Duplicate tab 
+            yt: Duplicate tab
             x: Close tab
             X: Undo close tab
             W: Move tab to new window
 
-# GNOME TERMINAL
-# ---------------------------
+  # GNOME TERMINAL
+  # ---------------------------
   - app_name: Terminal
     wm_class: gnome-terminal
     contexts:
-      - context_name: All
+      - context_name: Default
         wm_name_regex: .*
         hints:
           Navigating:
             pwd: Print working dir
             cd: Change to home dir
             cd -: Change to previous dir
-            
+
           History:
             history | grep <term>: Search for "<term>"
             history 10: Print last 10 cmds
