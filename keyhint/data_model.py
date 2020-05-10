@@ -42,10 +42,10 @@ class HintsData:
 
     # Control visual appearance of hint
     style_theme: str = "dark"
-    style_alpha: float = 0.7
+    style_alpha: float = 0.85
     style_font_family: str = ""
     style_font_base_size: int = 14
-    style_max_rows: int = 15
+    style_max_rows: int = 20
 
     def __repr__(self):
         """Create string representation of dataclass.
