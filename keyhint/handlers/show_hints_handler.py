@@ -27,11 +27,6 @@ class HintsWindow(Frame):
         self.data = data
 
         self.pack(side="top", fill="both", expand="yes")
-        # get screen width and height
-        # ws = master.winfo_screenwidth()
-        # hs = master.winfo_screenheight()
-
-        # self.master.geometry("%dx%d+%d+%d" % (w, h, x, y))
         self.lift()
 
         self._set_style()
@@ -82,9 +77,13 @@ class HintsWindow(Frame):
         title.grid(column=0, columnspan=max_cols, row=0)
         print(max_cols)
 
-    def _create_group_title_row(self, column, group):
+    def _create_group_title_row(self, column, row, group):
+        if row == 1:
+            pady = (0, 5)
+        else:
+            pady = (15, 5)
         group_title = Label(column, text=group)
-        group_title.grid(column=0, columnspan=2, pady=(15, 5), padx=0, sticky="W")
+        group_title.grid(column=0, columnspan=2, pady=pady, padx=0, sticky="W")
         group_title.config(**self.style["group_title_format"])
 
     def _create_key_desc_row(self, col, key, desc):
@@ -115,7 +114,7 @@ class HintsWindow(Frame):
             if self.current_row > self.data.style_max_rows - 4:
                 column = self._create_new_column()
             # Append group title
-            self._create_group_title_row(column, group)
+            self._create_group_title_row(column, self.current_row, group)
             self.current_row += 1
 
             # Append keys
@@ -155,7 +154,7 @@ class ShowHintsHandler(AbstractHandler):
         root = Tk(className="keyhint")
         root.title("keyhint")
 
-        _ = HintsWindow(root, data)
+        _ = HintsWindow(root, self.data)
 
         def on_event(_):
             root.destroy()
@@ -164,7 +163,7 @@ class ShowHintsHandler(AbstractHandler):
         root.bind_all("<Key>", on_event)
 
         root.wait_visibility(root)
-        root.attributes("-alpha", 0.6)
+        root.attributes("-alpha",self.data.style_alpha)
 
         root.mainloop()
 

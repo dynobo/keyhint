@@ -29,7 +29,7 @@ class LoadHintsHandler(AbstractHandler):
             NormcapData -- Enriched NormCap's session data
 
         """
-        self._logger.debug("Loading index data...")
+        self._logger.debug("Loading hints data...")
         self.data = data
 
         # Load hints for all applications from yaml file
@@ -40,7 +40,7 @@ class LoadHintsHandler(AbstractHandler):
 
         # if found, update in data object
         if self.app_hints:
-            self.data.app_name = self.app_hints["name"]
+            self.data.app_name = self.app_hints["app_name"]
             self.data.app_wm_class_regex = self.app_hints["wm_class"]
 
             # and try to find app context
@@ -50,7 +50,7 @@ class LoadHintsHandler(AbstractHandler):
             if context:
                 self.data.hints = context["hints"]
                 self.data.context_wm_name_regex = context["wm_name_regex"]
-                self.data.context_name = context["name"]
+                self.data.context_name = context["context_name"]
 
         # replace missing data, in case app or context wasn't found
         self._replace_data_if_unkown()
@@ -73,10 +73,14 @@ class LoadHintsHandler(AbstractHandler):
         """Identify active application by searching wm_class in all hints."""
         for app_hints in self.hints["applications"]:
             self._logger.debug(
-                "Checking '%s' of '%s'...", app_hints["wm_class"], app_hints["name"],
+                "Checking '%s' of '%s'...",
+                app_hints["wm_class"],
+                app_hints["app_name"],
             )
             if app_hints["wm_class"].lower() == self.data.wm_class.lower():
-                self._logger.info("Application '%s' is active...", app_hints["name"])
+                self._logger.info(
+                    "Application '%s' is active...", app_hints["app_name"]
+                )
                 return app_hints
             self._logger.debug("This application is not open...")
         return {}
@@ -87,10 +91,10 @@ class LoadHintsHandler(AbstractHandler):
             self._logger.debug(
                 "Applying regex '%s' for '%s'...",
                 context["wm_name_regex"],
-                context["name"],
+                context["context_name"],
             )
             if re.search(context["wm_name_regex"], self.data.context_wm_name_regex):
-                self._logger.info("Context '%s' is active...", context["name"])
+                self._logger.info("Context '%s' is active...", context["context_name"])
                 return context
             self._logger.debug("This context is not active!")
         return {}

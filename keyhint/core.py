@@ -44,7 +44,6 @@ def main():
 
         # Define handlers
         detect_application = DetectApplicationHandler()
-        # load_index = LoadIndexHandler()
         load_hints = LoadHintsHandler()
         show_hints = ShowHintsHandler()
 
