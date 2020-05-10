@@ -5,7 +5,9 @@ import logging
 import os
 import subprocess
 import re
-from typing import Tuple
+import platform
+from typing import Tuple, Union
+from pathlib import Path
 
 
 def init_logging(
@@ -123,3 +125,31 @@ def test_for_wayland():
     if "WAYLAND_DISPLAY" in os.environ:
         result = True
     return result
+
+
+def get_users_config_path() -> Union[Path, None]:
+    """Retrieve path for config files.
+
+    Returns
+        Path -- Root of config folder
+
+    """
+    platform_sytem = platform.system()  #'Linux', 'Darwin' or 'Windows'
+
+    config_path: Union[Path, None] = None
+
+    if platform_sytem == "Linux":
+        xdg_conf = os.getenv("XDG_CONFIG_HOME", None)
+        xdg_home = os.getenv("HOME", None)
+        if xdg_conf:
+            config_path = Path(xdg_conf)
+        elif xdg_home:
+            config_path = Path(xdg_home) / ".config"
+
+    elif platform_sytem == "Darwin":
+        pass
+
+    elif platform_sytem == "Windows":
+        pass
+
+    return config_path

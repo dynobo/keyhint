@@ -4,6 +4,7 @@
 import platform
 from pathlib import Path
 from dataclasses import dataclass, field
+from typing import Union
 
 
 @dataclass()
@@ -12,7 +13,6 @@ class HintsData:
 
     It is instantiated "empty" and enriched step by step, before
     the final hint window is rendered based on it's attributes.
-
     """
 
     # Many attributes are fina for a data class
@@ -23,10 +23,7 @@ class HintsData:
     wm_name: str = ""
 
     # Set data Path
-    data_path = Path(__file__).parent.parent / "data"
-
-    # Index of available applications
-    index: dict = field(default_factory=dict)
+    config_path: Union[Path, None] = None
 
     # Currently detected 'application' (based on regex on wm_class)
     app_name: str = ""
@@ -40,19 +37,14 @@ class HintsData:
     # {group_a: {keys_1: description_1, keys_2: desc...}, group_b {...}, ...},
     hints: dict = field(default_factory=dict)
 
-    # Control visual appearance of hint
-    style_theme: str = "dark"
-    style_alpha: float = 0.85
-    style_font_family: str = ""
-    style_font_base_size: int = 14
-    style_max_rows: int = 20
+    # Contains information from yaml config, about behavior and look
+    config: dict = field(default_factory=dict)
 
     def __repr__(self):
         """Create string representation of dataclass.
 
-        Returns
-            str -- Representation of class
-
+        Returns:
+            str: Representation of class
         """
         string = f"\n{'='*20} <dataclass> {'='*20}\n"
 

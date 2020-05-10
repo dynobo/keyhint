@@ -18,10 +18,9 @@ class HintsWindow(Frame):
     def __init__(self, master: Tk, data: HintsData):
         """Receive tk and data to show.
 
-        Arguments:
-            master {Tk} -- Tk root window
-            data {Hintsdata} -- central data object
-
+        Args:
+            master (Tk): Root window object
+            data (HintsData): Central data object
         """
         Frame.__init__(self, master)
         self.data = data
@@ -34,40 +33,44 @@ class HintsWindow(Frame):
 
     def _set_style(self):
         """Configure style for window."""
-        font_family = self.data.style_font_family
-        font_size = self.data.style_font_base_size
+        style: dict = self.data.config["style"]
 
-        if self.data.style_theme.lower() == "dark":
-            self.style["bg_color"] = "black"
-            self.style["text_color"] = "white"
-        else:
-            self.style["bg_color"] = "white"
-            self.style["text_color"] = "black"
+        # Fallback to defaults, if missing
+        font_family = style.get("font_family", "")
+        font_base_size = style.get("font_base_size", 16)
+        background_color = style.get("background_color", "black")
+        title_color = style.get("title_color", "white")
+        group_title_color = style.get("group_title_color", "white")
+        description_color = style.get("description_color", "white")
+        keys_color = style.get("description_color", "white")
 
-        self.config(bg=self.style["bg_color"])
+        # Window Background
+        self.style["background_color"] = background_color
+        self.config(bg=background_color)
 
+        # Font Styles
         self.style["title_format"] = {
-            "font": (font_family, int(font_size * 1.4),),
-            "fg": self.style["text_color"],
-            "bg": self.style["bg_color"],
+            "font": (font_family, int(font_base_size * 1.4),),
+            "fg": title_color,
+            "bg": background_color,
             "justify": "center",
         }
         self.style["group_title_format"] = {
-            "font": (font_family, int(font_size * 1.125),),
-            "bg": self.style["bg_color"],
-            "fg": self.style["text_color"],
+            "font": (font_family, int(font_base_size * 1.125),),
+            "bg": background_color,
+            "fg": group_title_color,
             "justify": "left",
         }
         self.style["text_format"] = {
-            "font": (font_family, int(font_size * 0.85),),
-            "bg": self.style["bg_color"],
-            "fg": self.style["text_color"],
+            "font": (font_family, int(font_base_size * 0.85),),
+            "bg": background_color,
+            "fg": description_color,
             "justify": "left",
         }
         self.style["bold_text_format"] = {
-            "font": (font_family, int(font_size * 0.85), "bold",),
-            "bg": self.style["bg_color"],
-            "fg": self.style["text_color"],
+            "font": (font_family, int(font_base_size * 0.85), "bold",),
+            "bg": background_color,
+            "fg": keys_color,
             "justify": "left",
         }
 
@@ -87,16 +90,16 @@ class HintsWindow(Frame):
         group_title.config(**self.style["group_title_format"])
 
     def _create_key_desc_row(self, col, key, desc):
-        key = Label(col, text=key)
-        key.grid(column=0, row=self.current_row, sticky="W", padx=15, pady=2)
-        key.config(**self.style["bold_text_format"])
-
         desc = Label(col, text=desc)
-        desc.grid(column=1, row=self.current_row, sticky="W", padx=15, pady=2)
+        desc.grid(column=0, row=self.current_row, sticky="W", padx=15, pady=2)
         desc.config(**self.style["text_format"])
 
+        key = Label(col, text=key)
+        key.grid(column=1, row=self.current_row, sticky="W", padx=15, pady=2)
+        key.config(**self.style["bold_text_format"])
+
     def _create_new_column(self):
-        column = Frame(self, bg=self.style["bg_color"])
+        column = Frame(self, bg=self.style["background_color"])
         column.grid(row=1, column=self.current_col, sticky="nsew", padx=15, pady=15)
         self.current_col += 1
         self.current_row = 1
@@ -106,12 +109,13 @@ class HintsWindow(Frame):
         self.current_row = 1  # Row 0 is reserved for Title
         self.current_col = 0
 
+        max_rows = self.data.config["style"].get("max_rows", 15)
         column = self._create_new_column()
 
         for group, hints in self.data.hints.items():
 
             # Start next column, if less than 4 rows left
-            if self.current_row > self.data.style_max_rows - 4:
+            if self.current_row > max_rows - 4:
                 column = self._create_new_column()
             # Append group title
             self._create_group_title_row(column, self.current_row, group)
@@ -120,7 +124,7 @@ class HintsWindow(Frame):
             # Append keys
             for key, desc in hints.items():
                 # If column is full switch to next column
-                if self.current_row >= self.data.style_max_rows:
+                if self.current_row >= max_rows:
                     column = self._create_new_column()
                 self._create_key_desc_row(column, key, desc)
                 self.current_row += 1
@@ -139,12 +143,12 @@ class ShowHintsHandler(AbstractHandler):
     def handle(self, data: HintsData) -> HintsData:
         """Take multimon screenshots and add those images to session data.
 
-        Arguments
-            AbstractHandler {class} -- self
-            data {NormcapData} -- NormCap's
+        Args:
+            AbstractHandler (class): self
+            data (HintsData): Central data object
 
-        Returns
-            NormcapData -- Enriched NormCap's session data
+        Returns:
+            HintsData: Central data object
 
         """
         self._logger.info("Displaying hints...")
@@ -163,7 +167,7 @@ class ShowHintsHandler(AbstractHandler):
         root.bind_all("<Key>", on_event)
 
         root.wait_visibility(root)
-        root.attributes("-alpha",self.data.style_alpha)
+        root.attributes("-alpha", self.data.config["style"].get("alpha", 0.8))
 
         root.mainloop()
 

@@ -2,7 +2,6 @@
 
 # Standard
 import re
-import yaml
 
 # Own
 from ..data_model import HintsData
@@ -10,7 +9,7 @@ from .. import helpers
 from .abstract_handler import AbstractHandler
 
 
-class LoadHintsHandler(AbstractHandler):
+class SelectHintsHandler(AbstractHandler):
     """Reads information from application specific json file."""
 
     # Container for data object
@@ -21,19 +20,16 @@ class LoadHintsHandler(AbstractHandler):
     def handle(self, data: HintsData) -> HintsData:
         """Take multimon screenshots and add those images to session data.
 
-        Arguments
-            AbstractHandler {class} -- self
-            data {NormcapData} -- NormCap's session data
+        Args:
+            AbstractHandler (class): self
+            data (HintsData): Central data object
 
         Returns
-            NormcapData -- Enriched NormCap's session data
+            HintsData: Central data object
 
         """
         self._logger.debug("Loading hints data...")
         self.data = data
-
-        # Load hints for all applications from yaml file
-        self.hints = self._load_yaml()
 
         # Try to find hints for current application in all hints
         self.app_hints = self._get_app_hints()
@@ -59,19 +55,9 @@ class LoadHintsHandler(AbstractHandler):
             return super().handle(self.data)
         return self.data
 
-    def _load_yaml(self):
-        data = {}
-        with open(self.data.data_path / "hints.yaml") as file:
-            try:
-                data = yaml.safe_load(file)
-            except yaml.YAMLError as exc:
-                self._logger.error("Exception while loading hints.yaml!")
-                self._logger.error(exc)
-        return data
-
     def _get_app_hints(self) -> dict:
         """Identify active application by searching wm_class in all hints."""
-        for app_hints in self.hints["applications"]:
+        for app_hints in self.data.hints["applications"]:
             self._logger.debug(
                 "Checking '%s' of '%s'...",
                 app_hints["wm_class"],
@@ -105,7 +91,6 @@ class LoadHintsHandler(AbstractHandler):
         If no hints are found, the app/context to display is replaced
         by a "Not Found" message and instead of hints, the window
         information is added.
-
         """
         if not self.data.app_name:
             self.data.app_name = "Application unknown!"

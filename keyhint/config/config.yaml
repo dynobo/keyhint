@@ -1,0 +1,17 @@
+style:
+  alpha: 0.85
+  font_family:
+  font_base_size: 14
+  max_rows: 20
+
+  # the colors below are only used if "theme: custom"
+  background_color: black
+  title_color: white
+  group_title_color: white
+  description_color: white
+  keys_color: white
+
+behavior:
+  close_on_mouse_out: true
+  close_on_esc: true
+  close_on_anykey: true
