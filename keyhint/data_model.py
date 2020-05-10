@@ -54,11 +54,7 @@ class HintsData:
                 continue
 
             # Convert other attributes to strings
-            if attr == "index":
-                string += f"{attr}: \n"
-                for elem in getattr(self, attr):
-                    string += f"  {elem}\n"
-            elif attr == "hints":
+            if attr in ["hints", "config"]:
                 string += f"{attr}:\n"
                 for group, keys in getattr(self, attr).items():
                     string += f"  {group}:\n"
