@@ -134,22 +134,19 @@ def get_users_config_path() -> Union[Path, None]:
         Path -- Root of config folder
 
     """
-    platform_sytem = platform.system()  #'Linux', 'Darwin' or 'Windows'
+    platform_system = platform.system()  #'Linux', 'Darwin' or 'Windows'
 
     config_path: Union[Path, None] = None
 
-    if platform_sytem == "Linux":
+    if platform_system == "Linux":
         xdg_conf = os.getenv("XDG_CONFIG_HOME", None)
-        xdg_home = os.getenv("HOME", None)
         if xdg_conf:
             config_path = Path(xdg_conf)
-        elif xdg_home:
-            config_path = Path(xdg_home) / ".config"
-
-    elif platform_sytem == "Darwin":
+        else:
+            config_path = Path.home() / ".config"
+    elif platform_system == "Darwin":
         pass
-
-    elif platform_sytem == "Windows":
-        pass
+    elif platform_system == "Windows":
+        config_path = Path.home() / "AppData" / "Roaming"
 
     return config_path
