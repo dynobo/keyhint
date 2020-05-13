@@ -57,7 +57,7 @@ class SelectHintsHandler(AbstractHandler):
 
     def _get_app_hints(self) -> dict:
         """Identify active application by searching wm_class in all hints."""
-        for app_hints in self.data.hints["applications"]:
+        for app_hints in self.data.hints_list["applications"]:
             self._logger.debug(
                 "Checking '%s' of '%s'...",
                 app_hints["wm_class"],

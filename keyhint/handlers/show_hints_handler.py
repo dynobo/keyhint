@@ -2,11 +2,12 @@
 
 # default
 from tkinter import Frame, Label, Tk  # noqa
+import time
 
 # Own
 from ..data_model import HintsData
 from .abstract_handler import AbstractHandler
-
+from ..helpers import timing
 
 class HintsWindow(Frame):
     """Show window with hints."""
@@ -15,6 +16,7 @@ class HintsWindow(Frame):
     current_col: int
     style: dict = {}
 
+    @timing
     def __init__(self, master: Tk, data: HintsData):
         """Receive tk and data to show.
 
@@ -30,6 +32,8 @@ class HintsWindow(Frame):
 
         self._set_style()
         self._create_layout()
+
+        self._set_window_style()
 
     def _set_style(self):
         """Configure style for window."""
@@ -85,7 +89,6 @@ class HintsWindow(Frame):
         title = Label(self, text=text)
         title.config(**self.style["title_format"])
         title.grid(column=0, columnspan=max_cols, row=0)
-        print(max_cols)
 
     def _create_group_title_row(self, column, row, group):
         if row == 1:
@@ -109,7 +112,6 @@ class HintsWindow(Frame):
         title = Label(self, text=text)
         title.config(**self.style["statusbar_format"])
         title.grid(column=0, columnspan=max_cols, row=row, pady=1)
-        print(max_cols)
 
     def _create_new_column(self):
         column = Frame(self, bg=self.style["background_color"])
@@ -155,6 +157,17 @@ class HintsWindow(Frame):
             acutal_max_rows,
         )
 
+    def _set_window_style(self):
+        """Center a window on the screen."""
+        root = self.master
+        
+        #root.wait_visibility(root)     
+        root.attributes("-alpha", self.data.config["style"].get("alpha", 0.8))
+
+        if self.data.platform_os == "Windows":
+            root.eval('tk::PlaceWindow %s center' % root.winfo_toplevel())        
+
+
 
 class ShowHintsHandler(AbstractHandler):
     """Display hints in own window."""
@@ -179,20 +192,16 @@ class ShowHintsHandler(AbstractHandler):
 
         root = Tk(className="keyhint")
         root.title("keyhint")
+        root.bind("<FocusOut>", lambda x: root.destroy())
+        root.bind_all("<Key>", lambda x: root.destroy())
 
-        _ = HintsWindow(root, self.data)
+        if self.data.platform_os == "Windows":
+            root.overrideredirect(True)
 
-        def on_event(_):
-            root.destroy()
-
-        root.bind("<FocusOut>", on_event)
-        root.bind_all("<Key>", on_event)
-
-        root.wait_visibility(root)
-        root.attributes("-alpha", self.data.config["style"].get("alpha", 0.8))
-
+        HintsWindow(root, self.data)
         root.mainloop()
 
         if self._next_handler:
             return super().handle(data)
         return data
+

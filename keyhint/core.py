@@ -46,11 +46,11 @@ def main():
         # Define handlers
         load_configs = LoadConfigsHandler()
         detect_app = DetectApplicationHandler()
-        load_hints = SelectHintsHandler()
+        select_hints = SelectHintsHandler()
         show_hints = ShowHintsHandler()
 
         # Define chain of handlers
-        load_configs.set_next(detect_app).set_next(load_hints).set_next(show_hints)
+        load_configs.set_next(detect_app).set_next(select_hints).set_next(show_hints)
 
         # Run chain of handlers
         data = client_code(load_configs, data)

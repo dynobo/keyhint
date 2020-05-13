@@ -82,4 +82,4 @@ class LoadConfigsHandler(AbstractHandler):
     def _load_configs(self):
         """Load config/hint yamls to central data object."""
         self.data.config = self._load_yaml(self.data.config_path / self.config_file)
-        self.data.hints = self._load_yaml(self.data.config_path / self.hints_file)
+        self.data.hints_list = self._load_yaml(self.data.config_path / self.hints_file)

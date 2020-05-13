@@ -40,6 +40,9 @@ class HintsData:
     # Contains information from yaml config, about behavior and look
     config: dict = field(default_factory=dict)
 
+    # Contains information from yaml config, about behavior and look
+    hints_list: list = field(default_factory=dict)
+
     def __repr__(self):
         """Create string representation of dataclass.
 
@@ -58,8 +61,11 @@ class HintsData:
                 string += f"{attr}:\n"
                 for group, keys in getattr(self, attr).items():
                     string += f"  {group}:\n"
-                    for key, val in keys.items():
-                        string += f"    {key}: {val}\n"
+                    if isinstance(keys, dict):
+                        for key, val in keys.items():
+                            string += f"    {key}: {val}\n"
+                    else:
+                        string += str(keys)
             else:
                 string += f"{attr}: {getattr(self, attr)}\n"
 

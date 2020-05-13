@@ -8,6 +8,7 @@ import re
 import platform
 from typing import Tuple, Union
 from pathlib import Path
+import time
 
 
 def init_logging(
@@ -49,9 +50,45 @@ def get_active_window_info(platform_os) -> Tuple[str, str]:
 
     if platform_os == "Linux":
         wm_class, wm_name = get_active_window_info_x()
-
+    elif platform_os == "Windows":
+        wm_class, wm_name = get_active_window_info_win()
     return wm_class.lower(), wm_name.lower()
 
+
+def get_active_window_info_win() -> Tuple[str, str]:
+    """Read wm_class and wm_name on X based Linux systems."""
+    wm_name = ""
+    wm_class = ""
+
+    from ctypes import windll, create_unicode_buffer, c_ulong, sizeof, c_buffer, wintypes, byref
+
+    # Get handle and title of active window
+    handle_window = windll.user32.GetForegroundWindow()
+    length = windll.user32.GetWindowTextLengthW(handle_window)
+    buf = create_unicode_buffer(length + 1)
+    windll.user32.GetWindowTextW(handle_window, buf, length + 1)
+    if buf.value:
+        wm_name = buf.value
+
+    # Get Process ID from window handle
+    pid = wintypes.DWORD()
+    windll.user32.GetWindowThreadProcessId(handle_window, byref(pid))
+
+    # Get Process name from Process ID
+    hModule = c_ulong()
+    count = c_ulong()
+    modname = c_buffer(30)
+    PROCESS_QUERY_INFORMATION = 0x0400
+    PROCESS_VM_READ = 0x0010
+
+    hProcess = windll.kernel32.OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, False, pid)
+    if hProcess:
+        windll.psapi.EnumProcessModules(hProcess, byref(hModule), sizeof(hModule), byref(count))
+        windll.psapi.GetModuleBaseNameA(hProcess, hModule.value, modname, sizeof(modname))
+        windll.kernel32.CloseHandle(hProcess)
+        wm_class = "".join([ i.decode("utf-8") for i in modname if i.decode("utf-8") != '\x00'])
+
+    return wm_class, wm_name
 
 def get_active_window_info_x() -> Tuple[str, str]:
     """Read wm_class and wm_name on X based Linux systems."""
@@ -150,3 +187,13 @@ def get_users_config_path() -> Union[Path, None]:
         config_path = Path.home() / "AppData" / "Roaming"
 
     return config_path
+
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print('{:s} function took {:.3f} ms'.format(f.__name__, (time2-time1)*1000.0))
+
+        return ret
+    return wrap
