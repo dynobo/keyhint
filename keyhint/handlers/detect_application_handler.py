@@ -21,7 +21,9 @@ class DetectApplicationHandler(AbstractHandler):
         """
         self._logger.debug("Detecting active window..")
 
-        data.wm_class, data.wm_name = helpers.get_active_window_info(data.platform_os)
+        data.app_process, data.app_title = helpers.get_active_window_info(
+            data.platform_os
+        )
 
         if self._next_handler:
             return super().handle(data)

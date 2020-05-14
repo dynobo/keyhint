@@ -45,22 +45,30 @@ def init_logging(
 
 def get_active_window_info(platform_os) -> Tuple[str, str]:
     """Gather information about active window, distinquishs between os."""
-    wm_class: str = ""
+    app_process: str = ""
     wm_name: str = ""
 
     if platform_os == "Linux":
-        wm_class, wm_name = get_active_window_info_x()
+        app_process, wm_name = get_active_window_info_x()
     elif platform_os == "Windows":
-        wm_class, wm_name = get_active_window_info_win()
-    return wm_class.lower(), wm_name.lower()
+        app_process, wm_name = get_active_window_info_win()
+    return app_process.lower(), wm_name.lower()
 
 
 def get_active_window_info_win() -> Tuple[str, str]:
-    """Read wm_class and wm_name on X based Linux systems."""
+    """Read app_process and wm_name on X based Linux systems."""
     wm_name = ""
-    wm_class = ""
+    app_process = ""
 
-    from ctypes import windll, create_unicode_buffer, c_ulong, sizeof, c_buffer, wintypes, byref
+    from ctypes import (
+        windll,
+        create_unicode_buffer,
+        c_ulong,
+        sizeof,
+        c_buffer,
+        wintypes,
+        byref,
+    )
 
     # Get handle and title of active window
     handle_window = windll.user32.GetForegroundWindow()
@@ -81,17 +89,26 @@ def get_active_window_info_win() -> Tuple[str, str]:
     PROCESS_QUERY_INFORMATION = 0x0400
     PROCESS_VM_READ = 0x0010
 
-    hProcess = windll.kernel32.OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, False, pid)
+    hProcess = windll.kernel32.OpenProcess(
+        PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, False, pid
+    )
     if hProcess:
-        windll.psapi.EnumProcessModules(hProcess, byref(hModule), sizeof(hModule), byref(count))
-        windll.psapi.GetModuleBaseNameA(hProcess, hModule.value, modname, sizeof(modname))
+        windll.psapi.EnumProcessModules(
+            hProcess, byref(hModule), sizeof(hModule), byref(count)
+        )
+        windll.psapi.GetModuleBaseNameA(
+            hProcess, hModule.value, modname, sizeof(modname)
+        )
         windll.kernel32.CloseHandle(hProcess)
-        wm_class = "".join([ i.decode("utf-8") for i in modname if i.decode("utf-8") != '\x00'])
+        app_process = "".join(
+            [i.decode("utf-8") for i in modname if i.decode("utf-8") != "\x00"]
+        )
 
-    return wm_class, wm_name
+    return app_process, wm_name
+
 
 def get_active_window_info_x() -> Tuple[str, str]:
-    """Read wm_class and wm_name on X based Linux systems."""
+    """Read app_process and wm_name on X based Linux systems."""
     # Query id of active window
     stdout_bytes: bytes = subprocess.check_output(
         "xprop -root _NET_ACTIVE_WINDOW", shell=True
@@ -105,14 +122,14 @@ def get_active_window_info_x() -> Tuple[str, str]:
         return "", ""
     window_id: str = match.group(1)
 
-    # Query wm_name and wm_class
+    # Query wm_name and app_process
     stdout_bytes = subprocess.check_output(
         f"xprop -id {window_id} WM_NAME WM_CLASS", shell=True
     )
     stdout = stdout_bytes.decode()
 
-    # Extract wm_name and wm_class from output
-    wm_name = wm_class = ""
+    # Extract wm_name and app_process from output
+    wm_name = app_process = ""
 
     match = re.search(r'WM_NAME\(\w+\) = "(?P<name>.+)"', stdout)
     if match is not None:
@@ -120,9 +137,9 @@ def get_active_window_info_x() -> Tuple[str, str]:
 
     match = re.search(r'WM_CLASS\(\w+\) =.*"(?P<class>.+?)"$', stdout)
     if match is not None:
-        wm_class = match.group("class")
+        app_process = match.group("class")
 
-    return wm_class, wm_name
+    return app_process, wm_name
 
 
 def remove_emojis(text: str) -> str:
@@ -188,12 +205,16 @@ def get_users_config_path() -> Union[Path, None]:
 
     return config_path
 
+
 def timing(f):
     def wrap(*args):
         time1 = time.time()
         ret = f(*args)
         time2 = time.time()
-        print('{:s} function took {:.3f} ms'.format(f.__name__, (time2-time1)*1000.0))
+        print(
+            "{:s} function took {:.3f} ms".format(f.__name__, (time2 - time1) * 1000.0)
+        )
 
         return ret
+
     return wrap

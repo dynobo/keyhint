@@ -9,6 +9,7 @@ from ..data_model import HintsData
 from .abstract_handler import AbstractHandler
 from ..helpers import timing
 
+
 class HintsWindow(Frame):
     """Show window with hints."""
 
@@ -128,31 +129,36 @@ class HintsWindow(Frame):
         acutal_max_rows = 0  # actual might not reach max_rows
         column = self._create_new_column()
 
-        for group, hints in self.data.hints.items():
+        if len(self.data.hints) <= 0:
+            acutal_max_rows = 1
+            title_text = "No Hints found"
+        else:
+            first_hints = self.data.hints[0]
+            title_text = first_hints["title"]
 
-            # Start next column, if less than 4 rows left
-            if self.current_row > max_rows - 4:
-                column = self._create_new_column()
-            # Append group title
-            self._create_group_title_row(column, self.current_row, group)
-            self.current_row += 1
+            for group, hints in first_hints["hints"].items():
 
-            # Append keys
-            for key, desc in hints.items():
-                # If column is full switch to next column
-                if self.current_row >= max_rows:
+                # Start next column, if less than 4 rows left
+                if self.current_row > max_rows - 4:
                     column = self._create_new_column()
-                self._create_key_desc_row(column, key, desc)
-                self.current_row += 1
-                acutal_max_rows = max(acutal_max_rows, self.current_row)
 
-        title_text = self.data.app_name
-        if not self.data.context_name.lower() == "default":
-            title_text += f" ({self.data.context_name})"
+                # Append group title
+                self._create_group_title_row(column, self.current_row, group)
+                self.current_row += 1
+
+                # Append keys
+                for key, desc in hints.items():
+                    # If column is full switch to next column
+                    if self.current_row >= max_rows:
+                        column = self._create_new_column()
+                    self._create_key_desc_row(column, key, desc)
+                    self.current_row += 1
+                    acutal_max_rows = max(acutal_max_rows, self.current_row)
+
         self._create_title_row(title_text, self.current_col)
 
         self._create_statusbar_row(
-            f"wm_class: '{self.data.wm_class}' - wm_name: '{self.data.wm_name}'",
+            f"process: '{self.data.app_process}' - title: '{self.data.app_title}'",
             self.current_col,
             acutal_max_rows,
         )
@@ -160,13 +166,12 @@ class HintsWindow(Frame):
     def _set_window_style(self):
         """Center a window on the screen."""
         root = self.master
-        
-        #root.wait_visibility(root)     
+
+        # root.wait_visibility(root)
         root.attributes("-alpha", self.data.config["style"].get("alpha", 0.8))
 
         if self.data.platform_os == "Windows":
-            root.eval('tk::PlaceWindow %s center' % root.winfo_toplevel())        
-
+            root.eval("tk::PlaceWindow %s center" % root.winfo_toplevel())
 
 
 class ShowHintsHandler(AbstractHandler):
@@ -204,4 +209,3 @@ class ShowHintsHandler(AbstractHandler):
         if self._next_handler:
             return super().handle(data)
         return data
-
