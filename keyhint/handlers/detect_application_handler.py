@@ -12,13 +12,12 @@ class DetectApplicationHandler(AbstractHandler):
     def handle(self, data: HintsData) -> HintsData:
         """Gather information about the currently active application window.
 
-        Arguments
-            AbstractHandler {class} -- self
-            data {NormcapData} -- NormCap's session data
+        Args:
+            AbstractHandler (class): self
+            data (HintsData): Central data object
 
-        Returns
-            NormcapData -- Enriched NormCap's session data
-
+        Returns:
+            HintsData: Central data object
         """
         self._logger.debug("Detecting active window..")
 

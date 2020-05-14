@@ -7,8 +7,8 @@ import logging
 from . import helpers
 from .handlers.abstract_handler import AbstractHandler
 from .handlers.detect_application_handler import DetectApplicationHandler
-from .handlers.load_index_handler import LoadIndexHandler
-from .handlers.load_hints_handler import LoadHintsHandler
+from .handlers.select_hints_handler import SelectHintsHandler
+from .handlers.load_configs_handler import LoadConfigsHandler
 from .handlers.show_hints_handler import ShowHintsHandler
 from .data_model import HintsData
 
@@ -22,12 +22,12 @@ __version__ = "0.1.0"
 def client_code(handler: AbstractHandler, data: HintsData) -> HintsData:
     """Wrap Chain of Responsibility classes.
 
-    Arguments
-        handler {AbstractHandler} -- Most outer handler
-        data {HintsData} -- keyhint's session data
+    Args:
+        handler (AbstractHandler): Most outer handler
+        data (HintsData) -- Central data object
 
-    Returns
-        HintsData -- Keyhint's session data processed by handler
+    Returns:
+        HintsData: Central data object processed by handler
 
     """
     data = handler.handle(data)
@@ -44,18 +44,16 @@ def main():
         data = HintsData()
 
         # Define handlers
-        detect_application = DetectApplicationHandler()
-        load_index = LoadIndexHandler()
-        load_hints = LoadHintsHandler()
+        load_configs = LoadConfigsHandler()
+        detect_app = DetectApplicationHandler()
+        select_hints = SelectHintsHandler()
         show_hints = ShowHintsHandler()
 
         # Define chain of handlers
-        detect_application.set_next(load_index).set_next(load_hints).set_next(
-            show_hints
-        )
+        load_configs.set_next(detect_app).set_next(select_hints).set_next(show_hints)
 
         # Run chain of handlers
-        data = client_code(detect_application, data)
+        data = client_code(load_configs, data)
         logger.debug("Final Datamodel:%s", data)
         logger.info("Finished successfully.")
 

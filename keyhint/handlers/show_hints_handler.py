@@ -1,11 +1,172 @@
 """Handler responsible for attaching screenshot(s) to session data."""
 
-# extra
-import PySimpleGUI as sg  # type: ignore
+# default
+from tkinter import Frame, Label, Tk  # noqa
+import time
 
 # Own
 from ..data_model import HintsData
 from .abstract_handler import AbstractHandler
+from ..helpers import timing
+
+class HintsWindow(Frame):
+    """Show window with hints."""
+
+    current_row: int
+    current_col: int
+    style: dict = {}
+
+    @timing
+    def __init__(self, master: Tk, data: HintsData):
+        """Receive tk and data to show.
+
+        Args:
+            master (Tk): Root window object
+            data (HintsData): Central data object
+        """
+        Frame.__init__(self, master)
+        self.data = data
+
+        self.pack(side="top", fill="both", expand="yes")
+        self.lift()
+
+        self._set_style()
+        self._create_layout()
+
+        self._set_window_style()
+
+    def _set_style(self):
+        """Configure style for window."""
+        style: dict = self.data.config["style"]
+
+        # Fallback to defaults, if missing
+        font_family = style.get("font_family", "")
+        font_base_size = style.get("font_base_size", 16)
+        background_color = style.get("background_color", "black")
+        title_color = style.get("title_color", "white")
+        group_title_color = style.get("group_title_color", "white")
+        description_color = style.get("description_color", "white")
+        keys_color = style.get("keys_color", "white")
+        statusbar_color = style.get("statusbar_color", "white")
+
+        # Window Background
+        self.style["background_color"] = background_color
+        self.config(bg=background_color)
+
+        # Font Styles
+        self.style["title_format"] = {
+            "font": (font_family, int(font_base_size * 1.4),),
+            "fg": title_color,
+            "bg": background_color,
+            "justify": "center",
+        }
+        self.style["group_title_format"] = {
+            "font": (font_family, int(font_base_size * 1.125),),
+            "bg": background_color,
+            "fg": group_title_color,
+            "justify": "left",
+        }
+        self.style["description_format"] = {
+            "font": (font_family, int(font_base_size * 0.85),),
+            "bg": background_color,
+            "fg": description_color,
+            "justify": "left",
+        }
+        self.style["keys_format"] = {
+            "font": (font_family, int(font_base_size * 0.85), "bold",),
+            "bg": background_color,
+            "fg": keys_color,
+            "justify": "left",
+        }
+        self.style["statusbar_format"] = {
+            "font": (font_family, int(font_base_size * 0.5)),
+            "bg": background_color,
+            "fg": statusbar_color,
+            "justify": "center",
+        }
+
+    def _create_title_row(self, text, max_cols):
+        title = Label(self, text=text)
+        title.config(**self.style["title_format"])
+        title.grid(column=0, columnspan=max_cols, row=0)
+
+    def _create_group_title_row(self, column, row, group):
+        if row == 1:
+            pady = (0, 5)
+        else:
+            pady = (15, 5)
+        group_title = Label(column, text=group)
+        group_title.grid(column=0, columnspan=2, pady=pady, padx=0, sticky="W")
+        group_title.config(**self.style["group_title_format"])
+
+    def _create_key_desc_row(self, col, key, desc):
+        desc = Label(col, text=desc)
+        desc.grid(column=0, row=self.current_row, sticky="W", padx=15, pady=2)
+        desc.config(**self.style["description_format"])
+
+        key = Label(col, text=key)
+        key.grid(column=1, row=self.current_row, sticky="W", padx=15, pady=2)
+        key.config(**self.style["keys_format"])
+
+    def _create_statusbar_row(self, text, max_cols, row):
+        title = Label(self, text=text)
+        title.config(**self.style["statusbar_format"])
+        title.grid(column=0, columnspan=max_cols, row=row, pady=1)
+
+    def _create_new_column(self):
+        column = Frame(self, bg=self.style["background_color"])
+        column.grid(row=1, column=self.current_col, sticky="nsew", padx=15, pady=15)
+        self.current_col += 1
+        self.current_row = 1
+        return column
+
+    def _create_layout(self):
+        self.current_row = 1  # Row 0 is reserved for Title
+        self.current_col = 0
+
+        max_rows = self.data.config["style"].get("max_rows", 15)
+        acutal_max_rows = 0  # actual might not reach max_rows
+        column = self._create_new_column()
+
+        for group, hints in self.data.hints.items():
+
+            # Start next column, if less than 4 rows left
+            if self.current_row > max_rows - 4:
+                column = self._create_new_column()
+            # Append group title
+            self._create_group_title_row(column, self.current_row, group)
+            self.current_row += 1
+
+            # Append keys
+            for key, desc in hints.items():
+                # If column is full switch to next column
+                if self.current_row >= max_rows:
+                    column = self._create_new_column()
+                self._create_key_desc_row(column, key, desc)
+                self.current_row += 1
+                acutal_max_rows = max(acutal_max_rows, self.current_row)
+
+        title_text = self.data.app_name
+        if not self.data.context_name.lower() == "default":
+            title_text += f" ({self.data.context_name})"
+        self._create_title_row(title_text, self.current_col)
+
+        self._create_statusbar_row(
+            f"wm_class: '{self.data.wm_class}' - wm_name: '{self.data.wm_name}'",
+            self.current_col,
+            acutal_max_rows,
+        )
+
+    def _set_window_style(self):
+        """Center a window on the screen."""
+        root = self.master
+        
+        #root.wait_visibility(root)     
+        root.attributes("-alpha", self.data.config["style"].get("alpha", 0.8))
+
+        if self.data.platform_os == "Windows":
+            root.eval('tk::PlaceWindow %s center' % root.winfo_toplevel())        
+
 
 
 class ShowHintsHandler(AbstractHandler):
@@ -14,160 +175,33 @@ class ShowHintsHandler(AbstractHandler):
     # Container for data object
     data: HintsData
 
-    # Container for style info
-    style: dict = {}
-
-    # pySimplyGUI Window object
-    window: sg.Window
-
-    # Will contain the elements to be layed ou in window
-    layout: list = []
-
     def handle(self, data: HintsData) -> HintsData:
         """Take multimon screenshots and add those images to session data.
 
-        Arguments
-            AbstractHandler {class} -- self
-            data {NormcapData} -- NormCap's session data
+        Args:
+            AbstractHandler (class): self
+            data (HintsData): Central data object
 
-        Returns
-            NormcapData -- Enriched NormCap's session data
+        Returns:
+            HintsData: Central data object
 
         """
         self._logger.info("Displaying hints...")
 
         self.data = data
 
-        self._set_style()
-        self.show()
+        root = Tk(className="keyhint")
+        root.title("keyhint")
+        root.bind("<FocusOut>", lambda x: root.destroy())
+        root.bind_all("<Key>", lambda x: root.destroy())
+
+        if self.data.platform_os == "Windows":
+            root.overrideredirect(True)
+
+        HintsWindow(root, self.data)
+        root.mainloop()
 
         if self._next_handler:
             return super().handle(data)
         return data
 
-    def _set_style(self):
-        """Configure style for window."""
-        if self.data.style_theme.lower() == "dark":
-            sg.theme("Black")
-            self.style["bg_color"] = "black"
-            self.style["text_color"] = "white"
-        else:
-            sg.theme("Default")
-            self.style["bg_color"] = "white"
-            self.style["text_color"] = "black"
-
-        sg.theme_background_color(self.style["bg_color"])
-        sg.theme_element_background_color(self.style["bg_color"])
-        sg.theme_text_color(self.style["text_color"])
-
-        self.style["title_format"] = {
-            "font": (
-                self.data.style_font_family,
-                int(self.data.style_font_base_size * 1.4),
-            ),
-            "background_color": self.style["bg_color"],
-        }
-        self.style["group_title_format"] = {
-            "font": (
-                self.data.style_font_family,
-                int(self.data.style_font_base_size * 1.125),
-            ),
-            "background_color": self.style["bg_color"],
-            "pad": ((0, 0), (int(self.data.style_font_base_size * 0.75), 0)),
-        }
-        self.style["text_format"] = {
-            "font": (
-                self.data.style_font_family,
-                int(self.data.style_font_base_size * 0.85),
-            ),
-            "background_color": self.style["bg_color"],
-        }
-        self.style["bold_text_format"] = {
-            "font": (
-                self.data.style_font_family,
-                int(self.data.style_font_base_size * 0.85),
-                "bold",
-            ),
-            "background_color": self.style["bg_color"],
-        }
-
-    def show(self):
-        """Create layout of elements and display them in window."""
-        self._create_layout()
-        self._show_window()
-
-    def _show_window(self):
-        """Display the window, close on Esc or any other key."""
-        self.window = sg.Window(
-            "keyhint",
-            self.layout,
-            return_keyboard_events=True,
-            keep_on_top=True,
-            no_titlebar=True,
-            alpha_channel=self.data.style_alpha,
-            grab_anywhere=True,
-            finalize=True,
-        )
-        while True:
-            event, _ = self.window.read()
-            if event in ["Escape:9"]:
-                break
-        self.window.close()
-
-    def _create_keys_layout(self):
-        layout = []
-
-        temp_column = []
-        column_counter = 0
-
-        # Loop over hint groups
-        for group, hints in self.data.hints.items():
-
-            # Start fresh column, if less than 4 rows left
-            if column_counter > self.data.style_max_rows - 4:
-                layout.append(sg.Column(temp_column))
-                temp_column = []
-                column_counter = 0
-
-            # Append group title
-            temp_column.append([sg.Text(group, **self.style["group_title_format"])])
-            column_counter += 1
-
-            # Append keys
-            left, right = [], []
-            for key, desc in hints.items():
-
-                # If row is full, append what's in column and switch to next column
-                if column_counter >= self.data.style_max_rows:
-                    temp_column.append([sg.Column(left), sg.Column(right)])
-                    layout.append(sg.Column(temp_column))
-                    temp_column, left, right = [], [], []
-                    column_counter = 0
-
-                left.append([sg.Text(key, **self.style["bold_text_format"])])
-                right.append([sg.Text(desc, **self.style["text_format"])])
-                column_counter += 1
-
-            temp_column.append([sg.Column(left), sg.Column(right)])
-
-        layout.append(sg.Column(temp_column))
-
-        return layout
-
-    def _create_layout(self):
-        self.layout = []
-
-        layout_title = self._create_layout_title()
-        self.layout.append(layout_title)
-
-        layout_keys = self._create_keys_layout()
-        self.layout.append(layout_keys)
-
-    def _create_layout_title(self):
-        title = self.data.app_name + " (" + self.data.context_name + ")"
-        layout = [
-            sg.Text(
-                title, pad=(0, 0), justification="right", **self.style["title_format"]
-            ),
-        ]
-        return layout

@@ -1,0 +1,144 @@
+applications:
+  # VISUAL STUDIO CODE
+  # ---------------------------
+  - app_name: VS Code
+    wm_class: code
+    contexts:
+      - context_name: Default
+        wm_name_regex: .*
+        hints:
+          Navigating UI:
+            Ctrl + 0: Focus sidebar
+            Ctrl + 1: Focus editor 1
+            Ctrl + 2: Focus editor 2
+            Ctrl + b: Toggle sidebar
+            Ctrl + j: Toggle panel
+            Ctrl + Shift + e: Explorer in Sidebar
+            Ctrl + Shift + m: Toggle problems
+            Ctrl + `: Toggle terminal
+
+          Basic Editing:
+            Ctrl + l: Select current line
+            Alt + Up/Down: Move line up/down
+            Alt + Shift + Up/Down: Duplicate cursor
+            Ctrl+ Alt + Shift + Up/Down: Duplicate line
+            Shift + Alt + Left/Right: Expand/shrink selection
+            Ctrl + h: Search and replace
+
+          Language Editing:
+            Ctrl + Space: Trigger IntelliSense and Hint
+            Ctrl + Shift + o: Search and jump to symbol
+            F12: Goto defintion
+            Alt + F12: Peek definition
+            Shift + F12: Peek usage
+            F2: Rename symbol
+            F8, Shift + F8: Cycle through errors
+
+          Debugging:
+            F9: Toogle breakpoint
+            F5: Start/continue
+            Shift + F5: Stop
+            F11 / Shift + F11: Step into / out
+            F10: Step over
+
+          File/Tab Management:
+            Ctrl + Tab: Switch between tabs
+            Ctrl + p: Quick open file
+
+  # FIREFOX BROWSER
+  # ---------------------------
+  - app_name: Firefox
+    wm_class: Firefox
+    contexts:
+      - context_name: GitHub
+        wm_name_regex: https\\://github\\.com
+        source: https://help.github.com/en/github/getting-started-with-github/keyboard-shortcuts
+        hints:
+          Side Wide:
+            s or /: Focus search bar
+            gn: Goto notifications
+            esc: Close hovercard, if open
+
+          Repositories:
+            gc: Goto code tab
+            gi: Goto issues tab
+            gp: Goto pull request tab
+            gb: Goto projects tab
+            gw: Goto wiki tab
+
+          Browse Code:
+            t: Activate file finder
+            l: Jump to line
+            w: Switch to new branch/tag
+            y: Expand URL to canonical
+            i: Toggle comments on diffs
+            b: Open blame view
+
+      - context_name: Default
+        wm_name_regex: .*
+        hints:
+          URL Navigation:
+            Ctrl + l: Location bar
+            Alt + left: Back in History
+            Alt + right: Forward in History
+
+          Tab Management:
+            Ctrl + t: New tab
+            Ctrl + Tab: Next tab
+            Ctrl + 1..8: Select tab 1..8
+            Ctrl + w: Close tab
+            Ctrl + Shift + t: Undo close tab
+            /: Quick Find
+
+          Various:
+            Ctrl + Shift + y: Show downloads
+
+          Vimium - Scrolling:
+            j, k: Scroll down, up
+            d, u: Scroll page down, up
+            h, l: Scroll left, right
+
+          Vimium - URL Navigation:
+            b: Open a bookmark
+            B: Open a bookmark in new tab
+            r: Reload page
+            gu: Go up the URL hierarchy
+            gU: Go to root in URL hierarchy
+            f: Open link in current tab
+            F: Open link new current tab
+            H: Back in History
+            L: Forward in History
+
+          Vimium - Tabs:
+            t: Create new tab
+            J, K: Next/previous tab
+            yt: Duplicate tab
+            x: Close tab
+            X: Undo close tab
+            W: Move tab to new window
+
+  # GNOME TERMINAL
+  # ---------------------------
+  - app_name: Terminal
+    wm_class: gnome-terminal
+    contexts:
+      - context_name: Default
+        wm_name_regex: .*
+        hints:
+          Navigating:
+            pwd: Print working dir
+            cd: Change to home dir
+            cd -: Change to previous dir
+
+          History:
+            history | grep <term>: Search for "<term>"
+            history 10: Print last 10 cmds
+            "!23": Execute cmd 23 from history
+            Ctrl + r: Reverse cmd search / find next
+
+          Tools:
+            bc: Calculator
+            gtop, htop: System Monitors
+            ranger: File manager
+            moc: Music Player in Console
+            alsamixer: Audio Mixer

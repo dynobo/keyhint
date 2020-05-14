@@ -1,0 +1,18 @@
+style:
+  alpha: 1
+  font_family:
+  font_base_size: 14
+  max_rows: 20
+
+  # the colors below are only used if "theme: custom"
+  background_color: "#1F232B"
+  title_color: "#eceff4"
+  group_title_color: "#bf616a"
+  description_color: "#eceff4"
+  keys_color: "#a3be8c"
+  statusbar_color: "#4c566a"
+
+behavior:
+  close_on_mouse_out: true
+  close_on_esc: true
+  close_on_anykey: true
