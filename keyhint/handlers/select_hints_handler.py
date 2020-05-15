@@ -5,7 +5,6 @@ import re
 
 # Own
 from ..data_model import HintsData
-from .. import helpers
 from .abstract_handler import AbstractHandler
 
 

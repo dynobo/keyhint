@@ -2,12 +2,10 @@
 
 # default
 from tkinter import Frame, Label, Tk  # noqa
-import time
 
 # Own
 from ..data_model import HintsData
 from .abstract_handler import AbstractHandler
-from ..helpers import timing
 
 
 class HintsWindow(Frame):
@@ -17,7 +15,6 @@ class HintsWindow(Frame):
     current_col: int
     style: dict = {}
 
-    @timing
     def __init__(self, master: Tk, data: HintsData):
         """Receive tk and data to show.
 
