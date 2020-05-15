@@ -15,17 +15,17 @@ jobs:
         run: sudo apt-get update && sudo apt-get install python3.7 python3.7-dev python3.7-tk python3-setuptools
 
       - name: Install dependencies
-        run: python3 -m pip install -r requirements-dev.txt
+        run: python3.7 -m pip install -r requirements-dev.txt
 
       - name: Install coveralls
-        run: python3 -m pip install coveralls
+        run: python3.7 -m pip install coveralls
 
       # TEST
       - name: Test with pytest
-        run: xvfb-run --server-args="-screen 0 1024x768x24+32" python3 -m pytest
+        run: xvfb-run --server-args="-screen 0 1024x768x24+32" python3.7 -m pytest
 
       # PUBLISH
       - name: Publish
-        run: python3 -m coveralls
+        run: python3-7 -m coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}

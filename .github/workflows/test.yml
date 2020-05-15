@@ -20,10 +20,6 @@ jobs:
       - name: Install dependencies
         run: python3.7 -m pip install -r requirements-dev.txt
 
-        # Version
-      - name: Print version
-        run: python3.7 --version && python3 --version
-
       # LINT
       - name: Lint with pylama
         run: python3.7 -m pylama
