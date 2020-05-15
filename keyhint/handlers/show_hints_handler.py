@@ -1,7 +1,7 @@
 """Handler responsible for attaching screenshot(s) to session data."""
 
 # default
-from tkinter import Frame, Label, Tk  # noqa
+from tkinter import Frame, Label, Tk, Text  # noqa
 
 # Own
 from ..data_model import HintsData
@@ -107,9 +107,9 @@ class HintsWindow(Frame):
         key.config(**self.style["keys_format"])
 
     def _create_statusbar_row(self, text, max_cols, row):
-        title = Label(self, text=text)
-        title.config(**self.style["statusbar_format"])
-        title.grid(column=0, columnspan=max_cols, row=row, pady=1)
+        status = Label(self, text=text, wraplength=300 * max_cols)
+        status.config(**self.style["statusbar_format"])
+        status.grid(column=0, columnspan=max_cols, row=row, pady=1)
 
     def _create_new_column(self):
         column = Frame(self, bg=self.style["background_color"])
@@ -154,11 +154,15 @@ class HintsWindow(Frame):
 
         self._create_title_row(title_text, self.current_col)
 
-        self._create_statusbar_row(
-            f"process: '{self.data.app_process}' - title: '{self.data.app_title}'",
-            self.current_col,
-            acutal_max_rows,
-        )
+        # Show statusbar if enabled in config or now hints found
+        if (len(self.data.hints) <= 0) or self.data.config["style"][
+            "statusbar_visible"
+        ]:
+            self._create_statusbar_row(
+                f"process: '{self.data.app_process}' - title: '{self.data.app_title}'",
+                self.current_col,
+                acutal_max_rows,
+            )
 
     def _set_window_style(self):
         """Center a window on the screen.
@@ -196,8 +200,12 @@ class ShowHintsHandler(AbstractHandler):
 
         root = Tk(className="keyhint")
         root.title("keyhint")
-        root.bind("<FocusOut>", lambda x: root.destroy())
-        root.bind_all("<Key>", lambda x: root.destroy())
+        if self.data.config["behavior"]["close_on_mouse_out"]:
+            root.bind("<FocusOut>", lambda x: root.destroy())
+        if self.data.config["behavior"]["close_on_anykey"]:
+            root.bind_all("<Key>", lambda x: root.destroy())
+        if self.data.config["behavior"]["close_on_esc"]:
+            root.bind_all("<Escape>", lambda x: root.destroy())
 
         if self.data.platform_os == "Windows":
             root.overrideredirect(True)
