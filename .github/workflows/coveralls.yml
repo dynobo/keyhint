@@ -26,6 +26,6 @@ jobs:
 
       # PUBLISH
       - name: Publish
-        run: python3-7 -m coveralls
+        run: python3.7 -m coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
