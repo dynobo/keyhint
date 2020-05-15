@@ -13,7 +13,7 @@ with open("LICENSE") as f:
 setup(
     name="keyhint",
     version=keyhint.__version__,
-    description="Display context sensitive keyboard shortcuts or other hints",
+    description="_Display context-sensitive keyboard shortcuts or other hints on Linux and Windows",
     keywords="shortcuts keybindings hints helper reminder",
     long_description=readme,
     long_description_content_type="text/markdown",

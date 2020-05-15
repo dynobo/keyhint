@@ -1,6 +1,6 @@
 # keyhint
 
-**_Display context-sensitive keyboard shortcuts or other hints on Linux or Windows._**
+**_Display context-sensitive keyboard shortcuts or other hints on Linux and Windows._**
 
 <p align="center"><br>
 <img alt="Tests passing" src="https://github.com/dynobo/keyhint/workflows/Test/badge.svg">
