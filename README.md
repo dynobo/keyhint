@@ -15,21 +15,9 @@ The tool can be started by `python -m keyhint` or simply `keyhint`. But as the *
 
 Based on the **process name** and **window title**, different sets of hints can be displayed.
 
-_General Firefox Shortcuts:_
+_Screenshots of some hints:_
 
-![General Firefox Shortcuts](assets/firefox.png)
-
-_Shortcuts on GitHub:_
-
-![Shortcuts on GitHub](assets/github.png)
-
-_VSCode Keybindings:_
-
-![VSCode Keybindings](assets/vscode.png)
-
-_Shell Commands:_
-
-![Shell Commands](assets/terminal.png)
+![General Firefox Shortcuts](assets/demo.gif)
 
 ## Installation
 
