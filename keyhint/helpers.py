@@ -25,7 +25,7 @@ def init_logging(
     """
     if to_file:
         logging.basicConfig(
-            filename="keyhints.log",
+            filename="keyhint.log",
             filemode="w",
             format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
             datefmt="%H:%M:%S",
@@ -51,7 +51,7 @@ def get_active_window_info(platform_os) -> Tuple[str, str]:
         app_process, app_title = get_active_window_info_x()
     elif platform_os == "Windows":
         app_process, app_title = get_active_window_info_win()
-    return app_process.lower(), app_title.lower()
+    return app_process, app_title
 
 
 def get_active_window_info_win() -> Tuple[str, str]:
@@ -145,23 +145,23 @@ def remove_emojis(text: str) -> str:
         "\U0001F1E0-\U0001F1FF"
         "\U00002702-\U000027B0"
         "\U000024C2-\U0001F251"
-        "\U0001f926-\U0001f937"
-        "\U00010000-\U0010ffff"
-        "\u200d"
+        "\U0001F926-\U0001F937"
+        "\U00010000-\U0010FFFF"
+        "\u200D"
         "\u2640-\u2642"
         "\u2600-\u2B55"
-        "\u23cf"
-        "\u23e9"
-        "\u231a"
+        "\u23CF"
+        "\u23E9"
+        "\u231A"
         "\u3030"
-        "\ufe0f"
+        "\uFE0F"
         "]+",
         flags=re.UNICODE,
     )
     return emoji_pattern.sub(r"", text)
 
 
-def test_for_wayland():
+def is_using_wayland():
     """Check if we are running on Wayland DE.
 
     Returns

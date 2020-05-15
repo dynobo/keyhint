@@ -4,8 +4,6 @@
 from pathlib import Path
 import shutil
 import os
-
-# Extra
 import yaml
 
 # Own

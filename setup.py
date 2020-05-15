@@ -2,7 +2,7 @@
 
 # standard
 from setuptools import setup, find_packages  # type: ignore
-from keyhint.core import __repo__, __version__, __author__, __email__
+import keyhint
 
 with open("README.md") as f:
     readme = f.read()
@@ -12,14 +12,14 @@ with open("LICENSE") as f:
 
 setup(
     name="keyhint",
-    version=__version__,
+    version=keyhint.__version__,
     description="Show context sensitive keyboard shortcuts or other hints",
     keywords="shortcuts keybindings hints helper reminder",
     long_description=readme,
     long_description_content_type="text/markdown",
-    author=__author__,
-    author_email=__email__,
-    url=__repo__,
+    author=keyhint.__author__,
+    author_email=keyhint.__email__,
+    url=keyhint.__repo__,
     license=license_text,
     packages=find_packages(exclude=("tests", "data")),
     entry_points={"console_scripts": ["keyhint=keyhint.__main__:run"]},

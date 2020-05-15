@@ -201,7 +201,9 @@ class ShowHintsHandler(AbstractHandler):
             root.overrideredirect(True)
 
         HintsWindow(root, self.data)
-        root.mainloop()
+
+        if not data.testrun:
+            root.mainloop()
 
         if self._next_handler:
             return super().handle(data)

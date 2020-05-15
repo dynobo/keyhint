@@ -2,6 +2,7 @@
 
 # Standard
 import logging
+import sys
 
 # Own
 from . import helpers
@@ -34,14 +35,15 @@ def client_code(handler: AbstractHandler, data: HintsData) -> HintsData:
     return data
 
 
-def main():
+def main(testrun=False):
     """Orchestrates the sequence of execution from start to end."""
-    logger = helpers.init_logging(__name__, logging.DEBUG, to_file=False)
+    logger = helpers.init_logging(__name__, logging.DEBUG, to_file=True)
     logger.info("Starting keyhint v%s ...", __version__)
 
     try:
         # Central data model
         data = HintsData()
+        data.testrun = testrun
 
         # Define handlers
         load_configs = LoadConfigsHandler()
@@ -68,6 +70,9 @@ def main():
             "If you like, submit an error report on %s/issues .", __repo__,
         )
         logger.error("If you do so, please include the information above.")
+        sys.exit(1)
+
+    sys.exit(0)
 
 
 if __name__ == "__main__":

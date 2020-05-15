@@ -16,6 +16,9 @@ class HintsData:
     the final hint window is rendered based on it's attributes.
     """
 
+    # Indicates unit tests
+    testrun: bool = False
+
     # Information about active info
     app_process: str = ""
     app_title: str = ""
