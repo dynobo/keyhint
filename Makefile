@@ -1,3 +1,6 @@
+colon := :
+$(colon) := :
+
 init:
 	rm -rf ./.venv
 	rm ~/.config/keyhint/*
@@ -18,4 +21,17 @@ run:
 
 package:
 	rm -rf build dist
-	python setup.py sdist bdist_wheel
+	.venv/bin/python setup.py sdist bdist_wheel
+	.venv/bin/twine check dist/*
+
+upload_test:
+	rm -rf build dist
+	.venv/bin/python setup.py sdist bdist_wheel
+	.venv/bin/twine check dist/*
+	.venv/bin/twine upload --repository-url=https$(:)//test.pypi.org/legacy/ dist/*
+
+upload_final:
+	rm -rf build dist
+	.venv/bin/python setup.py sdist bdist_wheel
+	.venv/bin/twine check dist/*
+	.venv/bin/twine upload dist/*

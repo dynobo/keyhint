@@ -7,21 +7,18 @@ import keyhint
 with open("README.md") as f:
     readme = f.read()
 
-with open("LICENSE") as f:
-    license_text = f.read()
-
 setup(
     name="keyhint",
     version=keyhint.__version__,
     description="Display context-sensitive keyboard shortcuts or"
     + " other hints on Linux and Windows",
     keywords="shortcuts keybindings hints helper reminder",
-    long_description=readme,
     long_description_content_type="text/markdown",
+    long_description=readme,
     author=keyhint.__author__,
     author_email=keyhint.__email__,
     url=keyhint.__repo__,
-    license=license_text,
+    license="MIT License",
     packages=find_packages(exclude=("tests",)),
     include_package_data=True,
     entry_points={"console_scripts": ["keyhint=keyhint.__main__:run"]},
