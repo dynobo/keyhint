@@ -22,11 +22,11 @@ jobs:
 
       # LINT
       - name: Lint with pylama
-        run: pylama
+        run: python3 -m pylama
 
       # TEST
       - name: Test with pytest
-        run: xvfb-run --server-args="-screen 0 1024x768x24+32" pytest
+        run: xvfb-run --server-args="-screen 0 1024x768x24+32" python3 -m pytest
 
   # test_macos:
   #   name: Test on MacOS
@@ -64,7 +64,7 @@ jobs:
 
       # LINT
       - name: Lint with flake8
-        run: pylama
+        run: python -m pylama
 
       # TEST
       - name: Test with pytest
