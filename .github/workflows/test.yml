@@ -18,15 +18,19 @@ jobs:
         run: sudo apt-get update && sudo apt-get install python3.7 python3.7-dev python3.7-tk python3-setuptools
 
       - name: Install dependencies
-        run: python3 -m pip install -r requirements-dev.txt
+        run: python3.7 -m pip install -r requirements-dev.txt
+
+        # Version
+      - name: Print version
+        run: python3.7 --version && python3 --version
 
       # LINT
       - name: Lint with pylama
-        run: python3 -m pylama
+        run: python3.7 -m pylama
 
       # TEST
       - name: Test with pytest
-        run: xvfb-run --server-args="-screen 0 1024x768x24+32" python3 -m pytest
+        run: xvfb-run --server-args="-screen 0 1024x768x24+32" python3.7 -m pytest
 
   # test_macos:
   #   name: Test on MacOS
