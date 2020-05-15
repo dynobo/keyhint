@@ -47,7 +47,7 @@
 # ---------------------------
 - title: Firefox - Github
   regex_process: Firefox
-  regex_title: https\\://github\\.com
+  regex_title: .*github\.com.*
   source: https://help.github.com/en/github/getting-started-with-github/keyboard-shortcuts
   hints:
     Side Wide:

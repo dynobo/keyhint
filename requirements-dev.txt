@@ -1,5 +1,3 @@
-
--r requirements-prod.txt
 # Tests
 pytest
 pytest-cov
@@ -25,3 +23,5 @@ bumpversion
 
 # Publish
 twine
+setuptools 
+wheel
