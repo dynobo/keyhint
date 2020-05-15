@@ -26,8 +26,6 @@ def test_get_active_window_info():
     app_process, app_title = helpers.get_active_window_info(platform.system())
     assert isinstance(app_process, str)
     assert isinstance(app_title, str)
-    assert len(app_process) > 0
-    assert len(app_title) > 0
 
 
 def test_get_active_window_info_win():
@@ -35,8 +33,6 @@ def test_get_active_window_info_win():
         app_process, app_title = helpers.get_active_window_info_win()
         assert isinstance(app_process, str)
         assert isinstance(app_title, str)
-        assert len(app_process) > 0
-        assert len(app_title) > 0
     else:
         assert True
 
@@ -46,8 +42,6 @@ def test_get_active_window_info_x():
         app_process, app_title = helpers.get_active_window_info_x()
         assert isinstance(app_process, str)
         assert isinstance(app_title, str)
-        assert len(app_process) > 0
-        assert len(app_title) > 0
     else:
         assert True
 

@@ -48,7 +48,7 @@ class HintsData:
             # Convert other attributes to strings
             if attr in ["config", "hints"]:
                 text += f"{attr}:\n"
-                text += pprint.pformat(getattr(self, attr), width=100, sort_dicts=False)
+                text += pprint.pformat(getattr(self, attr), width=100)
                 text += "\n"
 
             else:

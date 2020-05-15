@@ -95,7 +95,9 @@ def get_active_window_info_win() -> Tuple[str, str]:  # pylint: disable=R0914
             h_process, h_module.value, str_buf, sizeof(uc_buf)
         )
         windll.kernel32.CloseHandle(h_process)
-        app_process = "".join(str_buf)
+        app_process = "".join(
+            [b.decode("utf-8") for b in str_buf if b.decode("utf-8") != "\x00"]
+        )
 
     return app_process, app_title
 
