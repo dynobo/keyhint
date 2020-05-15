@@ -37,7 +37,7 @@ def test_create_default_configs():
     it_worked = True
     try:
         handler._create_default_configs()
-    except:
+    except:  # noqa
         it_worked = False
 
     assert (handler.data.config_path / "hints.yaml").exists()

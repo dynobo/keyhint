@@ -3,7 +3,6 @@
 # Standard
 import logging
 import platform
-from pathlib import Path
 
 # Own
 from .context import keyhint

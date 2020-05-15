@@ -33,6 +33,5 @@ setup(
         "Intended Audience :: End Users/Desktop",
         "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX :: Linux",
-        # "Operating System :: MacOS",
     ],
 )

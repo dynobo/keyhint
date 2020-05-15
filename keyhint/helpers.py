@@ -54,7 +54,7 @@ def get_active_window_info(platform_os) -> Tuple[str, str]:
     return app_process, app_title
 
 
-def get_active_window_info_win() -> Tuple[str, str]:
+def get_active_window_info_win() -> Tuple[str, str]:  # pylint: disable=R0914
     """Read app_process and app_title on X based Linux systems."""
     app_title = ""
     app_process = ""

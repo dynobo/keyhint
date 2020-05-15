@@ -161,10 +161,12 @@ class HintsWindow(Frame):
         )
 
     def _set_window_style(self):
-        """Center a window on the screen."""
+        """Center a window on the screen.
+
+        root.wait_visibility(root) my bee needed, have to check that!
+        """
         root = self.master
 
-        # root.wait_visibility(root)
         root.attributes("-alpha", self.data.config["style"].get("alpha", 0.8))
 
         if self.data.platform_os == "Windows":
