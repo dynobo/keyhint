@@ -181,7 +181,7 @@ def get_users_config_path() -> Union[Path, None]:
         Path -- Root of config folder
 
     """
-    platform_system = platform.system()  #'Linux', 'Darwin' or 'Windows'
+    platform_system = platform.system()  # 'Linux', 'Darwin' or 'Windows'
 
     config_path: Union[Path, None] = None
 
