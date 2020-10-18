@@ -17,7 +17,7 @@ from .data_model import HintsData
 __author__ = "dynobo"
 __email__ = "dynobo@mailbox.org"
 __repo__ = "https://github.com/dynobo/keyhint"
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 
 
 def client_code(handler: AbstractHandler, data: HintsData) -> HintsData:
@@ -37,10 +37,7 @@ def client_code(handler: AbstractHandler, data: HintsData) -> HintsData:
 
 def main(testrun=False):
     """Orchestrates the sequence of execution from start to end."""
-    logger = helpers.init_logging(__name__, logging.DEBUG, to_file=False)
-    import time
-
-    logger.info(f"{time.time()} - Style ")
+    logger = helpers.init_logging(__name__, logging.ERROR, to_file=False)
     logger.info("Starting keyhint v%s ...", __version__)
 
     try:

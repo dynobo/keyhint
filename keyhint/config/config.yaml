@@ -3,7 +3,7 @@ style:
   font_family:
   font_base_size: 14
   max_rows: 20
-  statusbar_visible: true
+  show_statusbar: true
 
   background_color: "#1F232B"
   title_color: "#eceff4"
