@@ -16,12 +16,6 @@ def test_helpers_init_logging():
     assert isinstance(logger, logging.Logger)
 
 
-def test_helpers_init_logging_to_file():
-    """Test if function returns a logger."""
-    logger = helpers.init_logging("test_logger", to_file=True)
-    assert isinstance(logger, logging.Logger)
-
-
 def test_get_active_window_info():
     app_process, app_title = helpers.get_active_window_info(platform.system())
     assert isinstance(app_process, str)
