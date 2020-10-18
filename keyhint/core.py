@@ -18,7 +18,7 @@ from .data_model import HintsData
 __author__ = "dynobo"
 __email__ = "dynobo@mailbox.org"
 __repo__ = "https://github.com/dynobo/keyhint"
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 
 def client_code(handler: AbstractHandler, data: HintsData) -> HintsData:
