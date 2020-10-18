@@ -1,7 +1,10 @@
 """Handler responsible for attaching screenshot(s) to session data."""
 
 # default
-from tkinter import Frame, Label, Tk, Text  # noqa
+from tkinter import Tk, font, Text  # noqa import Label, Tk, Text, font  # noqa
+from tkinter.ttk import Frame, Label, Style
+import time
+import logging
 
 # Own
 from ..data_model import HintsData
@@ -22,23 +25,30 @@ class HintsWindow(Frame):
             master (Tk): Root window object
             data (HintsData): Central data object
         """
+        self._logger = logging.getLogger(self.__class__.__name__)
         Frame.__init__(self, master)
         self.data = data
 
         self.pack(side="top", fill="both", expand="yes")
         self.lift()
 
+        self._logger.info(f"{time.time()} - Style ")
         self._set_style()
+
+        self._logger.info(f"{time.time()} - Layout")
         self._create_layout()
 
+        self._logger.info(f"{time.time()} - Window")
         self._set_window_style()
+
+        self._logger.info(f"{time.time()} - Done")
 
     def _set_style(self):
         """Configure style for window."""
         style: dict = self.data.config["style"]
 
         # Fallback to defaults, if missing
-        font_family = style.get("font_family", "")
+        font_family_name = style.get("font_family", "")
         font_base_size = style.get("font_base_size", 16)
         background_color = style.get("background_color", "black")
         title_color = style.get("title_color", "white")
@@ -49,43 +59,37 @@ class HintsWindow(Frame):
 
         # Window Background
         self.style["background_color"] = background_color
-        self.config(bg=background_color)
+        font_family = font.nametofont("TkDefaultFont").copy()
 
-        # Font Styles
-        self.style["title_format"] = {
-            "font": (font_family, int(font_base_size * 1.4),),
-            "fg": title_color,
-            "bg": background_color,
-            "justify": "center",
-        }
-        self.style["group_title_format"] = {
-            "font": (font_family, int(font_base_size * 1.125),),
-            "bg": background_color,
-            "fg": group_title_color,
-            "justify": "left",
-        }
-        self.style["description_format"] = {
-            "font": (font_family, int(font_base_size * 0.85),),
-            "bg": background_color,
-            "fg": description_color,
-            "justify": "left",
-        }
-        self.style["keys_format"] = {
-            "font": (font_family, int(font_base_size * 0.85), "bold",),
-            "bg": background_color,
-            "fg": keys_color,
-            "justify": "left",
-        }
-        self.style["statusbar_format"] = {
-            "font": (font_family, int(font_base_size * 0.5)),
-            "bg": background_color,
-            "fg": statusbar_color,
-            "justify": "center",
-        }
+        style = Style()
+        style.configure(
+            "title.TLabel",
+            foreground=title_color,
+            font=(font_family, int(font_base_size * 1.5)),
+        )
+        style.configure(
+            "groupTitle.TLabel",
+            foreground=group_title_color,
+            font=(font_family, int(font_base_size * 1.125)),
+        )
+        style.configure(
+            "keys.TLabel",
+            foreground=keys_color,
+            font=(font_family, int(font_base_size)),
+        )
+        style.configure(
+            "desc.TLabel",
+            foreground=description_color,
+            font=(font_family, int(font_base_size)),
+        )
+        style.configure(
+            "statusbar.TLabel",
+            foreground=statusbar_color,
+            font=(font_family, int(font_base_size * 0.8)),
+        )
 
     def _create_title_row(self, text, max_cols):
-        title = Label(self, text=text)
-        title.config(**self.style["title_format"])
+        title = Label(self, text=text, style="title.TLabel")
         title.grid(column=0, columnspan=max_cols, row=0)
 
     def _create_group_title_row(self, column, row, group):
@@ -93,38 +97,40 @@ class HintsWindow(Frame):
             pady = (0, 5)
         else:
             pady = (15, 5)
-        group_title = Label(column, text=group)
+        group_title = Label(column, text=group, style="groupTitle.TLabel")
         group_title.grid(column=0, columnspan=2, pady=pady, padx=0, sticky="W")
-        group_title.config(**self.style["group_title_format"])
 
     def _create_key_desc_row(self, col, key, desc):
-        desc = Label(col, text=desc)
+        desc = Label(col, text=desc, style="desc.TLabel")
         desc.grid(column=0, row=self.current_row, sticky="W", padx=15, pady=2)
-        desc.config(**self.style["description_format"])
 
-        key = Label(col, text=key)
+        key = Label(col, text=key, style="keys.TLabel")
         key.grid(column=1, row=self.current_row, sticky="W", padx=15, pady=2)
-        key.config(**self.style["keys_format"])
 
     def _create_statusbar_row(self, text, max_cols, row):
-        status = Label(self, text=text, wraplength=300 * max_cols)
-        status.config(**self.style["statusbar_format"])
+        status = Label(
+            self, text=text, wraplength=300 * max_cols, style="statusbar.TLabel"
+        )
+        # with: 0.048 / without: 0.026 - 0.030
         status.grid(column=0, columnspan=max_cols, row=row, pady=1)
 
     def _create_new_column(self):
-        column = Frame(self, bg=self.style["background_color"])
+        column = Frame(self)
         column.grid(row=1, column=self.current_col, sticky="nsew", padx=15, pady=15)
         self.current_col += 1
         self.current_row = 1
         return column
 
     def _create_layout(self):
+        start_time = time.time()
+        self._logger.info(f"{start_time} - Layout - Start")
         self.current_row = 1  # Row 0 is reserved for Title
         self.current_col = 0
 
         max_rows = self.data.config["style"].get("max_rows", 15)
         acutal_max_rows = 0  # actual might not reach max_rows
         column = self._create_new_column()
+        self._logger.info(f"Layout - {time.time() - start_time:.4f} - Init")
 
         if len(self.data.hints) <= 0:
             acutal_max_rows = 1
@@ -134,7 +140,6 @@ class HintsWindow(Frame):
             title_text = first_hints["title"]
 
             for group, hints in first_hints["hints"].items():
-
                 # Start next column, if less than 4 rows left
                 if self.current_row > max_rows - 4:
                     column = self._create_new_column()
@@ -151,8 +156,12 @@ class HintsWindow(Frame):
                     self._create_key_desc_row(column, key, desc)
                     self.current_row += 1
                     acutal_max_rows = max(acutal_max_rows, self.current_row)
+                self._logger.info(
+                    f"Layout - {time.time() - start_time:.4f} - Group {group}"
+                )
 
         self._create_title_row(title_text, self.current_col)
+        self._logger.info(f"Layout - {time.time() - start_time:.4f} - Title")
 
         # Show statusbar if enabled in config or now hints found
         if (len(self.data.hints) <= 0) or self.data.config["style"][
@@ -163,6 +172,9 @@ class HintsWindow(Frame):
                 self.current_col,
                 acutal_max_rows,
             )
+        self._logger.info(f"Layout - {time.time() - start_time:.4f} - Statusbar")
+
+        self._logger.info(f"{time.time()} - Layout - End")
 
     def _set_window_style(self):
         """Center a window on the screen.
@@ -199,13 +211,27 @@ class ShowHintsHandler(AbstractHandler):
         self.data = data
 
         root = Tk(className="keyhint")
+
+        # style: dict = self.data.config["style"]
+        # Fallback to defaults, if missing
+        # font_family = style.get("font_family", "")
+        # font_base_size = style.get("font_base_size", 16)
+        # background_color = style.get("background_color", "black")
+
+        # self.default_font = font.nametofont("TkDefaultFont")
+        # self.default_font.configure(size=int(font_base_size * 0.85), family=font_family)
+
+        # root.option_add("*Font", self.default_font)
+        # root.configure(bg="red")
+
         root.title("keyhint")
+
         if self.data.config["behavior"]["close_on_mouse_out"]:
-            root.bind("<FocusOut>", lambda x: root.destroy())
+            root.bind("<FocusOut>", lambda _: root.destroy())
         if self.data.config["behavior"]["close_on_anykey"]:
-            root.bind_all("<Key>", lambda x: root.destroy())
+            root.bind_all("<Key>", lambda _: root.destroy())
         if self.data.config["behavior"]["close_on_esc"]:
-            root.bind_all("<Escape>", lambda x: root.destroy())
+            root.bind_all("<Escape>", lambda _: root.destroy())
 
         if self.data.platform_os == "Windows":
             root.overrideredirect(True)

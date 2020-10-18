@@ -37,7 +37,10 @@ def client_code(handler: AbstractHandler, data: HintsData) -> HintsData:
 
 def main(testrun=False):
     """Orchestrates the sequence of execution from start to end."""
-    logger = helpers.init_logging(__name__, logging.DEBUG, to_file=True)
+    logger = helpers.init_logging(__name__, logging.DEBUG, to_file=False)
+    import time
+
+    logger.info(f"{time.time()} - Style ")
     logger.info("Starting keyhint v%s ...", __version__)
 
     try:
