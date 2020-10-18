@@ -39,11 +39,13 @@ def main(testrun=False):
     """Orchestrates the sequence of execution from start to end."""
     logger = helpers.init_logging(__name__, logging.ERROR, to_file=False)
     logger.info("Starting keyhint v%s ...", __version__)
-
+    data = None
     try:
         # Central data model
         data = HintsData()
-        data.testrun = testrun
+        if testrun:
+            data.testrun = testrun
+            data
 
         # Define handlers
         load_configs = LoadConfigsHandler()
@@ -62,14 +64,13 @@ def main(testrun=False):
     except Exception as error:  # noqa
         # Print useful information for reporting
         logger.error("================ An error occured! ============")
-        logger.error("Stacktrace:")
-        logger.exception(error)
+        logger.error("Stacktrace:\n%s", error)
         logger.error("Datamodel on Error:%s", data)
         logger.error("keyhint Version: %s", __version__)
         logger.error(
-            "If you like, submit an error report on %s/issues .", __repo__,
+            "If you like, submit the info above as error report on %s/issues .",
+            __repo__,
         )
-        logger.error("If you do so, please include the information above.")
         sys.exit(1)
 
     sys.exit(0)

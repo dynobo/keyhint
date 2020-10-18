@@ -37,4 +37,3 @@ class SelectHintsHandler(AbstractHandler):
 
         if self._next_handler:
             return super().handle(data)
-        return data
