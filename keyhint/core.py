@@ -43,6 +43,7 @@ def main(testrun=False):
     try:
         # Central data model
         data = HintsData()
+        data.testrun = testrun
 
         # Define handlers
         load_configs = LoadConfigsHandler()

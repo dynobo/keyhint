@@ -27,7 +27,7 @@ class HintsWindow(Frame):
         Frame.__init__(self, master)
         self.data = data
 
-        self.pack(side="top", fill="both", expand="yes")
+        self.pack(side="top", fill="both", expand=True)
         self.lift()
 
         self._set_style()
