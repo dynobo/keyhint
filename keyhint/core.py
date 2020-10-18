@@ -3,6 +3,7 @@
 # Standard
 import logging
 import sys
+import traceback
 
 # Own
 from . import helpers
@@ -63,7 +64,7 @@ def main(testrun=False):
     except Exception as error:  # noqa
         # Print useful information for reporting
         logger.error("================ An error occured! ============")
-        logger.error("Stacktrace:\n%s", error)
+        logger.exception("Error: %s", error)
         logger.error("Datamodel on Error:%s", data)
         logger.error("keyhint Version: %s", __version__)
         logger.error(

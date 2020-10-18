@@ -1,6 +1,6 @@
 # keyhint
 
-**_Display context-sensitive keyboard shortcuts or other hints on Linux and Windows._**
+**_Display keyboard shortcuts or other hints based on the **process name** and **window title** of the active window. (Linux/Windows)_**
 
 <p align="center"><br>
 <img alt="Tests passing" src="https://github.com/dynobo/keyhint/workflows/Test/badge.svg">
@@ -13,13 +13,11 @@
 
 - Install: `pip install keyhint`
 - Execute: `keyhint`
-- Recommendation: Configure a **global hotkey** to start `keyhint` on demand.
+- Tip: Configure a **global hotkey** to start `keyhint` on demand!
 
-Based on the **process name** and **window title** of the active window, different sets of hints are displayed.
+_Keyhint showing shortcuts for VS Code:_
 
-_Screenshots of some hints:_
-
-![General Firefox Shortcuts](assets/demo.gif)
+![General Firefox Shortcuts](assets/vscode.png)
 
 ## Configuration
 

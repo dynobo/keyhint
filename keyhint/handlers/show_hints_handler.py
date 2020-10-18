@@ -1,7 +1,9 @@
 """Handler responsible for attaching screenshot(s) to session data."""
 
 # default
-from tkinter import Frame, Label, Tk, font  # noqa
+from tkinter import Frame, Label, Tk  # noqa
+from tkinter.font import nametofont  # noqa
+
 import logging
 
 # Own
@@ -51,13 +53,13 @@ class HintsWindow(Frame):
         self.style["background_color"] = background_color
         self.config(bg=background_color)
 
-        title_font = font.nametofont("TkDefaultFont").copy()
+        title_font = nametofont("TkDefaultFont").copy()
         title_font.configure(size=int(font_base_size * 1.4))
 
-        group_title_font = font.nametofont("TkDefaultFont").copy()
+        group_title_font = nametofont("TkDefaultFont").copy()
         group_title_font.configure(size=int(font_base_size * 1.125))
 
-        statusbar_font = font.nametofont("TkDefaultFont").copy()
+        statusbar_font = nametofont("TkDefaultFont").copy()
         statusbar_font.configure(size=int(font_base_size * 0.5))
 
         # Font Styles
@@ -198,7 +200,7 @@ class ShowHintsHandler(AbstractHandler):
         # Default font
         font_family = self.data.config["style"].get("font_family", "")
         font_base_size = self.data.config["style"].get("font_base_size", 16)
-        default_font = font.nametofont("TkDefaultFont")
+        default_font = nametofont("TkDefaultFont")
         default_font.configure(size=int(font_base_size * 0.85), family=font_family)
         root.option_add("*Font", default_font)
 
