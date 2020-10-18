@@ -3,6 +3,7 @@
 # Standard
 import logging
 import sys
+import traceback  # noqa
 
 # Own
 from . import helpers
@@ -17,7 +18,7 @@ from .data_model import HintsData
 __author__ = "dynobo"
 __email__ = "dynobo@mailbox.org"
 __repo__ = "https://github.com/dynobo/keyhint"
-__version__ = "0.1.0"
+__version__ = "0.1.3"
 
 
 def client_code(handler: AbstractHandler, data: HintsData) -> HintsData:
@@ -37,9 +38,10 @@ def client_code(handler: AbstractHandler, data: HintsData) -> HintsData:
 
 def main(testrun=False):
     """Orchestrates the sequence of execution from start to end."""
-    logger = helpers.init_logging(__name__, logging.DEBUG, to_file=True)
-    logger.info("Starting keyhint v%s ...", __version__)
 
+    logger = helpers.init_logging(__name__, logging.ERROR)
+    logger.info("Starting keyhint v%s ...", __version__)
+    data = None
     try:
         # Central data model
         data = HintsData()
@@ -62,14 +64,13 @@ def main(testrun=False):
     except Exception as error:  # noqa
         # Print useful information for reporting
         logger.error("================ An error occured! ============")
-        logger.error("Stacktrace:")
-        logger.exception(error)
+        logger.exception("Error: %s", error)
         logger.error("Datamodel on Error:%s", data)
         logger.error("keyhint Version: %s", __version__)
         logger.error(
-            "If you like, submit an error report on %s/issues .", __repo__,
+            "If you like, submit the info above as error report on %s/issues .",
+            __repo__,
         )
-        logger.error("If you do so, please include the information above.")
         sys.exit(1)
 
     sys.exit(0)

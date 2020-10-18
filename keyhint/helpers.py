@@ -10,20 +10,18 @@ from typing import Tuple, Union
 from pathlib import Path
 
 
-def init_logging(
-    name: str, log_level: int = logging.DEBUG, to_file: bool = False
-) -> logging.Logger:
+def init_logging(name: str, log_level: int = logging.DEBUG) -> logging.Logger:
     """Initialize Logger with formatting and desired level.
 
     Arguments
         log_level {logging._Level} -- Desired loglevel
-        to_file {bool} -- Log also to file on disk
 
     Returns
         logging.Logger -- Formatted logger with desired level
 
     """
-    if to_file:
+    platform_system = platform.system()
+    if platform_system == "Windows":
         logging.basicConfig(
             filename="keyhint.log",
             filemode="w",
@@ -183,7 +181,7 @@ def get_users_config_path() -> Union[Path, None]:
         Path -- Root of config folder
 
     """
-    platform_system = platform.system()  #'Linux', 'Darwin' or 'Windows'
+    platform_system = platform.system()  # 'Linux', 'Darwin' or 'Windows'
 
     config_path: Union[Path, None] = None
 
