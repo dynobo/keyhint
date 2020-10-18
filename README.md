@@ -11,17 +11,15 @@
 
 ## Usage
 
-The tool can be started by `python -m keyhint` or simply `keyhint`. But as the **keyhint** displays hints based on the currently active window, you probably want to configure a **global hotkey** to trigger it on demand.
+- Install: `pip install keyhint`
+- Execute: `keyhint`
+- Recommendation: Configure a **global hotkey** to start `keyhint` on demand.
 
 Based on the **process name** and **window title** of the active window, different sets of hints are displayed.
 
 _Screenshots of some hints:_
 
 ![General Firefox Shortcuts](assets/demo.gif)
-
-## Installation
-
-`pip install keyhint`
 
 ## Configuration
 
