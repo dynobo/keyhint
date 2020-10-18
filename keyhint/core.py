@@ -3,7 +3,7 @@
 # Standard
 import logging
 import sys
-import traceback
+import traceback  # noqa
 
 # Own
 from . import helpers
