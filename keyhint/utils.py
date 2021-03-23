@@ -1,4 +1,3 @@
-import ast
 import os
 import re
 import subprocess
@@ -46,31 +45,32 @@ def replace_keys(text: str) -> str:
 
 
 def get_active_window_info_wayland():
-    app_command = 'gdbus call -e -d org.gnome.Shell -o /org/gnome/Shell -m org.gnome.Shell.Eval global.get_window_actors\(\)[`gdbus call -e -d org.gnome.Shell -o /org/gnome/Shell -m org.gnome.Shell.Eval global.get_window_actors\(\).findIndex\(a\=\>a.meta_window.has_focus\(\)===true\) | cut -d"\'" -f 2`].get_meta_window\(\).get_wm_class\(\)'
-    app_process = subprocess.Popen(
-        app_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    # https://gist.github.com/rbreaves/257c3edfa301786e66e964d7ac036269
+    def _get_cmd_result(cmd):
+        stdout_bytes: bytes = subprocess.check_output(cmd, shell=True)
+        stdout = stdout_bytes.decode()
+        match = re.search(r"'(.+)'", stdout)
+        return match.groups()[0].strip('"')
+
+    cmd_eval = (
+        "gdbus call -e -d org.gnome.Shell -o /org/gnome/Shell -m org.gnome.Shell.Eval"
     )
-    app_retval = app_process.stdout.read()
-    app_retcode = app_process.wait()
+    cmd_win_idx = (
+        ' "global.get_window_actors().findIndex(a=>a.meta_window.has_focus()===true)"'
+    )
+    window_idx = _get_cmd_result(cmd_eval + cmd_win_idx)
 
-    app_tuple_string = app_retval.decode("utf-8").strip()
-    # We now have a string that looks like:
-    # (true, "\"Qur'an App"\")
+    cmd_wm_class = (
+        f' "global.get_window_actors()[{window_idx}].get_meta_window().get_wm_class()"'
+    )
+    wm_class = _get_cmd_result(cmd_eval + cmd_wm_class)
 
-    app_tuple_string = app_tuple_string.replace("(true", "(True")
-    app_tuple_string = app_tuple_string.replace("(false", "(False")
-    # We now have a string that looks like a python tuple:
-    # (True, "\"Qur'an App"\")
+    cmd_wm_title = (
+        f' "global.get_window_actors()[{window_idx}].get_meta_window().get_title()"'
+    )
+    title = _get_cmd_result(cmd_eval + cmd_wm_title)
 
-    app_tuple = ast.literal_eval(app_tuple_string)
-    app = app_tuple[1]
-    # We now have a string with quotes in it that looks like:
-    # "Qur'an App"
-
-    app = ast.literal_eval(app)
-    # We now have a string that looks like:
-    # Qur'an App
-    return app
+    return wm_class, title
 
 
 def get_active_window_info_x() -> Tuple[str, str]:
@@ -95,17 +95,17 @@ def get_active_window_info_x() -> Tuple[str, str]:
     stdout = stdout_bytes.decode()
 
     # Extract app_title and app_process from output
-    app_title = app_process = ""
+    title = wm_class = ""
 
     match = re.search(r'WM_NAME\(\w+\) = "(?P<name>.+)"', stdout)
     if match is not None:
-        app_title = match.group("name")
+        title = match.group("name")
 
     match = re.search(r'WM_CLASS\(\w+\) =.*"(?P<class>.+?)"$', stdout)
     if match is not None:
-        app_process = match.group("class")
+        wm_class = match.group("class")
 
-    return app_process, app_title
+    return wm_class, title
 
 
 def is_using_wayland():
