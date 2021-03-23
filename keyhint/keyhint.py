@@ -7,7 +7,13 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gio, GLib, Gtk
 
-from keyhint.utils import load_hints, replace_keys
+from keyhint.utils import (
+    get_active_window_info_wayland,
+    get_active_window_info_x,
+    is_using_wayland,
+    load_hints,
+    replace_keys,
+)
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -228,6 +234,11 @@ class Application(Gtk.Application):
 
 
 def main():
+    # app_process, app_title = get_active_window_info_x()
+    # logger.info(app_process, app_title)
+    if is_using_wayland():
+        logger.warning(get_active_window_info_wayland())
+
     app = Application()
     app.run(sys.argv)
 
