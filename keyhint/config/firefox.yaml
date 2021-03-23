@@ -1,0 +1,43 @@
+title: Firefox
+regex_process: Firefox
+regex_title: .*
+hints:
+  URL Navigation:
+    Ctrl + l: Location bar
+    Alt + left: Back in History
+    Alt + right: Forward in History
+
+  Tab Management:
+    Ctrl + t: New tab
+    Ctrl + Tab: Next tab
+    Ctrl + 1..8: Select tab 1..8
+    Ctrl + w: Close tab
+    Ctrl + Shift + t: Undo close tab
+    /: Quick Find
+
+  Various:
+    Ctrl + Shift + y: Show downloads
+
+  Vimium - Scrolling:
+    j, k: Scroll down, up
+    d, u: Scroll page down, up
+    h, l: Scroll left, right
+
+  Vimium - URL Navigation:
+    b: Open a bookmark
+    B: Open a bookmark in new tab
+    r: Reload page
+    gu: Go up the URL hierarchy
+    gU: Go to root in URL hierarchy
+    f: Open link in current tab
+    F: Open link new current tab
+    H: Back in History
+    L: Forward in History
+
+  Vimium - Tabs:
+    t: Create new tab
+    J, K: Next/previous tab
+    yt: Duplicate tab
+    x: Close tab
+    X: Undo close tab
+    W: Move tab to new window

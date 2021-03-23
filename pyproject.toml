@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "keyhint"
+version = "0.1.0"
+description="Display context-sensitive keyboard shortcuts or other hints on Linux and Windows",
+keywords="shortcuts keybindings hints helper cheatsheet"
+licence = "MIT"
+authors = ["dynobo <dynobo@mailbox.org>"]
+readme = "README.md"
+repository = "https://github.com/dynobo/keyhint"
+classifiers=[
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: Utilities",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+]
+
+
+[tool.poetry.scripts]
+keyhint = "keyhint.keyhint:main"
+
+
+[tool.poetry.dependencies]
+python = "^3.8"
+PyGObject = "^3.40.0"
+PyYAML = "^5.4.1"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+mypy = "^0.812"
+isort = "^5.7.0"
+flake8 = "^3.9.0"
+pylint = "^2.7.2"
+pydocstyle = "^6.0.0"
+rope = "^0.18.0"
+black = {version = "^20.8b1", allow-prereleases = true}
+pytest-cov = "^2.11.1"
+pre-commit = "^2.11.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

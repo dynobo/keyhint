@@ -1,8 +1,8 @@
-from .core import main
+from keyhint.keyhint import main
 
 
 def run():
-    main()
+    _ = main()
 
 
 if __name__ == "__main__":
