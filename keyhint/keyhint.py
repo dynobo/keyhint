@@ -1,11 +1,11 @@
-import sys
-import logging
 import importlib.resources
+import logging
+import sys
 
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import GLib, Gio, Gtk, Gdk
+from gi.repository import Gdk, Gio, GLib, Gtk
 
 from keyhint.utils import load_hints, replace_keys
 
