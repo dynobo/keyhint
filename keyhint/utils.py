@@ -26,6 +26,7 @@ def _discover_hint_files() -> Iterable[Path]:
 def load_hints() -> List[dict]:
     files = _discover_hint_files()
     hints = [_load_yaml_file(f) for f in files]
+    hints = sorted(hints, key=lambda k: k["title"])
     return hints
 
 

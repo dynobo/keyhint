@@ -1,6 +1,10 @@
+id: code
 title: VS Code
-regex_process: code
-regex_title: .*
+source: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-linux.pdf
+match:
+  regex_process: code
+  regex_title: .*
+  
 hints:
   Navigating UI:
     Ctrl + 0: Focus sidebar

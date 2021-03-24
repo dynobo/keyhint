@@ -1,10 +1,13 @@
 import importlib.resources
 import logging
+import re
 import sys
 
 import gi
 
 gi.require_version("Gtk", "3.0")
+gi.require_version("Gdk", "3.0")
+
 from gi.repository import Gdk, Gio, GLib, Gtk
 
 from keyhint.utils import (
@@ -27,9 +30,13 @@ class AppWindow(Gtk.ApplicationWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.get_application()
         self.select_hints_combo = self.create_select_hints_combo()
-        self.select_hints_combo.set_active(0)
+        hint_id = self.get_application().get_appropriate_hint_id()
+        if hint_id is not None:
+            self.select_hints_combo.set_active_id(hint_id)
+        else:
+            self.select_hints_combo.set_active(0)
+
         self.header_bar = self.create_headerbar()
 
         self.set_titlebar(self.header_bar)
@@ -104,11 +111,14 @@ class AppWindow(Gtk.ApplicationWindow):
         return grid
 
     def create_select_hints_combo(self):
-        combo = Gtk.ComboBoxText()
-        combo.set_entry_text_column(0)
-        for title in self.get_application().get_hints_titles():
-            combo.append_text(title)
+        hints_store = Gtk.ListStore(str, str)
+        for hint_id, title in self.get_application().get_hint_ids_titles():
+            hints_store.append([hint_id, title])
+
+        combo = Gtk.ComboBox.new_with_model_and_entry(hints_store)
         combo.connect("changed", self.on_title_combo_changed)
+        combo.set_id_column(0)
+        combo.set_entry_text_column(1)
         return combo
 
     def create_flowbox(self, keyhints):
@@ -124,20 +134,27 @@ class AppWindow(Gtk.ApplicationWindow):
     def create_headerbar(self):
         header_bar = Gtk.HeaderBar(title="Keyhint")
         header_bar.props.show_close_button = True
-        header_bar.pack_end(self.select_hints_combo)
+        header_bar.pack_start(self.select_hints_combo)
         return header_bar
 
+    def get_selected_hint_id(self):
+        hint_id = None
+        selected_hints = self.select_hints_combo.get_active_iter()
+        if selected_hints is not None:
+            model = self.select_hints_combo.get_model()
+            hint_id = model[selected_hints][0]
+        return hint_id
+
     def update_hints_scrolled(self):
-        selected_hints = self.select_hints_combo.get_active_text()
+        hint_id = self.get_selected_hint_id()
+
         if hasattr(self, "hints_scrolled"):
             self.remove(self.hints_scrolled)
 
         self.hints_scrolled = Gtk.ScrolledWindow()
         self.hints_scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
 
-        flowbox = self.create_flowbox(
-            self.get_application().get_hints_by_title(selected_hints)
-        )
+        flowbox = self.create_flowbox(self.get_application().get_hints_by_id(hint_id))
         self.hints_scrolled.add(flowbox)
 
         self.add(self.hints_scrolled)
@@ -193,7 +210,34 @@ class Application(Gtk.Application):
 
         self.set_app_menu(builder.get_object("app-menu"))
 
+    def detect_active_window(self):
+        wm_class = window_title = None
+
+        if is_using_wayland():
+            wm_class, window_title = get_active_window_info_wayland()
+
+        logger.debug(
+            f"Detected wm_class: '{wm_class}'. Detected window_title: '{window_title}'."
+        )
+        return wm_class, window_title
+
+    def get_appropriate_hint_id(self):
+        wm_class, window_title = self.detect_active_window()
+        matching_hints = [
+            h
+            for h in self.hints
+            if re.search(h["match"]["regex_process"], wm_class, re.IGNORECASE)
+            and re.search(h["match"]["regex_title"], window_title, re.IGNORECASE)
+        ]
+
+        if matching_hints:
+            return matching_hints[0]["id"]
+
+        return None
+
     def do_activate(self):
+        self.wm_class, self.window_title = self.detect_active_window()
+
         # We only allow a single window and raise any existing ones
         if not self.window:
             # Windows are associated with the application
@@ -206,7 +250,7 @@ class Application(Gtk.Application):
         options = command_line.get_options_dict()
         options = options.end().unpack()
 
-        logger.warning(options)
+        logger.debug("CLI Options: " + str(options))
         if "verbose" in options:
             logger.setLevel("DEBUG")
             logger.info("Log level is set to 'DEBUG'")
@@ -214,14 +258,14 @@ class Application(Gtk.Application):
         self.activate()
         return 0
 
-    def get_hints_titles(self):
+    def get_hint_ids_titles(self):
         hints = self.hints
-        return [k["title"] for k in hints]
+        return [(k["id"], k["title"]) for k in hints]
 
-    def get_hints_by_title(self, title):
+    def get_hints_by_id(self, hint_id):
         hints = self.hints
         for keyhint in hints:
-            if keyhint["title"] == title:
+            if keyhint["id"] == hint_id:
                 return keyhint
         return None
 
@@ -236,9 +280,6 @@ class Application(Gtk.Application):
 def main():
     # app_process, app_title = get_active_window_info_x()
     # logger.info(app_process, app_title)
-    if is_using_wayland():
-        logger.warning(get_active_window_info_wayland())
-
     app = Application()
     app.run(sys.argv)
 

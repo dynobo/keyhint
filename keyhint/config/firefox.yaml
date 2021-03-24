@@ -1,6 +1,10 @@
+id: firefox
 title: Firefox
-regex_process: Firefox
-regex_title: .*
+source: https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly
+match:
+  regex_process: Firefox
+  regex_title: .*
+  
 hints:
   URL Navigation:
     Ctrl + l: Location bar
