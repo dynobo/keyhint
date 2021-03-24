@@ -34,10 +34,10 @@ def load_hints() -> List[dict]:
 
 def replace_keys(text: str) -> str:
     text = text.upper()
-    text = text.replace("DOWN", "🠣")
-    text = text.replace("UP", "🠡")
-    text = text.replace("LEFT", "🠠")
-    text = text.replace("RIGHT", "🠢")
+    text = text.replace("DOWN", "⬇")
+    text = text.replace("UP", "⬆")
+    text = text.replace("LEFT", "⬅")
+    text = text.replace("RIGHT", "➡")
     text = text.replace("SHIFT", "⇧")
     text = text.replace("ENTER", "↵")
     text = text.replace("CTRL", "ctrl")

@@ -86,6 +86,8 @@ class AppWindow(Gtk.ApplicationWindow):
             label.set_markup(f"{GLib.markup_escape_text(key)}")
             label_context = label.get_style_context()
             label_context.add_class("key")
+            if "🠇" in key:
+                label_context.add_class("symbol")
             box.add(label)
             plus = self.get_plus()
             box.add(plus)
