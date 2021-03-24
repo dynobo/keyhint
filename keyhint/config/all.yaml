@@ -1,0 +1,5 @@
+hint-files:
+  - firefox.yaml
+  - gnome-terminal.yaml
+  - vscode.yaml
+  - www-github.yaml

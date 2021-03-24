@@ -1,3 +1,4 @@
+import importlib
 import os
 import re
 import subprocess
@@ -7,20 +8,21 @@ from typing import Iterable, List, Tuple, Union
 import yaml
 
 
-def _load_yaml_file(file: Union[str, PosixPath]) -> dict:
-    with open(file, "r") as stream:
-        try:
-            result = yaml.safe_load(stream)
-        except yaml.YAMLError as exc:
-            print(exc)
-            result = {}
-        return result
+def _load_yaml_file(file: str) -> dict:
+    try:
+        text = importlib.resources.read_text("keyhint.config", file)
+        result = yaml.safe_load(text)
+    except yaml.YAMLError as exc:
+        print(exc)
+        result = {}
+    return result
 
 
 def _discover_hint_files() -> Iterable[Path]:
-    config_dir = Path.cwd() / "keyhint" / "config"
-    yaml_files = config_dir.glob("*.yaml")
-    return yaml_files
+    f = importlib.resources.read_text("keyhint.config", "all.yaml")
+    all_files = yaml.safe_load(f)
+
+    return all_files["hint-files"]
 
 
 def load_hints() -> List[dict]:

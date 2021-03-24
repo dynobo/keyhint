@@ -2,6 +2,7 @@ import importlib.resources
 import logging
 import re
 import sys
+import traceback
 
 import gi
 
@@ -44,9 +45,14 @@ class AppWindow(Gtk.ApplicationWindow):
         self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
         self.set_modal(True)
 
+        self.connect("key-release-event", self.on_key_release)
+
         self.add_css()
-        self.update_hints_scrolled()
         self.show_all()
+
+    def on_key_release(self, widget, event, data=None):
+        if event.keyval == Gdk.KEY_Escape:
+            self.get_application().quit()
 
     def add_css(self):
         css = importlib.resources.read_binary("keyhint.resources", "style.css")
@@ -77,7 +83,7 @@ class AppWindow(Gtk.ApplicationWindow):
         for key in text.split("+"):
             label = Gtk.Label()
             key = replace_keys(key.strip())
-            label.set_markup(f"{key}")
+            label.set_markup(f"{GLib.markup_escape_text(key)}")
             label_context = label.get_style_context()
             label_context.add_class("key")
             box.add(label)
@@ -134,7 +140,15 @@ class AppWindow(Gtk.ApplicationWindow):
     def create_headerbar(self):
         header_bar = Gtk.HeaderBar(title="Keyhint")
         header_bar.props.show_close_button = True
+
         header_bar.pack_start(self.select_hints_combo)
+
+        MENU_XML = importlib.resources.read_text("keyhint.resources", "menu.xml")
+        builder = Gtk.Builder.new_from_string(MENU_XML, -1)
+        menu = builder.get_object("app-menu")
+        button = Gtk.MenuButton(menu_model=menu)
+        header_bar.pack_end(button)
+
         return header_bar
 
     def get_selected_hint_id(self):
@@ -143,6 +157,7 @@ class AppWindow(Gtk.ApplicationWindow):
         if selected_hints is not None:
             model = self.select_hints_combo.get_model()
             hint_id = model[selected_hints][0]
+            logger.debug(f"Hint selected in dropdown: '{hint_id}'")
         return hint_id
 
     def update_hints_scrolled(self):
@@ -205,21 +220,27 @@ class Application(Gtk.Application):
         action.connect("activate", self.on_quit)
         self.add_action(action)
 
-        MENU_XML = importlib.resources.read_text("keyhint.resources", "menu.xml")
-        builder = Gtk.Builder.new_from_string(MENU_XML, -1)
-
-        self.set_app_menu(builder.get_object("app-menu"))
-
     def detect_active_window(self):
-        wm_class = window_title = None
+        self.wm_class = self.window_title = None
 
-        if is_using_wayland():
-            wm_class, window_title = get_active_window_info_wayland()
+        try:
+            if is_using_wayland():
+                self.wm_class, self.window_title = get_active_window_info_wayland()
+            else:
+                self.wm_class, self.window_title = get_active_window_info_x()
+        except Exception:
+            logger.error("Traceback:\n" + traceback.format_tb())
+            logger.error(
+                "Couldn't detect active application window."
+                "KeyHint currently should support Wayland and X. If you are using one "
+                "of those and see this error, please create and issue incl. the tracebackk "
+                "above on https://github.com/dynobo/keyhint/issues."
+            )
 
         logger.debug(
-            f"Detected wm_class: '{wm_class}'. Detected window_title: '{window_title}'."
+            f"Detected wm_class: '{self.wm_class}'. Detected window_title: '{self.window_title}'."
         )
-        return wm_class, window_title
+        return self.wm_class, self.window_title
 
     def get_appropriate_hint_id(self):
         wm_class, window_title = self.detect_active_window()
@@ -230,15 +251,18 @@ class Application(Gtk.Application):
             and re.search(h["match"]["regex_title"], window_title, re.IGNORECASE)
         ]
 
+        hint_id = None
         if matching_hints:
-            return matching_hints[0]["id"]
+            hint_id = matching_hints[0]["id"]
+            logger.debug(f"Found matching hints '{hint_id}'.")
+        else:
+            logger.debug("No matching hints found.")
 
-        return None
+        return hint_id
 
     def do_activate(self):
-        self.wm_class, self.window_title = self.detect_active_window()
-
         # We only allow a single window and raise any existing ones
+        logger.debug(f"Loaded {len(self.hints)} hints.")
         if not self.window:
             # Windows are associated with the application
             # when the last one is closed the application shuts down
@@ -270,8 +294,20 @@ class Application(Gtk.Application):
         return None
 
     def on_about(self, action, param):
-        about_dialog = Gtk.AboutDialog(transient_for=self.window, modal=True)
-        about_dialog.present()
+        about = Gtk.AboutDialog(transient_for=self.window, modal=True)
+        about.set_program_name("KeyHint")
+        about.set_version("0.1")
+        about.set_authors(["dynobo"])
+        about.set_copyright(
+            "\nDETECTED WINDOW:\n"
+            f"wm class: '{self.wm_class}'\n"
+            f"window title: '{self.window_title}'"
+        )
+        about.set_comments(
+            "Display context-sensitive keyboard shortcuts\nor other hints on Linux"
+        )
+        about.set_website("https://github.com/dynobo/keyhint")
+        about.present()
 
     def on_quit(self, action, param):
         self.quit()

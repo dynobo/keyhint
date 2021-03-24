@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "keyhint"
 version = "0.2.0"
-description = "Display context-sensitive keyboard shortcuts or other hints on Linux and Windows"
+description = "Display context-sensitive keyboard shortcuts or other hints on Linux"
 keywords = ["shortcuts", "keybindings", "hints", "helper", "cheatsheet"]
 license = "MIT"
 authors = ["dynobo <dynobo@mailbox.org>"]
