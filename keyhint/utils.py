@@ -8,10 +8,14 @@ from typing import Iterable, List, Tuple, Union
 import yaml
 
 
-def _load_yaml_file(file: str) -> dict:
+def _load_yaml(file: str, from_resources=False) -> dict:
     try:
-        text = importlib.resources.read_text("keyhint.config", file)
-        result = yaml.safe_load(text)
+        if from_resources:
+            text = importlib.resources.read_text("keyhint.config", file)
+            result = yaml.safe_load(text)
+        else:
+            with open(file) as f:
+                result = yaml.load(f)
     except yaml.YAMLError as exc:
         print(exc)
         result = {}
@@ -19,16 +23,42 @@ def _load_yaml_file(file: str) -> dict:
 
 
 def _discover_hint_files() -> Iterable[Path]:
-    f = importlib.resources.read_text("keyhint.config", "all.yaml")
-    all_files = yaml.safe_load(f)
+    files = importlib.resources.contents("keyhint.config")
+    yaml_files = [f for f in files if f.endswith(".yaml")]
+    return yaml_files
 
-    return all_files["hint-files"]
+
+def load_default_hints() -> List[dict]:
+    files = _discover_hint_files()
+    hints = [_load_yaml(f, True) for f in files]
+    hints = sorted(hints, key=lambda k: k["title"])
+    return hints
+
+
+def load_user_hints() -> List[dict]:
+    config_path = get_users_config_path()
+    files = (config_path / "keyhint").glob("*.yaml")
+    hints = [_load_yaml(f) for f in files]
+    hints = sorted(hints, key=lambda k: k["title"])
+    return hints
 
 
 def load_hints() -> List[dict]:
-    files = _discover_hint_files()
-    hints = [_load_yaml_file(f) for f in files]
-    hints = sorted(hints, key=lambda k: k["title"])
+    hints = load_default_hints()
+    user_hints = load_user_hints()
+
+    for user_hint in user_hints:
+        existed = False
+        for hint in hints:
+            # Update default hints by user hint (if existing)
+            if hint["id"] == user_hint["id"]:
+                hint.update(user_hint)
+                existed = True
+                break
+        # If it didn't exist, append as new
+        if not existed:
+            hints.append(user_hint)
+
     return hints
 
 
