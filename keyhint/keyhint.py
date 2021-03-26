@@ -36,6 +36,8 @@ class AppWindow(Gtk.ApplicationWindow):
         self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
         self.set_modal(True)
         self.add_css()
+        self.padding = 20
+        self.spacing = 30
 
         # Attach key listener (for ESC)
         self.connect("key-release-event", self.on_key_release)
@@ -111,9 +113,8 @@ class AppWindow(Gtk.ApplicationWindow):
 
     def get_section(self, section: str, shortcuts: dict):
         grid = Gtk.Grid()
-        grid.set_column_spacing(30)
+        grid.set_column_spacing(20)
         grid.set_row_spacing(10)
-        grid.set_margin_bottom(30)
         grid.set_column_homogeneous(True),
         grid.set_vexpand(False)
         grid.set_valign(Gtk.Align.START)
@@ -146,6 +147,9 @@ class AppWindow(Gtk.ApplicationWindow):
         # Parent container box to be filled with columns
         hints_box = Gtk.Box()
         hints_box.set_orientation(Gtk.Orientation.HORIZONTAL)
+        hints_box.set_margin_top(self.padding)
+        hints_box.set_margin_left(self.padding)
+        hints_box.set_margin_right(self.padding)
 
         max_column_height = (
             self.get_default_size().height - self.header_bar.size_request().height
@@ -164,6 +168,11 @@ class AppWindow(Gtk.ApplicationWindow):
                 hints_box.pack_start(column_box, False, False, 0)
                 column_box = Gtk.Box()
                 column_box.set_orientation(Gtk.Orientation.VERTICAL)
+                section_box.set_margin_bottom(self.spacing)
+
+            # Don't draw margin bottom, if it would exceed column height
+            if column_height + section_height + self.spacing < max_column_height:
+                section_box.set_margin_bottom(self.spacing)
 
             column_box.pack_start(section_box, False, False, 0)
             column_box.show_all()
