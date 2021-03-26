@@ -8,6 +8,10 @@
     background-color: rgba(120,120,120, 0.2);
     /*min-height: 1.6rem;*/
 }
+
+.section-title {
+    font-size: 110%;
+}
 /*
 .key.symbol {
     padding: 0px 7px;

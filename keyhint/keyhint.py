@@ -99,6 +99,8 @@ class AppWindow(Gtk.ApplicationWindow):
         label = Gtk.Label()
         label.set_markup(f"<b>{text}</b>")
         label.set_xalign(0.0)
+        label_context = label.get_style_context()
+        label_context.add_class("section-title")
         return label
 
     def get_section(self, section: str, shortcuts: dict):
