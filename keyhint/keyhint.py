@@ -31,23 +31,29 @@ class AppWindow(Gtk.ApplicationWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Set window properties
+        self.set_default_size(int(1280), int(720))
+        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
+        self.set_modal(True)
+        self.add_css()
+
+        # Attach key listener (for ESC)
+        self.connect("key-release-event", self.on_key_release)
+
+        # Create control elements
         self.select_hints_combo = self.create_select_hints_combo()
+        self.header_bar = self.create_headerbar()
+        self.set_titlebar(self.header_bar)
+
+        # Render headerbar to determine size
+        self.header_bar.show()
+
         hint_id = self.get_application().get_appropriate_hint_id()
         if hint_id is not None:
             self.select_hints_combo.set_active_id(hint_id)
         else:
             self.select_hints_combo.set_active(0)
 
-        self.header_bar = self.create_headerbar()
-
-        self.set_titlebar(self.header_bar)
-        self.set_default_size(int(1280), int(720))
-        self.set_position(Gtk.WindowPosition.CENTER_ON_PARENT)
-        self.set_modal(True)
-
-        self.connect("key-release-event", self.on_key_release)
-
-        self.add_css()
         self.show_all()
 
     def on_key_release(self, widget, event, data=None):
@@ -109,6 +115,8 @@ class AppWindow(Gtk.ApplicationWindow):
         grid.set_row_spacing(10)
         grid.set_margin_bottom(30)
         grid.set_column_homogeneous(True),
+        grid.set_vexpand(False)
+        grid.set_valign(Gtk.Align.START)
 
         section_title = self.get_section_title(section)
         grid.attach(section_title, left=1, top=0, width=1, height=1)
@@ -131,18 +139,37 @@ class AppWindow(Gtk.ApplicationWindow):
         combo.set_entry_text_column(1)
         return combo
 
-    def create_flowbox(self, keyhints):
-        flowbox = Gtk.FlowBox()
-        flowbox.set_orientation(Gtk.Orientation.VERTICAL)
-        # flowbox.set_homogeneous(False)
-        # flowbox.set_valign(Gtk.Align.START)
-        # flowbox.set_halign(Gtk.Align.START)
-        # flowbox.set_max_children_per_line(30)
-        flowbox.set_selection_mode(Gtk.SelectionMode.NONE)
+    def create_hints_box(self, hint_id):
+        keyhints = self.get_application().get_hints_by_id(hint_id)
+
+        parent_box = Gtk.Box()
+        parent_box.set_orientation(Gtk.Orientation.HORIZONTAL)
+
+        max_box_height = (
+            self.get_default_size().height - self.header_bar.size_request().height
+        )
+
+        box = Gtk.Box()
+        box.set_orientation(Gtk.Orientation.VERTICAL)
+        box_height = 0
         for section, hints in keyhints["hints"].items():
-            sectionGrid = self.get_section(section, hints)
-            flowbox.add(sectionGrid)
-        return flowbox
+            section = self.get_section(section, hints)
+            section.show_all()
+            section_height = section.size_request().height
+
+            if box_height + section_height > max_box_height:
+                parent_box.pack_start(box, False, False, 0)
+                box = Gtk.Box()
+                box.set_orientation(Gtk.Orientation.VERTICAL)
+
+            box.pack_start(section, False, False, 0)
+            box.show_all()
+            box_height = box.size_request().height
+
+        if box is not None:
+            parent_box.pack_start(box, False, False, 0)
+
+        return parent_box
 
     def create_headerbar(self):
         header_bar = Gtk.HeaderBar(title="Keyhint")
@@ -174,16 +201,15 @@ class AppWindow(Gtk.ApplicationWindow):
             self.remove(self.hints_scrolled)
 
         self.hints_scrolled = Gtk.ScrolledWindow()
-        # self.hints_scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         self.hints_scrolled.set_policy(
             Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC
         )
 
-        flowbox = self.create_flowbox(self.get_application().get_hints_by_id(hint_id))
-        self.hints_scrolled.add(flowbox)
+        hints_box = self.create_hints_box(hint_id)
+        self.hints_scrolled.add(hints_box)
 
         self.add(self.hints_scrolled)
-        self.hints_scrolled.show_all()
+        self.show_all()
 
     def on_title_combo_changed(self, combo):
         self.update_hints_scrolled()
