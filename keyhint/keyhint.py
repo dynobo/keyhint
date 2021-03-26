@@ -133,8 +133,11 @@ class AppWindow(Gtk.ApplicationWindow):
 
     def create_flowbox(self, keyhints):
         flowbox = Gtk.FlowBox()
-        flowbox.set_valign(Gtk.Align.START)
-        flowbox.set_max_children_per_line(30)
+        flowbox.set_orientation(Gtk.Orientation.VERTICAL)
+        # flowbox.set_homogeneous(False)
+        # flowbox.set_valign(Gtk.Align.START)
+        # flowbox.set_halign(Gtk.Align.START)
+        # flowbox.set_max_children_per_line(30)
         flowbox.set_selection_mode(Gtk.SelectionMode.NONE)
         for section, hints in keyhints["hints"].items():
             sectionGrid = self.get_section(section, hints)
@@ -171,7 +174,10 @@ class AppWindow(Gtk.ApplicationWindow):
             self.remove(self.hints_scrolled)
 
         self.hints_scrolled = Gtk.ScrolledWindow()
-        self.hints_scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        # self.hints_scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        self.hints_scrolled.set_policy(
+            Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC
+        )
 
         flowbox = self.create_flowbox(self.get_application().get_hints_by_id(hint_id))
         self.hints_scrolled.add(flowbox)
