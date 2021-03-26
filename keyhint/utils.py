@@ -8,14 +8,14 @@ from typing import Iterable, List, Tuple, Union
 import yaml
 
 
-def _load_yaml(file: str, from_resources=False) -> dict:
+def _load_yaml(file: Union[PosixPath, str], from_resources=False) -> dict:
     try:
         if from_resources:
             text = importlib.resources.read_text("keyhint.config", file)
             result = yaml.safe_load(text)
         else:
             with open(file) as f:
-                result = yaml.load(f)
+                result = yaml.safe_load(f)
     except yaml.YAMLError as exc:
         print(exc)
         result = {}

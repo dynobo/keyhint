@@ -140,36 +140,38 @@ class AppWindow(Gtk.ApplicationWindow):
         return combo
 
     def create_hints_box(self, hint_id):
+        # Retrieve keyhints for currently selected sapplication
         keyhints = self.get_application().get_hints_by_id(hint_id)
 
-        parent_box = Gtk.Box()
-        parent_box.set_orientation(Gtk.Orientation.HORIZONTAL)
+        # Parent container box to be filled with columns
+        hints_box = Gtk.Box()
+        hints_box.set_orientation(Gtk.Orientation.HORIZONTAL)
 
-        max_box_height = (
+        max_column_height = (
             self.get_default_size().height - self.header_bar.size_request().height
         )
 
-        box = Gtk.Box()
-        box.set_orientation(Gtk.Orientation.VERTICAL)
-        box_height = 0
+        column_box = Gtk.Box()
+        column_box.set_orientation(Gtk.Orientation.VERTICAL)
+        column_height = 0
         for section, hints in keyhints["hints"].items():
-            section = self.get_section(section, hints)
-            section.show_all()
-            section_height = section.size_request().height
+            section_box = self.get_section(section, hints)
+            section_box.show_all()
+            section_height = section_box.size_request().height
 
-            if box_height + section_height > max_box_height:
-                parent_box.pack_start(box, False, False, 0)
-                box = Gtk.Box()
-                box.set_orientation(Gtk.Orientation.VERTICAL)
+            # Start new column, too high
+            if column_height + section_height > max_column_height:
+                hints_box.pack_start(column_box, False, False, 0)
+                column_box = Gtk.Box()
+                column_box.set_orientation(Gtk.Orientation.VERTICAL)
 
-            box.pack_start(section, False, False, 0)
-            box.show_all()
-            box_height = box.size_request().height
+            column_box.pack_start(section_box, False, False, 0)
+            column_box.show_all()
+            column_height = column_box.size_request().height
 
-        if box is not None:
-            parent_box.pack_start(box, False, False, 0)
+        hints_box.pack_start(column_box, False, False, 0)
 
-        return parent_box
+        return hints_box
 
     def create_headerbar(self):
         header_bar = Gtk.HeaderBar(title="Keyhint")
