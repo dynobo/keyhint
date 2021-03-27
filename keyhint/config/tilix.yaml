@@ -1,6 +1,6 @@
 id: tilix
 title: Tilix
-source: https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly
+source: 
 match:
   regex_process: Tilix
   regex_title: .*
