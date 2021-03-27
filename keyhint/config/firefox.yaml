@@ -7,25 +7,25 @@ match:
   
 hints:
   URL Navigation:
-    Ctrl + l: Location bar
-    Alt + left: Back in History
-    Alt + right: Forward in History
+    Ctrl + L: Location bar
+    Alt + Left: Back in History
+    Alt + Right: Forward in History
 
   Tab Management:
-    Ctrl + t: New tab
+    Ctrl + T: New tab
     Ctrl + Tab: Next tab
     Ctrl + 1..8: Select tab 1..8
-    Ctrl + w: Close tab
-    Ctrl + Shift + t: Undo close tab
-    /: Quick Find
+    Ctrl + W: Close tab
+    Ctrl + Shift + T: Undo close tab
+    \/: Quick Find
 
   Various:
-    Ctrl + Shift + y: Show downloads
+    Ctrl + Shift + Y: Show downloads
 
   Vimium - Scrolling:
-    j, k: Scroll down, up
-    d, u: Scroll page down, up
-    h, l: Scroll left, right
+    J / K: Scroll down / up
+    D / U: Scroll page down / up
+    H / L: Scroll left / right
 
   Vimium - URL Navigation:
     b: Open a bookmark
@@ -40,7 +40,7 @@ hints:
 
   Vimium - Tabs:
     t: Create new tab
-    J, K: Next/previous tab
+    J / K: Next / previous tab
     yt: Duplicate tab
     x: Close tab
     X: Undo close tab

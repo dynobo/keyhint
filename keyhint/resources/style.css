@@ -1,20 +1,16 @@
 .key {
-    font-family: monospace;
     font-size: 100%;
-    font-weight: bold;
-    border: 1px solid rgba(120,120,120, 0.5);
-    border-radius: 7px;
-    padding: 1px 7px;
+    border: 1px solid rgb(43,46,57);
+    border-radius: 2.5px;
+    padding: 3px 6px 4px 6px;
     background-color: rgba(120,120,120, 0.2);
-    /*min-height: 1.6rem;*/
+    box-shadow: 0 -2px rgba(0,0,0,0.15) inset;
+    margin: 0px 2px;
+    min-height: 20px;
+    min-width: 16px;
 }
-
-.section-title {
-    font-size: 110%;
+.separator {
+    margin: 0px 2px;
+    opacity: 0.4;
+    font-size: 90%;
 }
-/*
-.key.symbol {
-    padding: 0px 7px;
-    font-size: 80%;
-}
-*/

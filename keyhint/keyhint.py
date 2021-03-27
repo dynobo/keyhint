@@ -25,6 +25,10 @@ logging.basicConfig(
     level="WARNING",
 )
 logger = logging.getLogger(__name__)
+# TODO: Store settings:
+# https://docs.python.org/3/library/configparser.html
+# https://marianochavero.wordpress.com/2012/04/03/short-example-of-gsettings-bindings-in-python/
+# https://www.micahcarrick.com/gsettings-python-gnome-3.html
 
 
 class AppWindow(Gtk.ApplicationWindow):
@@ -88,19 +92,18 @@ class AppWindow(Gtk.ApplicationWindow):
     def get_bindings(self, text):
         box = Gtk.Box()
         box.set_halign(Gtk.Align.END)
-        for key in text.split("+"):
+        for key in text.split():
             label = Gtk.Label()
             key = replace_keys(key.strip())
-            label.set_markup(f"{GLib.markup_escape_text(key)}")
             label_context = label.get_style_context()
-            label_context.add_class("key")
-            if "🠇" in key:
-                label_context.add_class("symbol")
+            if key in ["+", "/"]:
+                label_context.add_class("separator")
+            else:
+                key = key.replace("\\/", "/")
+                key = key.replace("\\+", "+")
+                label_context.add_class("key")
+            label.set_markup(f"{GLib.markup_escape_text(key)}")
             box.add(label)
-            plus = self.get_plus()
-            box.add(plus)
-        last = box.get_children()[-1]
-        last.destroy()
         return box
 
     def get_section_title(self, text):
@@ -244,16 +247,22 @@ class Application(Gtk.Application):
             "Verbose log output for debugging",
             None,
         )
-        # TODO
         self.add_main_option(
-            "hints",
+            "hint",
             ord("h"),
             GLib.OptionFlags.NONE,
-            GLib.OptionArg.NONE,
-            "Command line test",
-            None,
+            GLib.OptionArg.STRING,
+            "Show hints by specified ID",
+            "HINT-ID",
         )
-
+        self.add_main_option(
+            "default-hint",
+            ord("d"),
+            GLib.OptionFlags.NONE,
+            GLib.OptionArg.STRING,
+            "Hint to show in case no hints for active application were found",
+            "HINT-ID",
+        )
         self.hints = load_hints()
 
     def do_startup(self):
@@ -290,6 +299,13 @@ class Application(Gtk.Application):
         return self.wm_class, self.window_title
 
     def get_appropriate_hint_id(self):
+        # If hint-id was provided by option, use that one:
+        if "hint" in self.options:
+            hint_id = self.options["hint"]
+            logger.debug(f"Using provided hint-id: {hint_id}")
+            return hint_id
+
+        # Otherwise select hints by active window
         wm_class, window_title = self.detect_active_window()
         matching_hints = [
             h
@@ -304,6 +320,10 @@ class Application(Gtk.Application):
             logger.debug(f"Found matching hints '{hint_id}'.")
         else:
             logger.debug("No matching hints found.")
+            if "default-hint" in self.options:
+                hint_id = self.options["default-hint"]
+                logger.debug(f"Using provided default hint-id: {hint_id}")
+                return hint_id
 
         return hint_id
 
@@ -319,13 +339,13 @@ class Application(Gtk.Application):
 
     def do_command_line(self, command_line):
         options = command_line.get_options_dict()
-        options = options.end().unpack()
+        self.options = options.end().unpack()
 
-        logger.debug("CLI Options: " + str(options))
-        if "verbose" in options:
+        if "verbose" in self.options:
             logger.setLevel("DEBUG")
             logger.info("Log level is set to 'DEBUG'")
 
+        logger.debug("CLI Options: " + str(self.options))
         self.activate()
         return 0
 
