@@ -92,7 +92,12 @@ class AppWindow(Gtk.ApplicationWindow):
     def get_bindings(self, text):
         box = Gtk.Box()
         box.set_halign(Gtk.Align.END)
-        for key in text.split():
+        if text.startswith("`"):
+            keys = [text.replace("`", "")]
+        else:
+            keys = text.split()
+
+        for key in keys:
             label = Gtk.Label()
             key = replace_keys(key.strip())
             label_context = label.get_style_context()

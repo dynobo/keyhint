@@ -67,7 +67,7 @@ def replace_keys(text: str) -> str:
     text = text.replace("Up", "↑")
     text = text.replace("Left", "←")
     text = text.replace("Right", "→")
-    text = text.replace("Enter", "↵")
+    # text = text.replace("Enter", "↵")
     return text
 
 

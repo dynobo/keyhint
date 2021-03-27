@@ -9,17 +9,17 @@ hints:
   Navigating:
     pwd: Print working dir
     cd: Change to home dir
-    cd -: Change to previous dir
+    "`cd -`": Change to previous dir
 
   History:
-    "history | grep <term>": Search for "<term>"
-    history 10: Print last 10 cmds
-    "!23": Execute cmd 23 from history
+    "`history | grep <term>`": Search for "<term>"
+    "`history 10`": Print last 10 cmds
+    "!3": Execute cmd 3 from history
     Ctrl + r: Reverse cmd search / find next
 
   Tools:
     bc: Calculator
-    gtop, htop: System Monitors
+    gtop / htop: System Monitors
     ranger: File manager
     moc: Music Player in Console
     alsamixer: Audio Mixer
