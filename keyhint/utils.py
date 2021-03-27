@@ -63,6 +63,9 @@ def load_hints() -> List[dict]:
 
 
 def replace_keys(text: str) -> str:
+    if text in ["PageUp", "PageDown"]:
+        text = text.replace("Page", "Page ")
+
     text = text.replace("Down", "↓")
     text = text.replace("Up", "↑")
     text = text.replace("Left", "←")
