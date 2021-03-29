@@ -1,4 +1,5 @@
 import importlib
+import logging
 import os
 import re
 import subprocess
@@ -7,6 +8,7 @@ from typing import Iterable, List, Tuple, Union
 
 import yaml
 
+logger = logging.getLogger(__name__)
 
 def _load_yaml(file: Union[PosixPath, str], from_resources=False) -> dict:
     try:
@@ -164,6 +166,28 @@ def get_users_config_path() -> Union[Path, None]:
 
     return config_path
 
+
+def detect_active_window():
+    wm_class = window_title = None
+
+    try:
+        if is_using_wayland():
+            wm_class, window_title = get_active_window_info_wayland()
+        else:
+            wm_class, window_title = get_active_window_info_x()
+    except Exception:
+        logger.error("Traceback:\n" + traceback.format_tb())
+        logger.error(
+            "Couldn't detect active application window."
+            "KeyHint currently should support Wayland and X. If you are using one "
+            "of those and see this error, please create and issue incl. the tracebackk "
+            "above on https://github.com/dynobo/keyhint/issues."
+        )
+
+    logger.debug(
+        f"Detected wm_class: '{wm_class}'. Detected window_title: '{window_title}'."
+    )
+    return wm_class, window_title
 
 if __name__ == "__main__":
     load_hints()
