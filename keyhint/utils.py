@@ -3,12 +3,14 @@ import logging
 import os
 import re
 import subprocess
+import traceback
 from pathlib import Path, PosixPath
 from typing import Iterable, List, Tuple, Union
 
 import yaml
 
 logger = logging.getLogger(__name__)
+
 
 def _load_yaml(file: Union[PosixPath, str], from_resources=False) -> dict:
     try:
@@ -188,6 +190,7 @@ def detect_active_window():
         f"Detected wm_class: '{wm_class}'. Detected window_title: '{window_title}'."
     )
     return wm_class, window_title
+
 
 if __name__ == "__main__":
     load_hints()

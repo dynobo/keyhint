@@ -4,12 +4,12 @@ import sys
 
 import gi
 
+from keyhint.handler import WindowHandler
+
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
 
-from gi.repository import Gio, GLib, Gtk
-
-from keyhint.handler import WindowHandler
+from gi.repository import Gio, GLib, Gtk  # noqa
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
