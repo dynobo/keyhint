@@ -10,15 +10,32 @@ logger = logging.getLogger(__name__)
 
 
 class WindowHandler:
+    _section_title_height = None
+    _row_height = None
+
     def __init__(self, builder, options):
         self._options = options
 
         self._hints = keyhint.utils.load_hints()
 
+        self._window = builder.get_object("keyhint_app_window")
+        self._header_bar = builder.get_object("header_bar")
         self._select_hints_combo = builder.get_object("select_hints_combo")
         self._hints_box = builder.get_object("hints_container_box")
 
         logger.debug(f"Loaded {len(self._hints)} hints.")
+
+    def get_screen_dims(self):
+        screen = self._window.get_screen()
+        display = screen.get_display()
+        monitor = display.get_monitor_at_window(screen.get_root_window())
+        workarea = monitor.get_workarea()
+        logger.debug(f"Width: {workarea.width}, Height: {workarea.height}")
+        return workarea.width, workarea.height
+
+    def get_hints_box_dims(self):
+        size = self._hints_box.size_request()
+        return size.width, size.height
 
     def get_hint_ids_titles(self):
         return [(k["id"], k["title"]) for k in self._hints]
@@ -37,12 +54,20 @@ class WindowHandler:
             return hint_id
 
         # Otherwise select hints by active window
-        wm_class, window_title = keyhint.utils.detect_active_window()
+        (
+            self.active_wm_class,
+            self.active_window_title,
+        ) = keyhint.utils.detect_active_window()
+
         matching_hints = [
             h
             for h in self._hints
-            if re.search(h["match"]["regex_process"], wm_class, re.IGNORECASE)
-            and re.search(h["match"]["regex_title"], window_title, re.IGNORECASE)
+            if re.search(
+                h["match"]["regex_process"], self.active_wm_class, re.IGNORECASE
+            )
+            and re.search(
+                h["match"]["regex_title"], self.active_window_title, re.IGNORECASE
+            )
         ]
 
         hint_id = None
@@ -67,10 +92,16 @@ class WindowHandler:
         label = self.create_label("testlabel")
         grid.attach(bindings_box, left=0, top=1, width=1, height=1)
         grid.attach(label, left=1, top=1, width=1, height=1)
-
+        # self._hints_box.pack_start(grid, False, False, 0)
+        # self._window.show_all()
         grid.show_all()
-        title_height = section_title.size_request().height
-        row_height = bindings_box.size_request().height
+
+        spacing = grid.get_row_spacing()
+
+        title_height = section_title.size_request().height + spacing
+        row_height = bindings_box.size_request().height + spacing
+
+        logger.debug(f"Title height: {title_height}, Row height: {row_height}")
         return title_height, row_height
 
     # GENERATE/MODIFY WIDGETS
@@ -121,24 +152,6 @@ class WindowHandler:
         label_context.add_class("section-title")
         return label
 
-    def create_section(self, section: str, shortcuts: dict):
-        grid = Gtk.Grid()
-        grid.set_column_spacing(20)
-        grid.set_row_spacing(10)
-        grid.set_column_homogeneous(True),
-        grid.set_vexpand(False)
-        grid.set_valign(Gtk.Align.START)
-
-        section_title = self.create_section_title(section)
-        grid.attach(section_title, left=1, top=0, width=1, height=1)
-
-        for idx, bindings in enumerate(shortcuts):
-            bindings_box = self.create_bindings(bindings)
-            label = self.create_label(shortcuts[bindings])
-            grid.attach(bindings_box, left=0, top=idx + 1, width=1, height=1)
-            grid.attach(label, left=1, top=idx + 1, width=1, height=1)
-        return grid
-
     def clear_hints_container(self):
         for child in self._hints_box.get_children():
             self._hints_box.remove(child)
@@ -157,17 +170,18 @@ class WindowHandler:
         return column_grid
 
     def distribute_hints_in_columns(self, keyhints):
-        max_column_height = 700  # self.window.get_default_size().height
-        title_height, row_height = self.get_row_heights()
-        logger.debug(f"Max column height: {max_column_height}")
-        logger.debug(f"Title height: {title_height}, Row height: {row_height}")
+        _, screen_height = self.get_screen_dims()
+        max_column_height = screen_height // 1.3
+
+        if (not self._section_title_height) or (not self._row_height):
+            self._section_title_height, self._row_height = self.get_row_heights()
 
         hint_columns = []
         current_column = {}
         column_height = 0
 
         for section, hints in keyhints["hints"].items():
-            section_height = title_height + row_height * len(hints)
+            section_height = self._section_title_height + self._row_height * len(hints)
             if column_height + section_height < max_column_height:
                 current_column[section] = hints
                 column_height += section_height
@@ -205,9 +219,21 @@ class WindowHandler:
 
         self._hints_box.show_all()
 
+    def adjust_window_dimensions(self):
+        screen_width, screen_height = self.get_screen_dims()
+        hints_box_width, hints_box_height = self.get_hints_box_dims()
+        header_height = self._header_bar.size_request().height
+
+        target_height = min(hints_box_height + header_height, screen_height // 1.1)
+        target_width = min(hints_box_width + 80, screen_width // 1.1)
+
+        self._window.resize(target_width, target_height)
+        self._window.move(0, 0)
+
     def on_select_hints_combo_changed(self, combo):
         self.clear_hints_container()
         self.populate_hints_container()
+        self.adjust_window_dimensions()
 
     def on_window_destroy(self, *args):
         print("destroy")
@@ -220,7 +246,10 @@ class WindowHandler:
         if hint_id is not None:
             self._select_hints_combo.set_active_id(hint_id)
         else:
-            self._select_hints_combo.set_active(1)
+            self._select_hints_combo.set_active(0)
+        self._header_bar.set_subtitle(
+            f"(wm_class: {self.active_wm_class}, title: {self.active_window_title})"
+        )
 
     def onButtonPressed(self, button):
         print("button")
