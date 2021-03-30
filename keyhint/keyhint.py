@@ -1,10 +1,9 @@
-import importlib.resources
 import logging
 import sys
 
 import gi
 
-from keyhint.handler import WindowHandler
+from keyhint.window import WindowHandler
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
@@ -75,7 +74,7 @@ class Application(Gtk.Application):
             builder.add_from_file("keyhint/resources/ApplicationWindow.glade")
             builder.connect_signals(WindowHandler(builder, self.options))
 
-            self.window = builder.get_object("application_window")
+            self.window = builder.get_object("keyhint_app_window")
             self.window.set_application(self)
             self.window.show_all()
 

@@ -3,14 +3,6 @@
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <!-- interface-css-provider-path style.css -->
-  <object class="GtkListStore" id="hints_liststore">
-    <columns>
-      <!-- column-name hint_id -->
-      <column type="gchararray"/>
-      <!-- column-name hint_title -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
   <object class="GtkApplicationWindow" id="keyhint_app_window">
     <property name="can_focus">False</property>
     <property name="modal">True</property>
@@ -26,19 +18,10 @@
         <property name="subtitle" translatable="yes">VS Code</property>
         <property name="show_close_button">True</property>
         <child>
-          <object class="GtkComboBox" id="select_hints_combo">
+          <object class="GtkComboBoxText" id="select_hints_combo">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="model">hints_liststore</property>
-            <property name="has_entry">True</property>
-            <property name="entry_text_column">1</property>
-            <property name="id_column">0</property>
             <signal name="changed" handler="on_select_hints_combo_changed" swapped="no"/>
-            <child internal-child="entry">
-              <object class="GtkEntry">
-                <property name="can_focus">False</property>
-              </object>
-            </child>
           </object>
         </child>
         <child>
@@ -62,16 +45,20 @@
       <object class="GtkScrolledWindow" id="scrolled_window">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="shadow_type">in</property>
+        <property name="margin_left">20</property>
+        <property name="margin_right">20</property>
+        <property name="vscrollbar_policy">never</property>
         <child>
           <object class="GtkViewport" id="scrolled_viewport">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="hscroll_policy">natural</property>
+            <property name="shadow_type">none</property>
             <child>
               <object class="GtkBox" id="hints_container_box">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="orientation">vertical</property>
+                <property name="spacing">50</property>
                 <child>
                   <object class="GtkGrid" id="hints_column_grid">
                     <property name="visible">True</property>
@@ -151,10 +138,82 @@
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
+                  <object class="GtkGrid" id="hints_column_grid1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="column_spacing">10</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">end</property>
+                        <property name="label" translatable="yes">Shortcuts</property>
+                        <property name="justify">right</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">Description</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">end</property>
+                        <property name="label" translatable="yes">Shortcuts 2</property>
+                        <property name="justify">right</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">Description 2</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">Section Titlekkkkkkkkkkkkkkkkk</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">1</property>
+                  </packing>
                 </child>
               </object>
             </child>

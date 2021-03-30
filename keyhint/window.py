@@ -1,4 +1,4 @@
-import importlib
+import importlib.resources
 import logging
 import re
 
@@ -11,34 +11,28 @@ logger = logging.getLogger(__name__)
 
 class WindowHandler:
     def __init__(self, builder, options):
-        self.builder = builder
-        self.options = options
-        self.hints = keyhint.utils.load_hints()
-        logger.debug(f"Loaded {len(self.hints)} hints.")
+        self._options = options
+
+        self._hints = keyhint.utils.load_hints()
+
+        self._select_hints_combo = builder.get_object("select_hints_combo")
+        self._hints_box = builder.get_object("hints_container_box")
+
+        logger.debug(f"Loaded {len(self._hints)} hints.")
 
     def get_hint_ids_titles(self):
-        return [(k["id"], k["title"]) for k in self.hints]
+        return [(k["id"], k["title"]) for k in self._hints]
 
     def get_hints_by_id(self, hint_id):
-        for h in self.hints:
+        for h in self._hints:
             if h["id"] == hint_id:
                 return h
         return None
 
-    def get_selected_hint_id(self):
-        hint_id = None
-        select_hints_combo = self.builder.get_object("select_hints_combo")
-        selected_hints = select_hints_combo.get_active_iter()
-        if selected_hints is not None:
-            model = select_hints_combo.get_model()
-            hint_id = model[selected_hints][0]
-            logger.debug(f"Hint selected in dropdown: '{hint_id}'")
-        return hint_id
-
     def get_appropriate_hint_id(self):
         # If hint-id was provided by option, use that one:
-        if "hint" in self.options:
-            hint_id = self.options["hint"]
+        if "hint" in self._options:
+            hint_id = self._options["hint"]
             logger.debug(f"Using provided hint-id: {hint_id}")
             return hint_id
 
@@ -46,7 +40,7 @@ class WindowHandler:
         wm_class, window_title = keyhint.utils.detect_active_window()
         matching_hints = [
             h
-            for h in self.hints
+            for h in self._hints
             if re.search(h["match"]["regex_process"], wm_class, re.IGNORECASE)
             and re.search(h["match"]["regex_title"], window_title, re.IGNORECASE)
         ]
@@ -57,12 +51,27 @@ class WindowHandler:
             logger.debug(f"Found matching hints '{hint_id}'.")
         else:
             logger.debug("No matching hints found.")
-            if "default-hint" in self.options:
-                hint_id = self.options["default-hint"]
+            if "default-hint" in self._options:
+                hint_id = self._options["default-hint"]
                 logger.debug(f"Using provided default hint-id: {hint_id}")
                 return hint_id
 
         return hint_id
+
+    def get_row_heights(self):
+        grid = self.create_column_grid()
+        section_title = self.create_section_title("dummy")
+        grid.attach(section_title, left=1, top=0, width=1, height=1)
+
+        bindings_box = self.create_bindings("Ctrl + A")
+        label = self.create_label("testlabel")
+        grid.attach(bindings_box, left=0, top=1, width=1, height=1)
+        grid.attach(label, left=1, top=1, width=1, height=1)
+
+        grid.show_all()
+        title_height = section_title.size_request().height
+        row_height = bindings_box.size_request().height
+        return title_height, row_height
 
     # GENERATE/MODIFY WIDGETS
 
@@ -131,47 +140,70 @@ class WindowHandler:
         return grid
 
     def clear_hints_container(self):
-        hints_box = self.builder.get_object("hints_container_box")
-        for child in hints_box.get_children():
-            hints_box.remove(child)
+        for child in self._hints_box.get_children():
+            self._hints_box.remove(child)
 
     def populate_select_hints_combo(self):
-        hints_liststore = self.builder.get_object("hints_liststore")
         for hint_id, title in self.get_hint_ids_titles():
-            hints_liststore.append([hint_id, title])
+            self._select_hints_combo.append(id=hint_id, text=title)
+
+    def create_column_grid(self):
+        column_grid = Gtk.Grid()
+        column_grid.set_column_spacing(20)
+        column_grid.set_row_spacing(10)
+        column_grid.set_column_homogeneous(False),
+        column_grid.set_vexpand(False)
+        column_grid.set_valign(Gtk.Align.START)
+        return column_grid
+
+    def distribute_hints_in_columns(self, keyhints):
+        max_column_height = 700  # self.window.get_default_size().height
+        title_height, row_height = self.get_row_heights()
+        logger.debug(f"Max column height: {max_column_height}")
+        logger.debug(f"Title height: {title_height}, Row height: {row_height}")
+
+        hint_columns = []
+        current_column = {}
+        column_height = 0
+
+        for section, hints in keyhints["hints"].items():
+            section_height = title_height + row_height * len(hints)
+            if column_height + section_height < max_column_height:
+                current_column[section] = hints
+                column_height += section_height
+            else:
+                hint_columns.append(current_column)
+                current_column = {}
+                current_column[section] = hints
+                column_height = section_height
+
+        if len(current_column) > 0:
+            hint_columns.append(current_column)
+
+        return hint_columns
 
     def populate_hints_container(self):
-        hint_id = self.get_selected_hint_id()
+        hint_id = self._select_hints_combo.get_active_id()
         keyhints = self.get_hints_by_id(hint_id)
-        max_column_height = 700  # self.window.get_default_size().height
+        hint_columns = self.distribute_hints_in_columns(keyhints)
 
-        hints_box = self.builder.get_object("hints_container_box")
-        column_box = Gtk.Box()
-        column_box.set_orientation(Gtk.Orientation.VERTICAL)
-        column_height = 0
-        for section, hints in keyhints["hints"].items():
-            section_box = self.create_section(section, hints)
-            section_box.show_all()
-            section_height = section_box.size_request().height
+        for column in hint_columns:
+            grid = self.create_column_grid()
+            idx = 0
+            for section, shortcuts in column.items():
+                section_title = self.create_section_title(section)
+                grid.attach(section_title, left=1, top=idx, width=1, height=1)
+                idx += 1
+                for bindings in shortcuts:
+                    bindings_box = self.create_bindings(bindings)
+                    label = self.create_label(shortcuts[bindings])
+                    grid.attach(bindings_box, left=0, top=idx, width=1, height=1)
+                    grid.attach(label, left=1, top=idx, width=1, height=1)
+                    idx += 1
 
-            # Start new column, too high
-            if column_height + section_height > max_column_height:
-                hints_box.pack_start(column_box, False, False, 0)
-                column_box = Gtk.Box()
-                column_box.set_orientation(Gtk.Orientation.VERTICAL)
-                section_box.set_margin_bottom(10)
+            self._hints_box.pack_start(grid, False, False, 0)
 
-            # Don't draw margin bottom, if it would exceed column height
-            if column_height + section_height + 10 < max_column_height:
-                section_box.set_margin_bottom(10)
-
-            column_box.pack_start(section_box, False, False, 0)
-            column_box.show_all()
-            column_height = column_box.size_request().height
-
-        hints_box.pack_start(column_box, False, False, 0)
-
-    # EVENT HANDLERS
+        self._hints_box.show_all()
 
     def on_select_hints_combo_changed(self, combo):
         self.clear_hints_container()
@@ -186,9 +218,9 @@ class WindowHandler:
         self.populate_select_hints_combo()
         hint_id = self.get_appropriate_hint_id()
         if hint_id is not None:
-            self.builder.get_object("select_hints_combo").set_active_id(hint_id)
+            self._select_hints_combo.set_active_id(hint_id)
         else:
-            self.builder.get_object("select_hints_combo").set_active(1)
+            self._select_hints_combo.set_active(1)
 
     def onButtonPressed(self, button):
         print("button")
