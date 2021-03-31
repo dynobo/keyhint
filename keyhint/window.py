@@ -237,7 +237,6 @@ class WindowHandler:
 
     def on_window_destroy(self, *args):
         print("destroy")
-        Gtk.main_quit()
 
     def on_window_realize(self, *args):
         self.create_css()
