@@ -20,13 +20,13 @@ hints:
     Ctrl + Alt + R: Add terminal right
     Ctrl + Alt + D: Add terminal down
     Shift + Alt + Up Down Left Right: Resize terminal
+    Ctrl + Shift + W: Close
 
   Terminal:
     Shift + Ctrl + F: Find
     Shift + Ctrl + G / H: Find next / previous
     Shift + Ctrl + Up Down: Scroll up / down
     Shift + PageUp PageDown: Page up / down
-    Shift + Ctrl + W: Close
 
   Navigate cmds:
     pwd: Print working dir
