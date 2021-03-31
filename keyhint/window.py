@@ -1,4 +1,3 @@
-import importlib.resources
 import logging
 import re
 
@@ -17,10 +16,12 @@ class WindowHandler:
     def __init__(self, builder, options):
         self._options = options
 
+        self._builder = builder
         self._window = builder.get_object("keyhint_app_window")
         self._header_bar = builder.get_object("header_bar")
         self._select_hints_combo = builder.get_object("select_hints_combo")
         self._hints_box = builder.get_object("hints_container_box")
+        self._about_dialog = builder.get_object("about_dialog")
 
         logger.debug(f"Loaded {len(self._hints)} hints.")
 
@@ -54,10 +55,10 @@ class WindowHandler:
             and re.search(h["match"]["regex_title"], self._window_title, re.IGNORECASE)
         ]
 
-        hint_id = None
         if matching_hints:
             hint_id = matching_hints[0]["id"]
-            logger.debug(f"Found matching hints '{hint_id}'.")
+        else:
+            hint_id = None
 
         return hint_id
 
@@ -221,11 +222,16 @@ class WindowHandler:
         self._window.move(0, 0)
 
     # EVENT HANDLERS
+    def on_quit(self):
+        self._window.get_application().quit()
+
+    def on_menu_quit(self, target):
+        self.on_quit()
 
     def on_key_release(self, widget, event, data=None):
         logger.debug(f"Key pressed: {event.keyval}")
         if event.keyval == Gdk.KEY_Escape:
-            self._window.get_application().quit()
+            self.on_quit()
 
     def on_select_hints_combo_changed(self, combo):
         self._clear_hints_container()
@@ -243,14 +249,7 @@ class WindowHandler:
             f"(wm_class: {self._wm_class}, title: {self._window_title})"
         )
 
-    def on_about(self, action, param):
-        about = Gtk.AboutDialog(transient_for=self.window, modal=True)
-        about.set_program_name("KeyHint")
-        about.set_version("0.1")
-        about.set_authors(["dynobo"])
-        about.set_copyright("MIT Licenced")
-        about.set_comments(
-            "Display context-sensitive keyboard shortcuts\nor other hints on Linux"
-        )
-        about.set_website("https://github.com/dynobo/keyhint")
-        about.present()
+    def on_menu_about(self, target):
+        a = self._builder.get_object("about_dialog")
+        a.run()
+        a.hide()

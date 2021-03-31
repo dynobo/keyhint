@@ -3,9 +3,37 @@
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <!-- interface-css-provider-path style.css -->
+  <object class="GtkMenu" id="app_menu">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkMenuItem" id="prefs_button">
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Preferences</property>
+        <property name="use_underline">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="about_button">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">About</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="on_menu_about" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="quit_button">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Quit</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="on_menu_quit" swapped="no"/>
+      </object>
+    </child>
+  </object>
   <object class="GtkApplicationWindow" id="keyhint_app_window">
     <property name="can_focus">False</property>
-    <property name="modal">True</property>
     <property name="window_position">center-always</property>
     <property name="gravity">center</property>
     <signal name="destroy" handler="on_window_destroy" swapped="no"/>
@@ -31,6 +59,7 @@
             <property name="can_focus">True</property>
             <property name="focus_on_click">False</property>
             <property name="receives_default">True</property>
+            <property name="popup">app_menu</property>
             <child>
               <placeholder/>
             </child>
@@ -145,6 +174,53 @@
               </object>
             </child>
           </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkAboutDialog" id="about_dialog">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">About KeyHint</property>
+    <property name="resizable">False</property>
+    <property name="modal">True</property>
+    <property name="window_position">center</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="icon">keyhint.svg</property>
+    <property name="type_hint">dialog</property>
+    <property name="skip_taskbar_hint">True</property>
+    <property name="skip_pager_hint">True</property>
+    <property name="gravity">center</property>
+    <property name="transient_for">keyhint_app_window</property>
+    <property name="program_name">KeyHint</property>
+    <property name="version">v0.2.0</property>
+    <property name="comments" translatable="yes">Cheatsheat for keyboard shortcuts &amp; commands</property>
+    <property name="website">https://github.com/dynobo/keyhint</property>
+    <property name="website_label" translatable="yes">Website</property>
+    <property name="logo">keyhint.png</property>
+    <property name="license_type">mit-x11</property>
+    <child type="titlebar">
+      <object class="GtkHeaderBar">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="title" translatable="yes">About - KeyHint</property>
+        <property name="show_close_button">True</property>
+      </object>
+    </child>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
         </child>
       </object>
     </child>

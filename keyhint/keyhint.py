@@ -63,6 +63,7 @@ class Application(Gtk.Application):
     def do_activate(self):
         if not self.window:
             builder = Gtk.Builder()
+            builder.set_application(self)
             builder.add_from_file("keyhint/resources/ApplicationWindow.glade")
             builder.connect_signals(WindowHandler(builder, self.options))
 
