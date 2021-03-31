@@ -3,10 +3,10 @@ import sys
 
 import gi
 
-from keyhint.window import WindowHandler
-
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
+
+from keyhint.window import WindowHandler  # noqa
 
 from gi.repository import Gio, GLib, Gtk  # noqa
 
