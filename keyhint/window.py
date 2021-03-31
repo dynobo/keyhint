@@ -16,7 +16,7 @@ class WindowHandler:
     def __init__(self, builder, options):
         self._options = options
 
-        self._builder = builder
+        self._about_dialog = builder.get_object("about_dialog")
         self._window = builder.get_object("keyhint_app_window")
         self._header_bar = builder.get_object("header_bar")
         self._select_hints_combo = builder.get_object("select_hints_combo")
@@ -229,9 +229,11 @@ class WindowHandler:
         self.on_quit()
 
     def on_key_release(self, widget, event, data=None):
-        logger.debug(f"Key pressed: {event.keyval}")
         if event.keyval == Gdk.KEY_Escape:
-            self.on_quit()
+            if self._about_dialog_open:
+                self._about_dialog_open = False
+            else:
+                self.on_quit()
 
     def on_select_hints_combo_changed(self, combo):
         self._clear_hints_container()
@@ -250,6 +252,6 @@ class WindowHandler:
         )
 
     def on_menu_about(self, target):
-        a = self._builder.get_object("about_dialog")
-        a.run()
-        a.hide()
+        self._about_dialog_open = True
+        self._about_dialog.run()
+        self._about_dialog.hide()
