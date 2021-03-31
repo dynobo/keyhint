@@ -6,9 +6,9 @@ import gi
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
 
-from keyhint.window import WindowHandler  # noqa
-
 from gi.repository import Gio, GLib, Gtk  # noqa
+
+from keyhint.window import WindowHandler  # noqa
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -60,10 +60,6 @@ class Application(Gtk.Application):
     def do_startup(self):
         Gtk.Application.do_startup(self)
 
-        action = Gio.SimpleAction.new("quit", None)
-        action.connect("activate", self.on_quit)
-        self.add_action(action)
-
     def do_activate(self):
         if not self.window:
             builder = Gtk.Builder()
@@ -87,9 +83,6 @@ class Application(Gtk.Application):
         logger.debug("CLI Options: " + str(self.options))
         self.activate()
         return 0
-
-    def on_quit(self, action, param):
-        self.quit()
 
 
 def main():

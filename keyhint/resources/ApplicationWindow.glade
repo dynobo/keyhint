@@ -9,6 +9,7 @@
     <property name="window_position">center-always</property>
     <property name="gravity">center</property>
     <signal name="destroy" handler="on_window_destroy" swapped="no"/>
+    <signal name="key-release-event" handler="on_key_release" swapped="no"/>
     <signal name="realize" handler="on_window_realize" swapped="no"/>
     <child type="titlebar">
       <object class="GtkHeaderBar" id="header_bar">
