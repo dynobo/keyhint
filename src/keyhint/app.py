@@ -1,3 +1,8 @@
+"""
+Cheatsheat for keyboard shortcuts & commands
+"""
+
+import importlib.resources
 import logging
 import sys
 
@@ -64,7 +69,11 @@ class Application(Gtk.Application):
         if not self.window:
             builder = Gtk.Builder()
             builder.set_application(self)
-            builder.add_from_file("keyhint/resources/ApplicationWindow.glade")
+            with importlib.resources.path(
+                "keyhint.resources", "ApplicationWindow.glade"
+            ) as p:
+                ui = str(p.absolute())
+            builder.add_from_file(ui)
             builder.connect_signals(WindowHandler(builder, self.options))
 
             self.window = builder.get_object("keyhint_app_window")

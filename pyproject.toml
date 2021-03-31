@@ -27,6 +27,7 @@ keyhint = "keyhint.keyhint:main"
 python = "^3.8"
 PyGObject = "^3.40.0"
 PyYAML = "^5.4.1"
+briefcase = "^0.3.5"
 
 
 [tool.poetry.dev-dependencies]
@@ -50,3 +51,39 @@ multi_line_output = 3
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.briefcase]
+project_name = "KeyHint"
+bundle = "com.dynobo.keyhint"
+version = "0.0.1"
+url = "https://github.com/dynobo/keyhint"
+license = "MIT license"
+author = 'dynobo'
+author_email = "dynobo@mailbox.org"
+
+[tool.briefcase.app.keyhint]
+formal_name = "KeyHint"
+description = "Cheatsheat for keyboard shortcuts & commands"
+icon = "src/keyhint/resources/keyhint"
+sources = ['src/keyhint']
+requires = []
+
+[tool.briefcase.app.keyhint.macOS]
+requires = []
+
+[tool.briefcase.app.keyhint.linux]
+requires = []
+system_requires = [
+    'libgirepository1.0-dev',
+    'libcairo2-dev',
+    'pkg-config',
+    'python3-dev',
+    'gcc',
+    'python3-gi',
+    'python3-gi-cairo',
+    'gir1.2-gtk-3.0',
+]
+# system_requires = [‘’, ‘libcairo2-dev
+
+[tool.briefcase.app.keyhint.windows]
+requires = []

@@ -1,0 +1,10 @@
+Metadata-Version: 2.1
+Briefcase-Version: 0.3.5
+Name: keyhint
+Formal-Name: KeyHint
+App-ID: com.dynobo.keyhint.keyhint
+Version: 0.0.1
+Home-page: https://github.com/dynobo/keyhint
+Author: dynobo
+Author-email: dynobo@mailbox.org
+Summary: Cheatsheat for keyboard shortcuts & commands

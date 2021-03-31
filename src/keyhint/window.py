@@ -12,6 +12,7 @@ class WindowHandler:
     _section_title_height = None
     _row_height = None
     _hints = keyhint.utils.load_hints()
+    _about_dialog_open = False
 
     def __init__(self, builder, options):
         self._options = options

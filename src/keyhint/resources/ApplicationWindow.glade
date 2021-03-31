@@ -35,6 +35,7 @@
   <object class="GtkApplicationWindow" id="keyhint_app_window">
     <property name="can_focus">False</property>
     <property name="window_position">center-always</property>
+    <property name="icon">keyhint.png</property>
     <property name="gravity">center</property>
     <signal name="destroy" handler="on_window_destroy" swapped="no"/>
     <signal name="key-release-event" handler="on_key_release" swapped="no"/>
