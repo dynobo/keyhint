@@ -18,8 +18,9 @@ jobs:
       - name: Install appimagetool
         run: |
           mkdir linux
-          wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage -O linux/appimagetool
-          chmod +x linux/appimagetool
+          wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage -O appimagetool
+          chmod +x appimagetool
+          mv appimagetool /home/runner/.local/bin/
       - name: Poetry install
         run: poetry install
       - name: Pytest
