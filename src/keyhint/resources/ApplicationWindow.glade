@@ -35,7 +35,6 @@
   <object class="GtkApplicationWindow" id="keyhint_app_window">
     <property name="can_focus">False</property>
     <property name="window_position">center-always</property>
-    <property name="icon">keyhint.png</property>
     <property name="gravity">center</property>
     <signal name="destroy" handler="on_window_destroy" swapped="no"/>
     <signal name="key-release-event" handler="on_key_release" swapped="no"/>
@@ -186,7 +185,6 @@
     <property name="modal">True</property>
     <property name="window_position">center</property>
     <property name="destroy_with_parent">True</property>
-    <property name="icon">keyhint.svg</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
@@ -197,7 +195,7 @@
     <property name="comments" translatable="yes">Cheatsheat for keyboard shortcuts &amp; commands</property>
     <property name="website">https://github.com/dynobo/keyhint</property>
     <property name="website_label" translatable="yes">Website</property>
-    <property name="logo">keyhint.png</property>
+    <property name="logo_icon_name">keyhint</property>
     <property name="license_type">mit-x11</property>
     <child type="titlebar">
       <object class="GtkHeaderBar">
