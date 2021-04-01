@@ -17,9 +17,9 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libgirepository1.0-dev libcairo2-dev python3-gi
       - name: Install appimagetool
         run: |
-          wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage -O appimagetool
-          chmod +x appimagetool
-          mv ./appimagetool ~/.local/bin/
+          mkdir linux
+          wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage -O ./linux/appimagetool
+          chmod +x ./linux/appimagetool
       - name: Poetry install
         run: poetry install
       - name: Pytest

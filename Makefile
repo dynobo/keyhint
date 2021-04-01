@@ -11,7 +11,7 @@ build:
 	$$FILE_NAME --appimage-extract
 	rm ./squashfs-root/usr/lib/libcairo.so.2
 	rm ./$$FILE_NAME
-	appimagetool -v ./squashfs-root ./$$FILE_NAME
+	./appimagetool -v ./squashfs-root ./$$FILE_NAME
 	rm -rf ./squashfs-root
 	cd ..
 
