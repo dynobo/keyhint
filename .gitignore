@@ -2,6 +2,7 @@
 .vscode
 run.sh
 *.*~
+keyhint.dist-info/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -52,7 +53,6 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-keyhint.dist-info
 
 # IntelliJ Idea family of suites
 .idea
