@@ -23,8 +23,3 @@ jobs:
         run: poetry run black --check ./src
       - name: Pytest
         run: poetry run pytest
-      - name: Coveralls
-        run: poetry run coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-
