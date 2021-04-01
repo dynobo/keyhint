@@ -52,6 +52,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+keyhint.dist-info
 
 # IntelliJ Idea family of suites
 .idea
