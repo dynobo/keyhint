@@ -1,31 +1,24 @@
-on: ["push"]
-
 name: Coveralls
+on: [push, pull_request]
 
 jobs:
-  build:
-    name: Test
+  coveralls:
+    name: Coveralls
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-
-      # PREPARE
-      - name: Install Python 3.7
-        # Because GitHub Actions' python isn't build against tkinter!
-        run: sudo apt-get update && sudo apt-get install python3.7 python3.7-dev python3.7-tk python3-setuptools
-
-      - name: Install dependencies
-        run: python3.7 -m pip install -r requirements-dev.txt
-
-      - name: Install coveralls
-        run: python3.7 -m pip install coveralls
-
-      # TEST
-      - name: Test with pytest
-        run: xvfb-run --server-args="-screen 0 1024x768x24+32" python3.7 -m pytest
-
-      # PUBLISH
-      - name: Publish
-        run: python3.7 -m coveralls
+      - uses: actions/checkout@v2
+      - name: Install system deps
+        run: sudo apt-get update && sudo apt-get install libgirepository1.0-dev libcairo2-dev python3-gi
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Run image
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: 1.1.5
+      - name: Poetry install
+        run: poetry install
+      - name: Pylint
+        run: poetry run coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
