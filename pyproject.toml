@@ -18,9 +18,8 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
 ]
 
-
 [tool.poetry.scripts]
-keyhint = "keyhint.keyhint:main"
+keyhint = "keyhint.app:main"
 
 
 [tool.poetry.dependencies]
@@ -77,21 +76,7 @@ requires = []
 
 [tool.briefcase.app.keyhint.linux]
 requires = []
-system_requires = [
-    'gir1.2-gdkpixbuf-2.0',
-    'libgdk-pixbuf2.0-0',
-    'libgdk-pixbuf2.0-dev',
-    'libgirepository1.0-dev',
-    'libcairo2-dev',
-    'libcairo-gobject2',
-    'librsvg2-common',
-    'libgtk-3-0',
-    'gir1.2-gtk-3.0',
-    'python3-gi',
-    'python3-gi-cairo',
-    'pkg-config',
-    'libcanberra-gtk3-module',
-]
+system_requires = ['libgirepository1.0-dev', 'libcairo2-dev', 'python3-gi']
 
 
 [tool.briefcase.app.keyhint.windows]
