@@ -6,11 +6,11 @@ jobs:
     name: Build on Linux
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v2.3.4
+      - uses: actions/setup-python@v2.1.1
         with:
           python-version: 3.8          
-      - uses: abatilo/actions-poetry@v2
+      - uses: abatilo/actions-poetry@v2.1.0
         with:
           poetry-version: 1.1.5
       - name: Install system deps
