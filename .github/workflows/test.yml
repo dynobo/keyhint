@@ -1,4 +1,4 @@
-name: Testss
+name: Tests
 on: [push, pull_request]
 
 jobs:
@@ -11,13 +11,16 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libgirepository1.0-dev libcairo2-dev python3-gi
       - uses: actions/setup-python@v2
         with:
-          python-version: 3.7          
-      - name: Run image
-        uses: abatilo/actions-poetry@v2.0.0
+          python-version: 3.8          
+      - uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: 1.1.5
       - name: Poetry install
         run: poetry install
       - name: Pylint
-        run: poetry run pylint
+        run: poetry run pylint ./src
+      - name: Black
+        run: poetry run black --check ./src
+      - name: Pytest
+        run: poetry run pytest
 
