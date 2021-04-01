@@ -3,12 +3,17 @@ on: [push, pull_request]
 
 jobs:
   test_linux:
-    name: Test on Linux64
+    name: Build on Linux
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install system deps
         run: sudo apt-get update && sudo apt-get install libgirepository1.0-dev libcairo2-dev python3-gi
+      - name: Install appimagetool
+        run: |
+          mkdir linux
+          wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage -O linux/appimagetool
+          chmod +x linux/appimagetool
       - uses: actions/setup-python@v2
         with:
           python-version: 3.8          
@@ -24,4 +29,4 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       - name: Build AppImage
-        run: make build
+        run: poetry run make build
