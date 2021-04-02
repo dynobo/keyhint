@@ -1,9 +1,12 @@
 name: Build
 on: [push, pull_request]
+#  push:
+#    tags:
+#      - 'v*.*.*'
 
 jobs:
-  test_linux:
-    name: Build on Linux
+  build:
+    name: Build AppImage on Linux
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -30,3 +33,15 @@ jobs:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       - name: Build AppImage
         run: poetry run make build
+
+      # Release
+      - name: Draft release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            linux/*.AppImage
+          body: See [CHANGELOG](https://github.com/dynobo/kehint/blob/master/CHANGELOG.md) for details.
+          draft: true
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
