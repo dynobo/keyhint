@@ -24,7 +24,6 @@ jobs:
              libcairo2-dev \
              python3-gi \
              gobject-introspection \
-             libgtk-3 \
              libgtk-3-dev
       - name: Install appimagetool
         run: |
