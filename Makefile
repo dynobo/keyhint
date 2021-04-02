@@ -1,8 +1,11 @@
 SHELL := /bin/bash
 
 .ONESHELL:
-build:
+clean:
 	rm -rf ./linux
+
+.ONESHELL:
+build:
 	briefcase create --no-input
 	briefcase build
 	briefcase package
@@ -14,6 +17,10 @@ build:
 	./appimagetool -v ./squashfs-root ./$$FILE_NAME
 	rm -rf ./squashfs-root
 	cd ..
+
+clean-build:
+	clean
+	build
 
 run: 
 	briefcase run
