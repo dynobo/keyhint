@@ -1,19 +1,21 @@
 """
-Cheatsheat for keyboard shortcuts & commands
+Cheatsheat for keyboard shortcuts & commands.
+
+Main entry point that get's executed on start.
 """
 
 import importlib.resources
 import logging
 import sys
+from typing import Optional
 
 import gi
 
 gi.require_version("Gtk", "3.0")
-gi.require_version("Gdk", "3.0")
 
-from gi.repository import Gio, GLib, Gtk  # noqa
+from gi.repository import Gio, GLib, Gtk  # pylint: disable=wrong-import-position
 
-from keyhint.window import WindowHandler  # noqa
+from keyhint.window import WindowHandler  # pylint: disable=wrong-import-position
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -21,21 +23,28 @@ logging.basicConfig(
     level="WARNING",
 )
 logger = logging.getLogger(__name__)
-# TODO: Store settings:
-# https://docs.python.org/3/library/configparser.html
-# https://marianochavero.wordpress.com/2012/04/03/short-example-of-gsettings-bindings-in-python/
-# https://www.micahcarrick.com/gsettings-python-gnome-3.htm
 
 
 class Application(Gtk.Application):
+    """Main application class.
+
+    Handle command line options and display the window.
+
+    Args:
+        Gtk (Gtk.Application): Application Class
+    """
+
+    window: Optional[Gtk.ApplicationWindow] = None
+    options: dict = {}
+
     def __init__(self, *args, **kwargs):
+        """Initialize application with command line options."""
         super().__init__(
             *args,
-            application_id="org.example.myapp",
+            application_id="eu.dynobo.keyhint",
             flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE,
             **kwargs,
         )
-        self.window = None
 
         self.add_main_option(
             "verbose",
@@ -62,18 +71,18 @@ class Application(Gtk.Application):
             "HINT-ID",
         )
 
-    def do_startup(self):
-        Gtk.Application.do_startup(self)
+    def do_activate(self, *args, **kwargs):
+        """Create and activate a window with self as application the window belongs to."""
+        Gtk.Application.do_activate(self, *args, **kwargs)
 
-    def do_activate(self):
         if not self.window:
             builder = Gtk.Builder()
             builder.set_application(self)
             with importlib.resources.path(
                 "keyhint.resources", "ApplicationWindow.glade"
-            ) as p:
-                ui = str(p.absolute())
-            builder.add_from_file(ui)
+            ) as ui_path:
+                ui_file = str(ui_path.absolute())
+            builder.add_from_file(ui_file)
             builder.connect_signals(WindowHandler(builder, self.options))
 
             self.window = builder.get_object("keyhint_app_window")
@@ -82,20 +91,23 @@ class Application(Gtk.Application):
 
         self.window.present()
 
-    def do_command_line(self, command_line):
-        options = command_line.get_options_dict()
-        self.options = options.end().unpack()
+    def do_command_line(self, *args, **kwargs):
+        """Store command line options in class attribute for later usage."""
+        Gtk.Application.do_command_line(self, *args, **kwargs)
+
+        self.options = args[0].get_options_dict().end().unpack()
 
         if "verbose" in self.options:
             logging.getLogger().setLevel("DEBUG")
             logger.info("Log level is set to 'DEBUG'")
 
-        logger.debug("CLI Options: " + str(self.options))
+        logger.debug(f"CLI Options: {self.options}")
         self.activate()
         return 0
 
 
 def main():
+    """Start application on script call."""
     app = Application()
     app.run(sys.argv)
 

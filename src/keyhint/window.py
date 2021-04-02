@@ -1,5 +1,11 @@
+"""Logic handler used by the application window.
+
+Does the rendering of the hints as well interface actions.
+"""
+
 import logging
 import re
+from typing import List, Optional, Tuple
 
 from gi.repository import Gdk, GLib, Gtk
 
@@ -8,13 +14,18 @@ import keyhint.utils
 logger = logging.getLogger(__name__)
 
 
-class WindowHandler:
-    _section_title_height = None
-    _row_height = None
-    _hints = keyhint.utils.load_hints()
-    _about_dialog_open = False
+class WindowHandler:  # pylint: disable=too-many-instance-attributes
+    """Handler for main ApplicationWindow."""
+
+    _section_title_height: Optional[int] = None
+    _row_height: Optional[int] = None
+    _hints: List[dict] = keyhint.utils.load_hints()
+    _about_dialog_open: bool = False
+    _wm_class: str = ""
+    _window_title: str = ""
 
     def __init__(self, builder, options):
+        """Initialize during window creation."""
         self._options = options
 
         self._about_dialog = builder.get_object("about_dialog")
@@ -22,31 +33,30 @@ class WindowHandler:
         self._header_bar = builder.get_object("header_bar")
         self._select_hints_combo = builder.get_object("select_hints_combo")
         self._hints_box = builder.get_object("hints_container_box")
-        self._about_dialog = builder.get_object("about_dialog")
 
         logger.debug(f"Loaded {len(self._hints)} hints.")
 
-    def _get_screen_dims(self):
+    def _get_screen_dims(self) -> Tuple[int, int]:
         screen = self._window.get_screen()
         display = screen.get_display()
         monitor = display.get_monitor_at_window(screen.get_root_window())
         workarea = monitor.get_workarea()
         return workarea.width, workarea.height
 
-    def _get_hints_box_dims(self):
+    def _get_hints_box_dims(self) -> Tuple[int, int]:
         size = self._hints_box.size_request()
         return size.width, size.height
 
-    def _get_hint_ids_titles(self):
+    def _get_hint_ids_titles(self) -> List[Tuple[str, str]]:
         return [(k["id"], k["title"]) for k in self._hints]
 
-    def _get_hints_by_id(self, hint_id):
-        for h in self._hints:
-            if h["id"] == hint_id:
-                return h
+    def _get_hints_by_id(self, hint_id: str) -> Optional[dict]:
+        for hint in self._hints:
+            if hint["id"] == hint_id:
+                return hint
         return None
 
-    def _get_hint_id_by_active_window(self):
+    def _get_hint_id_by_active_window(self) -> Optional[str]:
         self._wm_class, self._window_title = keyhint.utils.detect_active_window()
 
         matching_hints = [
@@ -63,7 +73,7 @@ class WindowHandler:
 
         return hint_id
 
-    def _get_appropriate_hint_id(self):
+    def _get_appropriate_hint_id(self) -> Optional[str]:
         hint_id = None
 
         # If hint-id was provided by option, use that one:
@@ -89,7 +99,7 @@ class WindowHandler:
 
         return hint_id
 
-    def _get_row_heights(self):
+    def _get_row_heights(self) -> Tuple[int, int]:
         grid = self._create_column_grid()
         spacing = grid.get_row_spacing()
 
@@ -109,7 +119,7 @@ class WindowHandler:
         logger.debug(f"Title height: {title_height}, Row height: {row_height}")
         return title_height, row_height
 
-    def _distribute_hints_in_columns(self, keyhints):
+    def _distribute_hints_in_columns(self, keyhints: dict) -> List[dict]:
         _, screen_height = self._get_screen_dims()
         max_column_height = screen_height // 1.3
 
@@ -138,19 +148,22 @@ class WindowHandler:
 
     # GENERATE/MODIFY WIDGETS
 
-    def _create_column_grid(self):
+    @staticmethod
+    def _create_column_grid() -> Gtk.Grid:
         column_grid = Gtk.Grid()
         column_grid.set_column_spacing(20)
         column_grid.set_row_spacing(10)
         return column_grid
 
-    def _create_label(self, text):
+    @staticmethod
+    def _create_label(text) -> Gtk.Label:
         label = Gtk.Label()
         label.set_text(text)
         label.set_xalign(0.0)
         return label
 
-    def _create_bindings(self, text):
+    @staticmethod
+    def _create_bindings(text) -> Gtk.Box:
         box = Gtk.Box()
         box.set_halign(Gtk.Align.END)
         box.set_spacing(6)
@@ -173,7 +186,8 @@ class WindowHandler:
             box.add(label)
         return box
 
-    def _create_section_title(self, text):
+    @staticmethod
+    def _create_section_title(text) -> Gtk.Label:
         label = Gtk.Label()
         label.set_markup(f"<b>{text}</b>")
         label.set_xalign(0.0)
@@ -224,27 +238,35 @@ class WindowHandler:
 
     # EVENT HANDLERS
     def on_quit(self):
+        """Shutdown the application."""
         self._window.get_application().quit()
 
-    def on_menu_quit(self, target):
+    def on_menu_quit(self, _):
+        """Execute on click 'quit' in application menu."""
         self.on_quit()
 
-    def on_key_release(self, widget, event, data=None):
+    def on_key_release(
+        self, widget, event, data=None  # pylint: disable=unused-argument
+    ):
+        """Execute on key release."""
         if event.keyval == Gdk.KEY_Escape:
             if self._about_dialog_open:
                 self._about_dialog_open = False
             else:
                 self.on_quit()
 
-    def on_select_hints_combo_changed(self, combo):
+    def on_select_hints_combo_changed(self, _):
+        """Execute on change of the hints selection dropdown."""
         self._clear_hints_container()
         self._populate_hints_container()
         self._adjust_window_dimensions()
 
-    def on_window_destroy(self, *args):
-        pass
+    def on_window_destroy(self, _):  # pylint: disable=unused-argument,no-self-use
+        """Execute on window close."""
+        logger.debug("Closing application window.")
 
-    def on_window_realize(self, *args):
+    def on_window_realize(self, _):
+        """Execute on window realization on startup."""
         self._populate_select_hints_combo()
         hint_id = self._get_appropriate_hint_id()
         self._select_hints_combo.set_active_id(hint_id)
@@ -252,7 +274,8 @@ class WindowHandler:
             f"(wm_class: {self._wm_class}, title: {self._window_title})"
         )
 
-    def on_menu_about(self, target):
+    def on_menu_about(self, _):
+        """Execute on click "about" in application menu."""
         self._about_dialog_open = True
         self._about_dialog.run()
         self._about_dialog.hide()

@@ -33,7 +33,6 @@ briefcase = "^0.3.5"
 pytest = "^5.2"
 mypy = "^0.812"
 isort = "^5.7.0"
-flake8 = "^3.9.0"
 pylint = "^2.7.2"
 pydocstyle = "^6.0.0"
 rope = "^0.18.0"
@@ -47,6 +46,12 @@ coveralls = "^3.0.1"
 profile = "black"
 multi_line_output = 3
 
+[tool.pylint.master]
+load-plugins = "pylint.extensions.mccabe"
+
+[tool.pylint.'MESSAGES CONTROL']
+disable = ['logging-fstring-interpolation']
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -55,7 +60,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.briefcase]
 project_name = "KeyHint"
-bundle = "com.dynobo.keyhint"
+bundle = "eu.dynobo.keyhint"
 version = "0.2.0"
 url = "https://github.com/dynobo/keyhint"
 license = "MIT"
