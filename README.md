@@ -9,7 +9,7 @@
 <a href='https://coveralls.io/github/dynobo/keyhint'><img src='https://coveralls.io/repos/github/dynobo/keyhint/badge.svg' alt='Coverage Status' /></a>
 </p>
 
-<p align="center"><br><img src="https://raw.githubusercontent.com/dynobo/keyhint/refactoring/src/keyhint/resources/keyhint_128.png"></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/dynobo/keyhint/master/src/keyhint/resources/keyhint_128.png"></p>
 
 ## Usage
 
