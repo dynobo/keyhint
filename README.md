@@ -21,9 +21,9 @@ _KeyHint with KeyBindings for VS Code:_
 
 ## Configuration
 
-- The **config directory** is `.config/keyhint/`.
-- To **customize existing** hints, copy [tne corresponding `.yaml`-file](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config) into the config directory. Make your changes in a text editor. (As long as you don't change the `id` it will overwrite the defaults)
-- To **create new** hints, I suggest you start with [one of the existing `.yaml`-file](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config):
+- The **config directory** is `~/.config/keyhint/`.
+- To **customize existing** hints, copy [the corresponding .yaml-file](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config) into the config directory. Make your changes in a text editor. As long as you don't change the `id` it will overwrite the defaults.
+- To **create new** hints, I suggest you also start with [one of the existing .yaml-file](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config):
   - Place it in the config directory and give it a good file name.
   - Change the value `id` to something unique.
   - Adjust `regex_process` and `regex_title` so it will be selected based on the active window. (See [Tips](#tips))
@@ -33,17 +33,17 @@ _KeyHint with KeyBindings for VS Code:_
 
 ## Tips
 
-**Available hints:**
-
-- Check the [included yaml-files](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config) to see wich applications are available by default.
-- Feel free submit additional `yaml-files` for further applications.
-
 **Hints selection:**
 
 - The hints to be displayed on startup are selected by comparing the value of `regex_process` with the wm_class of the active window and the value of `regex_title` with the title of the active window. 
 - The potential hints are processed alphabetically by filename, the first file that matches both wm_class and title are gettin displayed. 
 - Both of `regex_` values are interpreted as **case insensitive regular expressions**.
 - Check "Debug Info" in the application menu to get insights about the active window and the selected hints file.
+
+**Available hints:**
+
+- Check the [included yaml-files](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config) to see wich applications are available by default.
+- Feel free submit additional `yaml-files` for further applications.
 
 **Differentiate hints per website:**
 
