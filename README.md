@@ -19,7 +19,7 @@
 
 _KeyHint with KeyBindings for VS Code:_
 
-![VS Code Shortcuts](https://raw.githubusercontent.com/dynobo/keyhint/refactoring/src/keyhint/resources/vscode.png)
+![VS Code Shortcuts](https://raw.githubusercontent.com/dynobo/keyhint/master/src/keyhint/resources/vscode.png)
 
 ## CLI Options
 
