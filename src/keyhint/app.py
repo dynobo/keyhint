@@ -45,15 +45,6 @@ class Application(Gtk.Application):
             flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE,
             **kwargs,
         )
-
-        self.add_main_option(
-            "verbose",
-            ord("v"),
-            GLib.OptionFlags.NONE,
-            GLib.OptionArg.NONE,
-            "Verbose log output for debugging",
-            None,
-        )
         self.add_main_option(
             "hint",
             ord("h"),
@@ -69,6 +60,14 @@ class Application(Gtk.Application):
             GLib.OptionArg.STRING,
             "Hint to show in case no hints for active application were found",
             "HINT-ID",
+        )
+        self.add_main_option(
+            "verbose",
+            ord("v"),
+            GLib.OptionFlags.NONE,
+            GLib.OptionArg.NONE,
+            "Verbose log output for debugging",
+            None,
         )
 
     def do_activate(self, *args, **kwargs):

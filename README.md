@@ -19,7 +19,17 @@
 
 _KeyHint with KeyBindings for VS Code:_
 
-![VS Code Shortcuts](https://raw.githubusercontent.com/dynobo/keyhint/refactoring/src/keyhint/resources/vscode.png)
+![VS Code Shortcuts](https://raw.githubusercontent.com/dynobo/keyhint/master/src/keyhint/resources/vscode.png)
+
+## CLI Options
+
+```
+Application Options:
+  -h, --hint=HINT-ID             Show hints by specified ID
+  -d, --default-hint=HINT-ID     Hint to show in case no hints for active application were found
+  -v, --verbose                  Verbose log output for debugging
+  --display=DISPLAY              X display to use
+```
 
 ## Configuration
 
