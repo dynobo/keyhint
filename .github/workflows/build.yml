@@ -1,8 +1,8 @@
 name: Build
 on:
   push:
-    tags:
-      - "v*.*.*"
+    branches:
+      - master
 
 jobs:
   build:
@@ -33,6 +33,14 @@ jobs:
         run: poetry run coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+      - name: Build and publish to PyPi-Test
+        run: |
+          poetry config repositories.pypi-test https://test.pypi.org/legacy/
+          poetry publish \
+            --build \
+            --repository=pypi-test \
+            --username __token__ \
+            --password ${{ secrets.PYPI_TEST_KEYHINT_TOKEN }}
       - name: Build AppImage
         run: poetry run make clean-build
 
