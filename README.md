@@ -14,7 +14,7 @@
 ## Usage
 
 - Install from **PyPi** with `pip install keyhint` and run `keyhint`.
-- Or download the **AppImage** from [releases](https://github.com/dynobo/keyhint/releases), make it exectuable and run it.
+- _Or_ download the **AppImage** from [releases](https://github.com/dynobo/keyhint/releases), make it executable and run it.
 - Configure a **global hotkey** (e.g. `F1`) to start KeyHint on demand.
 
 _KeyHint with KeyBindings for VS Code:_
