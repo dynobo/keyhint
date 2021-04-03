@@ -9,6 +9,8 @@
 <a href='https://coveralls.io/github/dynobo/keyhint'><img src='https://coveralls.io/repos/github/dynobo/keyhint/badge.svg' alt='Coverage Status' /></a>
 </p>
 
+<p align="center"><img src="https://raw.githubusercontent.com/dynobo/keyhint/refactoring/src/keyhint/resources/keyhint.png"></p>
+
 ## Usage
 
 - Install from **PyPi** with `pip install keyhint` and run `keyhint`.
