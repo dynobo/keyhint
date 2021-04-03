@@ -1,12 +1,11 @@
-name: Build
+name: Build and Publish
 on:
   push:
-    branches:
-      - master
-
+    tags:
+      - "v*.*.*"
 jobs:
-  build:
-    name: Build AppImage on Linux
+  publish:
+    name: Build and Publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,10 +28,6 @@ jobs:
         run: poetry install
       - name: Pytest
         run: poetry run pytest
-      - name: Coveralls
-        run: poetry run coveralls
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       # Prepare Release
       - name: Build AppImage
         run: poetry run make clean-build
@@ -46,12 +41,10 @@ jobs:
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Publish to pypi-test
-      - name: Build and publish to PyPi-Test
+      # Publish to PyPi
+      - name: Build and publish to PyPi
         run: |
-          poetry config repositories.pypi-test https://test.pypi.org/legacy/
           poetry publish \
             --build \
-            --repository=pypi-test \
             --username __token__ \
-            --password ${{ secrets.PYPI_TEST_KEYHINT_TOKEN }}
+            --password ${{ secrets.PYPI_KEYHINT_TOKEN }}
