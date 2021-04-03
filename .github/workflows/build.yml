@@ -33,18 +33,9 @@ jobs:
         run: poetry run coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-      - name: Build and publish to PyPi-Test
-        run: |
-          poetry config repositories.pypi-test https://test.pypi.org/legacy/
-          poetry publish \
-            --build \
-            --repository=pypi-test \
-            --username __token__ \
-            --password ${{ secrets.PYPI_TEST_KEYHINT_TOKEN }}
+      # Prepare Release
       - name: Build AppImage
         run: poetry run make clean-build
-
-      # Release
       - name: Draft release
         uses: softprops/action-gh-release@v1
         with:
@@ -55,3 +46,12 @@ jobs:
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Publish to pypi-test
+      - name: Build and publish to PyPi-Test
+        run: |
+          poetry config repositories.pypi-test https://test.pypi.org/legacy/
+          poetry publish \
+            --build \
+            --repository=pypi-test \
+            --username __token__ \
+            --password ${{ secrets.PYPI_TEST_KEYHINT_TOKEN }}

@@ -40,6 +40,7 @@ black = { version = "^20.8b1", allow-prereleases = true }
 pytest-cov = "^2.11.1"
 pre-commit = "^2.11.1"
 coveralls = "^3.0.1"
+bumpversion = "^0.6.0"
 
 
 [tool.isort]
