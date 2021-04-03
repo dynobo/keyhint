@@ -1,37 +1,27 @@
-colon := :
-$(colon) := :
+SHELL := /bin/bash
 
-init:
-	rm -rf ./.venv
-	rm ~/.config/keyhint/*
-	python3 -m venv .venv
-	.venv/bin/python -m pip install -r requirements-dev.txt
+.ONESHELL:
+clean:
+	rm -rf ./linux
+	mkdir linux
+	wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage -O ./linux/appimagetool
+	chmod +x ./linux/appimagetool
 
-reset_config:
-	rm ~/.config/keyhint/*
+.ONESHELL:
+build:
+	briefcase create --no-input
+	briefcase build
+	briefcase package
+	cd ./linux
+	FILE_NAME=$$(ls -t ./*.AppImage | head -1)
+	$$FILE_NAME --appimage-extract
+	rm ./squashfs-root/usr/lib/libcairo.so.2
+	rm ./$$FILE_NAME
+	./appimagetool -v ./squashfs-root ./$$FILE_NAME
+	rm -rf ./squashfs-root
+	cd ..
 
-test:
-	.venv/bin/pytest tests
+clean-build: clean build
 
-lint:
-	.venv/bin/pylama
-
-run:
-	.venv/bin/python -m keyhint
-
-package:
-	rm -rf build dist
-	.venv/bin/python setup.py sdist bdist_wheel
-	.venv/bin/twine check dist/*
-
-upload_test:
-	rm -rf build dist
-	.venv/bin/python setup.py sdist bdist_wheel
-	.venv/bin/twine check dist/*
-	.venv/bin/twine upload --repository-url=https$(:)//test.pypi.org/legacy/ dist/*
-
-upload_final:
-	rm -rf build dist
-	.venv/bin/python setup.py sdist bdist_wheel
-	.venv/bin/twine check dist/*
-	.venv/bin/twine upload dist/*
+run: 
+	briefcase run
