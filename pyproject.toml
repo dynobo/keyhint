@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "keyhint"
 version = "0.2.0"
-description = "Cheatsheat for keyboard shortcuts & commands"
+description = "Cheat-sheets for shortcuts & commands at your fingertips."
 keywords = ["shortcuts", "keybindings", "hints", "helper", "cheatsheet"]
 license = "MIT"
 authors = ["dynobo <dynobo@mailbox.org>"]
@@ -70,7 +70,7 @@ author_email = "dynobo@mailbox.org"
 
 [tool.briefcase.app.keyhint]
 formal_name = "KeyHint"
-description = "Cheatsheat for keyboard shortcuts & commands"
+description = "Cheat-sheets for shortcuts & commands at your fingertips."
 icon = "src/keyhint/resources/keyhint"
 installer_icon = "src/keyhint/resources/keyhint"
 sources = ['src/keyhint']

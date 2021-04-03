@@ -288,7 +288,6 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
         self._populate_select_hints_combo()
         self._hint_id = self._get_appropriate_hint_id()
         self._select_hints_combo.set_active_id(self._hint_id)
-        self._header_bar.set_subtitle("Shortcut cheatsheets at your fingertipps")
 
     def on_menu_about(self, _):
         """Execute on click "about" in application menu."""
