@@ -25,11 +25,6 @@ jobs:
              python3-gi \
              gobject-introspection \
              libgtk-3-dev
-      - name: Install appimagetool
-        run: |
-          mkdir linux
-          wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage -O ./linux/appimagetool
-          chmod +x ./linux/appimagetool
       - name: Poetry install
         run: poetry install
       - name: Pytest
@@ -39,7 +34,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       - name: Build AppImage
-        run: poetry run make build
+        run: poetry run make clean-build
 
       # Release
       - name: Draft release

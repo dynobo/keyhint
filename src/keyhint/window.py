@@ -3,11 +3,12 @@
 Does the rendering of the hints as well interface actions.
 """
 
+import importlib.resources
 import logging
 import re
 from typing import List, Optional, Tuple
 
-from gi.repository import Gdk, GLib, Gtk
+from gi.repository import Gdk, GdkPixbuf, GLib, Gtk
 
 import keyhint.utils
 
@@ -20,15 +21,18 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
     _section_title_height: Optional[int] = None
     _row_height: Optional[int] = None
     _hints: List[dict] = keyhint.utils.load_hints()
-    _about_dialog_open: bool = False
+    _dialog_is_open: bool = False
     _wm_class: str = ""
     _window_title: str = ""
+    _hint_id: str = ""
 
     def __init__(self, builder, options):
         """Initialize during window creation."""
         self._options = options
 
+        self._builder = builder
         self._about_dialog = builder.get_object("about_dialog")
+        self._debug_info_dialog = builder.get_object("debug_info_dialog")
         self._window = builder.get_object("keyhint_app_window")
         self._header_bar = builder.get_object("header_bar")
         self._select_hints_combo = builder.get_object("select_hints_combo")
@@ -100,6 +104,9 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
         return hint_id
 
     def _get_row_heights(self) -> Tuple[int, int]:
+        if self._section_title_height and self._row_height:
+            return self._section_title_height, self._row_height
+
         grid = self._create_column_grid()
         spacing = grid.get_row_spacing()
 
@@ -123,8 +130,7 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
         _, screen_height = self._get_screen_dims()
         max_column_height = screen_height // 1.3
 
-        if (not self._section_title_height) or (not self._row_height):
-            self._section_title_height, self._row_height = self._get_row_heights()
+        self._section_title_height, self._row_height = self._get_row_heights()
 
         hint_columns = []
         current_column = {}
@@ -147,6 +153,14 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
         return hint_columns
 
     # GENERATE/MODIFY WIDGETS
+
+    def _set_icons(self):
+        with importlib.resources.path("keyhint.resources", "keyhint.png") as ui_path:
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(ui_path.absolute()))
+
+        self._window.set_icon(pixbuf)
+        self._about_dialog.set_logo(pixbuf)
+        self._about_dialog.set_icon(pixbuf)
 
     @staticmethod
     def _create_column_grid() -> Gtk.Grid:
@@ -223,18 +237,21 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
 
             self._hints_box.pack_start(grid, False, False, 0)
 
-        self._hints_box.show_all()
+        self._window.show_all()
 
     def _adjust_window_dimensions(self):
+
         screen_width, screen_height = self._get_screen_dims()
         hints_box_width, hints_box_height = self._get_hints_box_dims()
         header_height = self._header_bar.size_request().height
-
         target_height = min(hints_box_height + header_height, screen_height // 1.1)
         target_width = min(hints_box_width + 80, screen_width // 1.1)
 
+        position_x = (screen_width - target_width) // 2
+        position_y = (screen_height - target_height) // 2
+
         self._window.resize(target_width, target_height)
-        self._window.move(0, 0)
+        self._window.move(position_x, position_y)
 
     # EVENT HANDLERS
     def on_quit(self):
@@ -250,8 +267,8 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
     ):
         """Execute on key release."""
         if event.keyval == Gdk.KEY_Escape:
-            if self._about_dialog_open:
-                self._about_dialog_open = False
+            if self._dialog_is_open:
+                self._dialog_is_open = False
             else:
                 self.on_quit()
 
@@ -267,15 +284,38 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
 
     def on_window_realize(self, _):
         """Execute on window realization on startup."""
+        self._set_icons()
         self._populate_select_hints_combo()
-        hint_id = self._get_appropriate_hint_id()
-        self._select_hints_combo.set_active_id(hint_id)
-        self._header_bar.set_subtitle(
-            f"(wm_class: {self._wm_class}, title: {self._window_title})"
-        )
+        self._hint_id = self._get_appropriate_hint_id()
+        self._select_hints_combo.set_active_id(self._hint_id)
+        self._header_bar.set_subtitle("Shortcut cheatsheets at your fingertipps")
 
     def on_menu_about(self, _):
         """Execute on click "about" in application menu."""
-        self._about_dialog_open = True
+        self._dialog_is_open = True
         self._about_dialog.run()
         self._about_dialog.hide()
+
+    def on_menu_debug_info(self, _):
+        """Execute on click "debug info" in application menu."""
+        hints = self._get_hints_by_id(self._hint_id)
+
+        self._builder.get_object("debug_wm_class").set_text(self._wm_class)
+        self._builder.get_object("debug_title").set_text(self._window_title)
+        self._builder.get_object("debug_hint_id").set_text(hints["id"])
+        self._builder.get_object("debug_hint_wmclass").set_text(
+            hints["match"]["regex_process"]
+        )
+        self._builder.get_object("debug_hint_title").set_text(
+            hints["match"]["regex_title"]
+        )
+        self._builder.get_object("debug_hint_source").set_label(
+            "website with shortcuts"
+        )
+        logger.info(hints["source"])
+        self._builder.get_object("debug_hint_source").set_uri(hints["source"])
+        self._builder.get_object("debug_hint_yaml").set_text("not implemented")
+
+        self._dialog_is_open = True
+        self._debug_info_dialog.run()
+        self._debug_info_dialog.hide()

@@ -257,7 +257,7 @@ def detect_active_window() -> Tuple[str, str]:
         f"Detected wm_class: '{wm_class}'. Detected window_title: '{window_title}'."
     )
 
-    if "" not in [wm_class, window_title]:
+    if "" in [wm_class, window_title]:
         logger.error(
             "Couldn't detect active window! Please report this errror "
             "together with information about your OS and display server on "

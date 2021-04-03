@@ -3,6 +3,9 @@ SHELL := /bin/bash
 .ONESHELL:
 clean:
 	rm -rf ./linux
+	mkdir linux
+	wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage -O ./linux/appimagetool
+	chmod +x ./linux/appimagetool
 
 .ONESHELL:
 build:
@@ -18,9 +21,7 @@ build:
 	rm -rf ./squashfs-root
 	cd ..
 
-clean-build:
-	clean
-	build
+clean-build: clean build
 
 run: 
 	briefcase run

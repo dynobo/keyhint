@@ -1,15 +1,15 @@
 id: tilix
 title: Tilix
-source: 
+source: https://github.com/gnunn1/tilix/blob/master/data/resources/ui/shortcuts.ui
 match:
-  regex_process: Tilix
+  regex_process: tilix
   regex_title: .*
-  
+
 hints:
   Window:
     F11: Toggle fullscreen
     F12: View session sidebar
-  
+
   Sessions:
     Ctrl + Shift + T: Open new session
     Ctrl + PageUp / PageDown: Switch to next/preview session
@@ -44,4 +44,4 @@ hints:
     gtop / htop: System Monitors
     ranger: File manager
     moc: Music Player in Console
-    alsamixer: Audio Mixer    
+    alsamixer: Audio Mixer
