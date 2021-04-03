@@ -1,6 +1,6 @@
-# keyhint
+# KeyHint
 
-**_Display keyboard shortcuts or other hints based on the **process name** and **window title** of the active window. (Linux/Windows)_**
+**_Display keyboard shortcuts or other hints based on the the active window. (GTK, Linux only!)_**
 
 <p align="center"><br>
 <img alt="Tests passing" src="https://github.com/dynobo/keyhint/workflows/Test/badge.svg">
@@ -11,59 +11,53 @@
 
 ## Usage
 
-- Install: `pip install keyhint`
-- Execute: `keyhint`
-- Tip: Configure a **global hotkey** to start `keyhint` on demand!
+- Install from **PyPi** with `pip install keyhint` and run `keyhint`.
+- Or download the **AppImage** from [releases](https://github.com/dynobo/keyhint/releases), make it exectuable and run it.
+- Configure a **global hotkey** (e.g. `F1`) to start KeyHint on demand.
 
-_Keyhint showing shortcuts for VS Code:_
+_KeyHint with KeyBindings for VS Code:_
 
-![General Firefox Shortcuts](assets/vscode.png)
+![VS Code Shortcuts](https://raw.githubusercontent.com/dynobo/keyhint/refactoring/src/keyhint/resources/vscode.png)
 
 ## Configuration
 
-### Look & Behavior
-
-- You can configure colors, font and closing behavior by modifying the file<br>
-  `<CONFIG_PATH>/keyhint/config.yaml`
-
-### Hints
-
-- You can also configure the hints to show for different applications by modifying or adding section in the file<br>
-  `<CONFIG_PATH>/keyhint/hints.yaml`
-
-- The hints to display are selected by going through all sections from top to bottom and comparing the value of `regex_process` with the process name of the active window and the value of `regex_title` with the title of the active window. The first section, where both values are found, gets displayed.
-
-- Both of those `regex_` values are interpreted as **case insensitive regular expressions**.)
-
-### Notes
-
-- The `<CONFIG_PATH>` can be different from system to system. On Linux it's usually `~/.config`, on Windows it should be `C:\Users\<YOURNAME>\AppData\Roaming`.
-
-- You can **reset configuration or hints** to the shipped version by deleting the `yaml` files from the configuration folder.
+- The **config directory** is `.config/keyhint/`.
+- To **customize existing** hints, copy [tne corresponding `.yaml`-file](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config) into the config directory. Make your changes in a text editor. (As long as you don't change the `id` it will overwrite the defaults)
+- To **create new** hints, I suggest you start with [one of the existing `.yaml`-file](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config):
+  - Place it in the config directory and give it a good file name.
+  - Change the value `id` to something unique.
+  - Adjust `regex_process` and `regex_title` so it will be selected based on the active window. (See [Tips](#tips))
+  - Add the `hints` to be displayed. 
+  - If you think the hints might be useful for others, please consider opening a pull request or an issue.
+- You can always **reset a configuration** to the shipped version by deleting the `.yaml` files from the config folder.
 
 ## Tips
 
-**Differentiate Websites:**
+**Available hints:**
+
+- Check the [included yaml-files](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config) to see wich applications are available by default.
+- Feel free submit additional `yaml-files` for further applications.
+
+**Hints selection:**
+
+- The hints to be displayed on startup are selected by comparing the value of `regex_process` with the wm_class of the active window and the value of `regex_title` with the title of the active window. 
+- The potential hints are processed alphabetically by filename, the first file that matches both wm_class and title are gettin displayed. 
+- Both of `regex_` values are interpreted as **case insensitive regular expressions**.
+- Check "Debug Info" in the application menu to get insights about the active window and the selected hints file.
+
+**Differentiate hints per website:**
 
 - For showing different browser-hints depending on the current website, you might want to use a browser extension like "[Add URL To Window Title](https://addons.mozilla.org/en-US/firefox/addon/add-url-to-window-title/)" and then configure the sections in `hints.yaml` to look for the URL in the window title.
 
-**Differentiate Multi Platform:**
-
-- Sometimes the hints you want to show are the same for e.g. Linux and Windows. In that case, you might want to set e.g. `regex_process: firefox.*` to match with `Firefox` (Linux) as well as with `Firefox.exe` (Windows).
-
-- If you want to show different hints for the same tool depending on the platform, use two sections, one with `regex_process: firefox(?!\.exe)` (Linux) and one with `regex_process: firefox\.exe` (Windows).
-
 ## Contribute
 
-I'm happy about any contribution! Especially I would appreciate submissions to improve the [shipped hints](https://github.com/dynobo/keyhint/blob/master/keyhint/config/hints.yaml). (The current set are the hints I personally use).
+I'm happy about any contribution! Especially I would appreciate submissions to improve the [shipped hints](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config). (The current set are the hints I personally use).
 
 ## Design Principles
 
-- **Multi-Platform**<br>Should work on Linux, Mac (not yet achieved) & Windows.
 - **Don't run as service**<br>It shouldn't consume resources in the background, even if this leads to slower start-up time.
 - **No network connection**<br>Everything should run locally without any network communication.
 - **Dependencies**<br>The fewer dependencies, the better.
-- **Chain of Responsibility as main design pattern**<br>[See description on refactoring.guru](https://refactoring.guru/design-patterns/chain-of-responsibility)
 - **Multi-Monitors**<br>Supports setups with two or more displays
 
 ## Certification
