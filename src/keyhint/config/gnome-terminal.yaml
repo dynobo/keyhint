@@ -1,0 +1,25 @@
+id: gnome-terminal
+title: Gnome Terminal
+source: https://help.gnome.org/users/gnome-terminal/stable/adv-keyboard-shortcuts.html.en
+match:
+  regex_process: gnome-terminal
+  regex_title: .*
+
+hints:
+  Navigating:
+    pwd: Print working dir
+    cd: Change to home dir
+    "`cd -`": Change to previous dir
+
+  History:
+    "`history | grep <term>`": Search for "<term>"
+    "`history 10`": Print last 10 cmds
+    "!3": Execute cmd 3 from history
+    Ctrl + r: Reverse cmd search / find next
+
+  Tools:
+    bc: Calculator
+    gtop / htop: System Monitors
+    ranger: File manager
+    moc: Music Player in Console
+    alsamixer: Audio Mixer

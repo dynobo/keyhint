@@ -1,0 +1,47 @@
+id: firefox
+title: Firefox
+source: https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly
+match:
+  regex_process: Firefox
+  regex_title: .*
+  
+hints:
+  URL Navigation:
+    Ctrl + L: Location bar
+    Alt + Left: Back in History
+    Alt + Right: Forward in History
+
+  Tab Management:
+    Ctrl + T: New tab
+    Ctrl + Tab: Next tab
+    Ctrl + 1..8: Select tab 1..8
+    Ctrl + W: Close tab
+    Ctrl + Shift + T: Undo close tab
+    \/: Quick Find
+
+  Various:
+    Ctrl + Shift + Y: Show downloads
+
+  Vimium - Scrolling:
+    J / K: Scroll down / up
+    D / U: Scroll page down / up
+    H / L: Scroll left / right
+
+  Vimium - URL Navigation:
+    b: Open a bookmark
+    B: Open a bookmark in new tab
+    r: Reload page
+    gu: Go up the URL hierarchy
+    gU: Go to root in URL hierarchy
+    f: Open link in current tab
+    F: Open link new current tab
+    H: Back in History
+    L: Forward in History
+
+  Vimium - Tabs:
+    t: Create new tab
+    J / K: Next / previous tab
+    yt: Duplicate tab
+    x: Close tab
+    X: Undo close tab
+    W: Move tab to new window
