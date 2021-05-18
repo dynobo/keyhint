@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "keyhint"
-version = "0.2.0"
+version = "0.2.1"
 description = "Cheat-sheets for shortcuts & commands at your fingertips."
 keywords = ["shortcuts", "keybindings", "hints", "helper", "cheatsheet"]
 license = "MIT"
@@ -62,7 +62,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.briefcase]
 project_name = "KeyHint"
 bundle = "eu.dynobo.keyhint"
-version = "0.2.0"
+version = "0.2.1"
 url = "https://github.com/dynobo/keyhint"
 license = "MIT"
 author = 'dynobo'

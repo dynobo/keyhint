@@ -4,17 +4,24 @@ source: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-linux.pdf
 match:
   regex_process: code
   regex_title: .*
-  
+
 hints:
   Navigating UI:
     Ctrl + 0: Focus sidebar
     Ctrl + 1: Focus editor 1
     Ctrl + 2: Focus editor 2
+
+  Sidebar:
     Ctrl + B: Toggle sidebar
+    Ctrl + Shift + E: Explorer in sidebar
+    Ctrl + Shift + G: Git in sidebar
+    Ctrl + Shift + D: Debug in sidebar
+
+  Panel:
     Ctrl + J: Toggle panel
-    Ctrl + Shift + E: Explorer in Sidebar
-    Ctrl + Shift + M: Toggle problems
     Ctrl + `: Toggle terminal
+    Ctrl + Shift + M: Toggle problems
+    Ctrl + Shift + Y: Toggle debug console
 
   Basic Editing:
     Ctrl + L: Select current line
