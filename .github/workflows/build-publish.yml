@@ -36,7 +36,7 @@ jobs:
         with:
           files: |
             linux/*.AppImage
-          body: See [CHANGELOG](https://github.com/dynobo/kehint/blob/master/CHANGELOG.md) for details.
+          body: See [CHANGELOG](https://github.com/dynobo/kehint/blob/main/CHANGELOG.md) for details.
           draft: true
           prerelease: true
         env:

@@ -4,12 +4,12 @@
 
 <p align="center"><br>
 <img alt="Tests passing" src="https://github.com/dynobo/keyhint/workflows/Test/badge.svg">
-<a href="https://github.com/dynobo/keyhint/blob/master/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
+<a href="https://github.com/dynobo/keyhint/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/Code%20style-black-%23000000"></a>
 <a href='https://coveralls.io/github/dynobo/keyhint'><img src='https://coveralls.io/repos/github/dynobo/keyhint/badge.svg' alt='Coverage Status' /></a>
 </p>
 
-<p align="center"><br><img src="https://raw.githubusercontent.com/dynobo/keyhint/master/src/keyhint/resources/keyhint_128.png"></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/dynobo/keyhint/main/src/keyhint/resources/keyhint_128.png"></p>
 
 ## Usage
 
@@ -19,7 +19,7 @@
 
 _KeyHint with KeyBindings for VS Code:_
 
-![VS Code Shortcuts](https://raw.githubusercontent.com/dynobo/keyhint/master/src/keyhint/resources/vscode.png)
+![VS Code Shortcuts](https://raw.githubusercontent.com/dynobo/keyhint/main/src/keyhint/resources/vscode.png)
 
 ## CLI Options
 
@@ -34,8 +34,8 @@ Application Options:
 ## Configuration
 
 - The **config directory** is `~/.config/keyhint/`.
-- To **customize existing** hints, copy [the corresponding .yaml-file](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config) into the config directory. Make your changes in a text editor. As long as you don't change the `id` it will overwrite the defaults.
-- To **create new** hints, I suggest you also start with [one of the existing .yaml-file](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config):
+- To **customize existing** hints, copy [the corresponding .yaml-file](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config) into the config directory. Make your changes in a text editor. As long as you don't change the `id` it will overwrite the defaults.
+- To **create new** hints, I suggest you also start with [one of the existing .yaml-file](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config):
   - Place it in the config directory and give it a good file name.
   - Change the value `id` to something unique.
   - Adjust `regex_process` and `regex_title` so it will be selected based on the active window. (See [Tips](#tips))
@@ -54,7 +54,7 @@ Application Options:
 
 **Available hints:**
 
-- Check the [included yaml-files](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config) to see wich applications are available by default.
+- Check the [included yaml-files](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config) to see wich applications are available by default.
 - Feel free submit additional `yaml-files` for further applications.
 
 **Differentiate hints per website:**
@@ -63,7 +63,7 @@ Application Options:
 
 ## Contribute
 
-I'm happy about any contribution! Especially I would appreciate submissions to improve the [shipped hints](https://github.com/dynobo/keyhint/tree/master/src/keyhint/config). (The current set are the hints I personally use).
+I'm happy about any contribution! Especially I would appreciate submissions to improve the [shipped hints](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config). (The current set are the hints I personally use).
 
 ## Design Principles
 
