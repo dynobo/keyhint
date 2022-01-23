@@ -25,6 +25,7 @@ hints:
 
   Basic Editing:
     Ctrl + L: Select current line
+    Ctrl + Backspace: Delete last word
     Alt + Up Down: Move line up/down
     Alt + Shift + Up Down: Duplicate cursor
     Ctrl+ Alt + Shift + Up Down: Duplicate line
@@ -33,6 +34,7 @@ hints:
 
   Language Editing:
     Ctrl + Space: Trigger IntelliSense and Hint
+    Ctrl + K I: Show hover docs
     Ctrl + Shift + O: Search and jump to symbol
     F12: Goto defintion
     Alt + F12: Peek definition
