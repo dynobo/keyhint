@@ -120,6 +120,10 @@ def replace_keys(text: str) -> str:
     text = text.replace("Up", "↑")
     text = text.replace("Left", "←")
     text = text.replace("Right", "→")
+    text = text.replace("Direction", "←↓↑→")
+    text = text.replace("PlusMinus", "±")
+    text = text.replace("Plus", "＋")
+    text = text.replace("Minus", "−")
     return text
 
 
