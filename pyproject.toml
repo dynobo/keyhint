@@ -24,23 +24,24 @@ keyhint = "keyhint.app:main"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-PyGObject = "^3.40.0"
-PyYAML = "^5.4.1"
+PyGObject = "^3.42.0"
+PyYAML = "^6.0"
 
 
 [tool.poetry.dev-dependencies]
-briefcase = "^0.3.5"
-pytest = "^5.2"
-mypy = "^0.812"
-isort = "^5.7.0"
-pylint = "^2.7.2"
-pydocstyle = "^6.0.0"
-rope = "^0.18.0"
-black = { version = "^20.8b1", allow-prereleases = true }
-pytest-cov = "^2.11.1"
-pre-commit = "^2.11.1"
-coveralls = "^3.0.1"
-bumpversion = "^0.6.0"
+briefcase = "^0.3.6"
+pytest = "^7.0.1"
+mypy = "^0.931"
+isort = "^5.10.1"
+pylint = "^2.12.2"
+pydocstyle = "^6.1.1"
+rope = "^0.23.0"
+black = "^22.1.0"
+pytest-cov = "^3.0.0"
+pre-commit = "^2.17.0"
+coveralls = "^3.3.1"
+PyGObject-stubs = "^0.0.7"
+types-PyYAML = "^6.0.4"
 
 
 [tool.isort]
@@ -49,6 +50,7 @@ multi_line_output = 3
 
 [tool.pylint.master]
 load-plugins = "pylint.extensions.mccabe"
+ignored-modules = "gi"
 
 [tool.pylint.'MESSAGES CONTROL']
 disable = ['logging-fstring-interpolation']
