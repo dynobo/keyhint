@@ -11,6 +11,14 @@
 
 <p align="center"><br><img src="https://raw.githubusercontent.com/dynobo/keyhint/main/src/keyhint/resources/keyhint_128.png"></p>
 
+## Dependencies
+
+Make sure to install the following dependencies:
+
+```
+sudo apt install pkg-config python3-dev libcairo2-dev libgirepository1.0-dev
+```
+
 ## Usage
 
 - Install from **PyPi** with `pip install keyhint` and run `keyhint`.
