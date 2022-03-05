@@ -55,10 +55,7 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
         return [(k["id"], k["title"]) for k in self._hints]
 
     def _get_hints_by_id(self, hint_id: str) -> Optional[dict]:
-        for hint in self._hints:
-            if hint["id"] == hint_id:
-                return hint
-        return None
+        return next((hint for hint in self._hints if hint["id"] == hint_id), None)
 
     def _get_hint_id_by_active_window(self) -> Optional[str]:
         self._wm_class, self._window_title = keyhint.utils.detect_active_window()
@@ -143,11 +140,10 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
                 column_height += section_height
             else:
                 hint_columns.append(current_column)
-                current_column = {}
-                current_column[section] = hints
+                current_column = {section: hints}
                 column_height = section_height
 
-        if len(current_column) > 0:
+        if current_column:
             hint_columns.append(current_column)
 
         return hint_columns
@@ -181,11 +177,7 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
         box = Gtk.Box()
         box.set_halign(Gtk.Align.END)
         box.set_spacing(6)
-        if text.startswith("`"):
-            keys = [text.replace("`", "")]
-        else:
-            keys = text.split()
-
+        keys = [text.replace("`", "")] if text.startswith("`") else text.split()
         for key in keys:
             label = Gtk.Label()
             key = keyhint.utils.replace_keys(key.strip())

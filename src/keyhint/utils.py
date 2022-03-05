@@ -30,7 +30,7 @@ def _load_yaml(file: Union[Path, str], from_resources=False) -> dict:
             text = importlib.resources.read_text("keyhint.config", file)
             result = yaml.safe_load(text)
         else:
-            with open(file) as yaml_file:
+            with open(file, encoding="utf-8") as yaml_file:
                 result = yaml.safe_load(yaml_file)
     except yaml.YAMLError as exc:
         print(exc)
@@ -45,8 +45,7 @@ def _discover_hint_files() -> Iterable[str]:
         Iterable[str]: List of paths to keyhint yaml files
     """
     files = importlib.resources.contents("keyhint.config")
-    yaml_files = [f for f in files if f.endswith(".yaml")]
-    return yaml_files
+    return [f for f in files if f.endswith(".yaml")]
 
 
 def load_default_hints() -> List[dict]:
@@ -67,8 +66,7 @@ def load_user_hints() -> List[dict]:
     Returns:
         List[dict]: List of application keyhints and metainfos.
     """
-    config_path = get_users_config_path()
-    if config_path:
+    if config_path := get_users_config_path():
         files = (config_path / "keyhint").glob("*.yaml")
         hints = [_load_yaml(f) for f in files]
         hints = sorted(hints, key=lambda k: k["title"])
@@ -113,7 +111,7 @@ def replace_keys(text: str) -> str:
     Returns:
         str: Text where some key names have been replaced by unicode symbole.
     """
-    if text in ["PageUp", "PageDown"]:
+    if text in {"PageUp", "PageDown"}:
         text = text.replace("Page", "Page ")
 
     text = text.replace("Down", "↓")
@@ -139,8 +137,7 @@ def get_active_window_info_wayland() -> Tuple[str, str]:
     def _get_cmd_result(cmd: str) -> str:
         stdout_bytes: bytes = subprocess.check_output(cmd, shell=True)
         stdout = stdout_bytes.decode()
-        match = re.search(r"'(.+)'", stdout)
-        if match:
+        if match := re.search(r"'(.+)'", stdout):
             return match.groups()[0].strip('"')
         return ""
 
@@ -210,10 +207,7 @@ def is_using_wayland() -> bool:
     Returns
         [bool] -- {True} if probably Wayland
     """
-    result = False
-    if "WAYLAND_DISPLAY" in os.environ:
-        result = True
-    return result
+    return "WAYLAND_DISPLAY" in os.environ
 
 
 def get_users_config_path() -> Union[Path, None]:
@@ -222,15 +216,10 @@ def get_users_config_path() -> Union[Path, None]:
     Returns
         Path -- Root of config folder
     """
-    config_path: Union[Path, None] = None
+    if xdg_conf := os.getenv("XDG_CONFIG_HOME", None):
+        return Path(xdg_conf)
 
-    xdg_conf = os.getenv("XDG_CONFIG_HOME", None)
-    if xdg_conf:
-        config_path = Path(xdg_conf)
-    else:
-        config_path = Path.home() / ".config"
-
-    return config_path
+    return Path.home() / ".config"
 
 
 def detect_active_window() -> Tuple[str, str]:
