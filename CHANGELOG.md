@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.2 (2022-03-05)
+
+- Add hints for kitty
+- Add hints for pop-shell
+- Update dependencies
+
 ## v0.2.1 (2021-05-18)
 
 - Slightly improve shortcuts for vscode
