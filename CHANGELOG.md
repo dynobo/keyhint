@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.3 (2022-03-06)
+
+- Add accent color for section titles
+
 ## v0.2.2 (2022-03-05)
 
 - Add hints for kitty
