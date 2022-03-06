@@ -33,10 +33,11 @@ _KeyHint with KeyBindings for VS Code:_
 
 ```
 Application Options:
-  -h, --hint=HINT-ID             Show hints by specified ID
-  -d, --default-hint=HINT-ID     Hint to show in case no hints for active application were found
-  -v, --verbose                  Verbose log output for debugging
-  --display=DISPLAY              X display to use
+  -h, --hint=HINT-ID                      Show hints by specified ID
+  -d, --default-hint=HINT-ID              Hint to show in case no hints for active application were found
+  -a, --accent-color=css color string     Accent color, used e.g. for section titles
+  -v, --verbose                           Verbose log output for debugging
+  --display=DISPLAY                       X display to use
 ```
 
 ## Configuration

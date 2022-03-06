@@ -62,6 +62,14 @@ class Application(Gtk.Application):
             "HINT-ID",
         )
         self.add_main_option(
+            "accent-color",
+            ord("a"),
+            GLib.OptionFlags.NONE,
+            GLib.OptionArg.STRING,
+            "Accent color, used e.g. for section titles",
+            "css color string",
+        )
+        self.add_main_option(
             "verbose",
             ord("v"),
             GLib.OptionFlags.NONE,

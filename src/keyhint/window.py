@@ -192,12 +192,15 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
             box.add(label)
         return box
 
-    @staticmethod
-    def _create_section_title(text) -> Gtk.Label:
+    def _create_section_title(self, text) -> Gtk.Label:
         label = Gtk.Label()
         label.set_markup(f"<b>{text}</b>")
         label.set_xalign(0.0)
         label.set_margin_top(24)
+        text_color = self._options.get("accent-color", "#FF2E88")
+        label.modify_fg(
+            state=Gtk.StateType.NORMAL, color=Gdk.Color.parse(text_color).color
+        )
         return label
 
     def _clear_hints_container(self):
