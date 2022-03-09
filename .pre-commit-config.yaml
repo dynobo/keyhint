@@ -20,7 +20,7 @@ repos:
         name: pylint
         stages: [commit]
         language: system
-        entry: poetry run pylint ./src
+        entry: poetry run pylint ./keyhint ./tests
         types: [python]
         pass_filenames: false
 

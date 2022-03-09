@@ -4,6 +4,8 @@ cheatsheet.jpeg
 run.sh
 *.*~
 keyhint.dist-info/
+app.build
+app.dist
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

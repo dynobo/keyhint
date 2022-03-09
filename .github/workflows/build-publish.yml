@@ -35,7 +35,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            linux/*.AppImage
+            keyhint.bin
           body: See [CHANGELOG](https://github.com/dynobo/kehint/blob/main/CHANGELOG.md) for details.
           draft: true
           prerelease: true

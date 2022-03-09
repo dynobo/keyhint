@@ -22,7 +22,7 @@ sudo apt install pkg-config python3-dev libcairo2-dev libgirepository1.0-dev
 ## Usage
 
 - Install from **PyPi** with `pip install keyhint` and run `keyhint`.
-- _Or_ download the **AppImage** from [releases](https://github.com/dynobo/keyhint/releases), make it executable and run it.
+- _Or_ download the **Binary** from [releases](https://github.com/dynobo/keyhint/releases), make it executable and run it.
 - Configure a **global hotkey** (e.g. `F1`) to start KeyHint on demand.
 
 _KeyHint with KeyBindings for VS Code:_

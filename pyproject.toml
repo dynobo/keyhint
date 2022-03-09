@@ -23,13 +23,12 @@ keyhint = "keyhint.app:main"
 
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 PyGObject = "^3.42.0"
 PyYAML = "^6.0"
 
 
 [tool.poetry.dev-dependencies]
-briefcase = "^0.3.6"
 pytest = "^7.0.1"
 mypy = "^0.931"
 isort = "^5.10.1"
@@ -42,7 +41,12 @@ pre-commit = "^2.17.0"
 coveralls = "^3.3.1"
 PyGObject-stubs = "^0.0.7"
 types-PyYAML = "^6.0.4"
+Nuitka = "^0.7.3"
+tbump = "^6.7.0"
 
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
 profile = "black"
@@ -55,39 +59,35 @@ ignored-modules = "gi"
 [tool.pylint.'MESSAGES CONTROL']
 disable = ['logging-fstring-interpolation']
 
+[tool.mypy]
+files = ["keyhint/**/*.py", "tests/**/*.py"]
+follow_imports = "skip"
+ignore_missing_imports = true
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.tbump]
 
+[tool.tbump.version]
+current = "0.2.3"
+regex = '''
+  (?P<major>\d+)
+  \.
+  (?P<minor>\d+)
+  \.
+  (?P<patch>\d+)
+  ((?P<extra>.+))?
+  '''
 
-[tool.briefcase]
-project_name = "KeyHint"
-bundle = "eu.dynobo.keyhint"
-version = "0.2.3"
-url = "https://github.com/dynobo/keyhint"
-license = "MIT"
-author = 'dynobo'
-author_email = "dynobo@mailbox.org"
+[tool.tbump.git]
+message_template = "Bump to {new_version}"
+tag_template = "v{new_version}"
 
+[[tool.tbump.file]]
+src = "pyproject.toml"
+search = 'version = "{current_version}"'
 
-[tool.briefcase.app.keyhint]
-formal_name = "KeyHint"
-description = "Cheat-sheets for shortcuts & commands at your fingertips."
-icon = "src/keyhint/resources/keyhint"
-installer_icon = "src/keyhint/resources/keyhint"
-sources = ['src/keyhint']
-requires = ['PyGObject', 'PyYAML']
+[[tool.tbump.file]]
+src = "keyhint/resources/ApplicationWindow.glade"
 
-
-[tool.briefcase.app.keyhint.macOS]
-requires = []
-
-
-[tool.briefcase.app.keyhint.linux]
-requires = []
-system_requires = ['libgirepository1.0-dev', 'libcairo2-dev', 'python3-gi']
-
-
-[tool.briefcase.app.keyhint.windows]
-requires = []
+[[tool.tbump.before_commit]]
+name = "check changelog"
+cmd = "grep -q {new_version} CHANGELOG.md"

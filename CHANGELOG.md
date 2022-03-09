@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.4 (2022-03-09)
+
+- Switch to Nuitka for building binary release
+
 ## v0.2.3 (2022-03-06)
 
 - Add accent color for section titles
