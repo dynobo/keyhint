@@ -85,10 +85,12 @@ class Application(Gtk.Application):
         if not self.window:
             builder = Gtk.Builder()
             builder.set_application(self)
-            with importlib.resources.path(
-                "keyhint.resources", "ApplicationWindow.glade"
-            ) as ui_path:
-                ui_file = str(ui_path.absolute())
+            ui_path = (
+                importlib.resources.files("keyhint")
+                / "resources"
+                / "ApplicationWindow.glade"
+            )
+            ui_file = str(ui_path.absolute())
             builder.add_from_file(ui_file)
             builder.connect_signals(WindowHandler(builder, self.options))
 

@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Iterable, List, Tuple, Union
 
 import yaml
+from git import PathLike
 
 logger = logging.getLogger(__name__)
 
@@ -27,25 +28,24 @@ def _load_yaml(file: Union[Path, str], from_resources=False) -> dict:
     """
     try:
         if from_resources:
-            text = importlib.resources.read_text("keyhint.config", file)
-            result = yaml.safe_load(text)
-        else:
-            with open(file, encoding="utf-8") as yaml_file:
-                result = yaml.safe_load(yaml_file)
+            file = Path(str(importlib.resources.files("keyhint"))) / "config" / file
+        with open(file, "r", encoding="utf-8") as stream:
+            result = yaml.safe_load(stream)
+
     except yaml.YAMLError as exc:
         print(exc)
         result = {}
     return result
 
 
-def _discover_hint_files() -> Iterable[str]:
+def _discover_hint_files() -> Iterable[Union[str, PathLike]]:
     """Get paths of yaml files shipped with the package.
 
     Returns:
         Iterable[str]: List of paths to keyhint yaml files
     """
-    files = importlib.resources.contents("keyhint.config")
-    return [f for f in files if f.endswith(".yaml")]
+    config_path = Path(str(importlib.resources.files("keyhint"))) / "config"
+    return config_path.glob("*.yaml")
 
 
 def load_default_hints() -> List[dict]:

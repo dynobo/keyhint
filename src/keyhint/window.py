@@ -151,8 +151,8 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
     # GENERATE/MODIFY WIDGETS
 
     def _set_icons(self):
-        with importlib.resources.path("keyhint.resources", "keyhint.svg") as ui_path:
-            pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(ui_path.absolute()))
+        ui_path = importlib.resources.files("keyhint") / "resources" / "keyhint.svg"
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(ui_path.absolute()))
 
         self._window.set_icon(pixbuf)
         self._about_dialog.set_logo(pixbuf)
