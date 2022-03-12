@@ -10,6 +10,7 @@ hints:
     Super + Direction: Move focus
     Super + O: Switch tiling orientation
     Super + M: Toggle maximized
+    Super + Y: Toggle tiling
     Super + G: Toggle floating
     Super + S: Toggle stacking
     Super + Q: Quit window
