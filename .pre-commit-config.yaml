@@ -6,21 +6,21 @@ repos:
         name: isort
         stages: [commit]
         language: system
-        entry: poetry run isort
+        entry: poetry run isort .
         types: [python]
 
       - id: black
         name: black
         stages: [commit]
         language: system
-        entry: poetry run black
+        entry: poetry run black .
         types: [python]
 
       - id: pylint
         name: pylint
         stages: [commit]
         language: system
-        entry: poetry run pylint ./src
+        entry: poetry run pylint ./keyhint ./tests
         types: [python]
         pass_filenames: false
 
@@ -39,11 +39,3 @@ repos:
         entry: poetry run pytest
         types: [python]
         pass_filenames: false
-
-    # - id: pytest-cov
-    #   name: pytest
-    #   stages: [push]
-    #   language: system
-    #   entry: pipenv run pytest --cov --cov-fail-under=1
-    #   types: [python]
-    #   pass_filenames: false

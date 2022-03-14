@@ -1,0 +1,34 @@
+id: pop-shell
+title: Pop Shell
+source: https://support.system76.com/articles/pop-keyboard-shortcuts/
+match:
+  regex_process: pop-shell
+  regex_title: .*
+
+hints:
+  Manipulate windows:
+    Super + Direction: Move focus
+    Super + O: Switch tiling orientation
+    Super + M: Toggle maximized
+    Super + Y: Toggle tiling
+    Super + G: Toggle floating
+    Super + S: Toggle stacking
+    Super + Q: Quit window
+
+  Adjustment Mode:
+    Super + Enter: Enter window adjustment mode
+    Direction: Move window
+    Shift + Direction: Resize window
+    Ctrl + Direction: Swap windows
+    Enter: Apply changes
+    Esc: Exit window adjustment mode
+
+  Manage workspaces:
+    Super + Ctrl + UpDown: Navigate between workspaces
+    Super + Shift + Direction: Move window between workspaces
+
+  Miscellaneous:
+    Super + Tab: Switch apps
+    Super + ^: Switch windows of current app
+    Alt + F2: Run command
+    Ctrl + Alt + Del: Logout
