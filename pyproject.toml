@@ -86,6 +86,10 @@ src = "pyproject.toml"
 search = 'version = "{current_version}"'
 
 [[tool.tbump.file]]
+src = "Makefile"
+search = "KeyHint-{current_version}"
+
+[[tool.tbump.file]]
 src = "keyhint/resources/ApplicationWindow.glade"
 
 [[tool.tbump.before_commit]]

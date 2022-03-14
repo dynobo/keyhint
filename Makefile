@@ -14,7 +14,7 @@ build:
 		--enable-plugin=gi \
 		--include-data-dir=keyhint/config=keyhint/config \
 		--include-data-dir=keyhint/resources=keyhint/resources \
-		-o keyhint.bin \
+		-o KeyHint-0.2.3-x86_64.AppImage \
 		keyhint/app.py 
 
 clean-build: clean build
