@@ -198,7 +198,7 @@
     <property name="gravity">center</property>
     <property name="transient_for">keyhint_app_window</property>
     <property name="program_name">KeyHint</property>
-    <property name="version">v0.2.3</property>
+    <property name="version">v0.2.4</property>
     <property name="comments" translatable="yes">Cheatsheat for keyboard shortcuts &amp; commands</property>
     <property name="website">https://github.com/dynobo/keyhint</property>
     <property name="website_label" translatable="yes">Website</property>
