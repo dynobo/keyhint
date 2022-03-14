@@ -2,26 +2,20 @@ SHELL := /bin/bash
 
 .ONESHELL:
 clean:
-	rm -rf ./linux
-	mkdir linux
-	wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage -O ./linux/appimagetool
-	chmod +x ./linux/appimagetool
+	rm -rf ./app.build
+	rm -rf ./app.dist
 
 .ONESHELL:
 build:
-	briefcase create --no-input
-	briefcase build
-	briefcase package
-	cd ./linux
-	FILE_NAME=$$(ls -t ./*.AppImage | head -1)
-	$$FILE_NAME --appimage-extract
-	rm ./squashfs-root/usr/lib/libcairo.so.2
-	rm ./$$FILE_NAME
-	./appimagetool -v ./squashfs-root ./$$FILE_NAME
-	rm -rf ./squashfs-root
-	cd ..
+	python -m nuitka \
+		--onefile \
+		--assume-yes-for-downloads \
+		--enable-plugin=anti-bloat \
+		--enable-plugin=gi \
+		--include-data-dir=keyhint/config=keyhint/config \
+		--include-data-dir=keyhint/resources=keyhint/resources \
+		-o keyhint.bin \
+		keyhint/app.py 
 
 clean-build: clean build
-
-run: 
-	briefcase run
+	

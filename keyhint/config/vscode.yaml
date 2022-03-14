@@ -1,0 +1,56 @@
+id: code
+title: VS Code
+source: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-linux.pdf
+match:
+  regex_process: code
+  regex_title: .*
+
+hints:
+  Navigating UI:
+    Ctrl + 0: Focus sidebar
+    Ctrl + 1: Focus editor 1
+    Ctrl + 2: Focus editor 2
+
+  Sidebar:
+    Ctrl + B: Toggle sidebar
+    Ctrl + Shift + E: Explorer in sidebar
+    Ctrl + Shift + G: Git in sidebar
+    Ctrl + Shift + D: Debug in sidebar
+
+  Panel:
+    Ctrl + J: Toggle panel
+    Ctrl + `: Toggle terminal
+    Ctrl + Shift + M: Toggle problems
+    Ctrl + Shift + Y: Toggle debug console
+
+  Basic Editing:
+    Ctrl + L: Select current line
+    Ctrl + Backspace: Delete last word
+    Alt + Up Down: Move line up/down
+    Alt + Shift + Up Down: Duplicate cursor
+    Ctrl+ Alt + Shift + Up Down: Duplicate line
+    Shift + Alt + Left Right: Expand/shrink selection
+    Ctrl + H: Search and replace
+
+  Language Editing:
+    Ctrl + Space: Trigger IntelliSense and Hint
+    Ctrl + K I: Show hover docs
+    Ctrl + Shift + O: Search and jump to symbol
+    F12: Goto defintion
+    Alt + F12: Peek definition
+    Shift + F12: Peek usage
+    F2: Rename symbol
+    F8: Cycle through errors
+    Shift + F8: Cycle through errors backwards
+
+  Debugging:
+    F9: Toogle breakpoint
+    F5: Start/continue
+    Shift + F5: Stop
+    F11: Step into
+    Shift + F11: Step out
+    F10: Step over
+
+  File/Tab Management:
+    Ctrl + Tab: Switch between tabs
+    Ctrl + P: Quick open file
