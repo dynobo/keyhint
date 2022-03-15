@@ -9,7 +9,7 @@
 <a href='https://coveralls.io/github/dynobo/keyhint'><img src='https://coveralls.io/repos/github/dynobo/keyhint/badge.svg' alt='Coverage Status' /></a>
 </p>
 
-<p align="center"><br><img src="https://raw.githubusercontent.com/dynobo/keyhint/main/src/keyhint/resources/keyhint_128.png"></p>
+<p align="center"><br><img src="https://raw.githubusercontent.com/dynobo/keyhint/main/keyhint/resources/keyhint_128.png"></p>
 
 ## Dependencies
 
@@ -27,7 +27,7 @@ sudo apt install pkg-config python3-dev libcairo2-dev libgirepository1.0-dev
 
 _KeyHint with KeyBindings for VS Code:_
 
-![VS Code Shortcuts](https://raw.githubusercontent.com/dynobo/keyhint/main/src/keyhint/resources/vscode.png)
+![VS Code Shortcuts](https://raw.githubusercontent.com/dynobo/keyhint/main/keyhint/resources/vscode.png)
 
 ## CLI Options
 
