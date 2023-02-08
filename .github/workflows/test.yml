@@ -15,7 +15,7 @@ jobs:
           poetry-version: 1.1.13
       - name: Install system deps
         run: |
-          sudo apt-get update 
+          sudo apt-get update
           sudo apt-get install \
              libgirepository1.0-dev \
              libcairo2-dev \

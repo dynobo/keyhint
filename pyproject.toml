@@ -8,41 +8,39 @@ authors = ["dynobo <dynobo@mailbox.org>"]
 readme = "README.md"
 repository = "https://github.com/dynobo/keyhint"
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Topic :: Utilities",
-    "Intended Audience :: End Users/Desktop",
-    "Operating System :: POSIX :: Linux",
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Topic :: Utilities",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: POSIX :: Linux",
 ]
 
 [tool.poetry.scripts]
 keyhint = "keyhint.app:main"
 
-
 [tool.poetry.dependencies]
 python = "^3.9"
-PyGObject = "^3.42.0"
+PyGObject = "^3.42.2"
 PyYAML = "^6.0"
 
-
-[tool.poetry.dev-dependencies]
-pytest = "^7.0.1"
-mypy = "^0.931"
-isort = "^5.10.1"
-pylint = "^2.12.2"
-pydocstyle = "^6.1.1"
-rope = "^0.23.0"
-black = "^22.1.0"
-pytest-cov = "^3.0.0"
-pre-commit = "^2.17.0"
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.1"
+rope = "^1.7.0"
+black = "^23.1.0"
+pytest-cov = "^4.0.0"
+pre-commit = "^3.0.4"
 coveralls = "^3.3.1"
-PyGObject-stubs = "^0.0.7"
-types-PyYAML = "^6.0.4"
-Nuitka = "^0.7.3"
-tbump = "^6.7.0"
+types-PyYAML = "^6.0.12.4"
+Nuitka = "^1.4.3"
+tbump = "^6.9.0"
+ruff = "^0.0.243"
+pip-audit = "^2.4.14"
+mdformat = "^0.7.16"
+pygobject-stubs = "^2.2.0"
+pyright = "^1.1.293"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

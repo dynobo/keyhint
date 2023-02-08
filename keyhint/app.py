@@ -7,15 +7,17 @@ Main entry point that get's executed on start.
 import importlib.resources
 import logging
 import sys
+from pathlib import Path
 from typing import Optional
 
 import gi
 
+# TODO: Update to 4.0
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gio, GLib, Gtk  # pylint: disable=wrong-import-position
+from gi.repository import Gio, GLib, Gtk  # noqa: E402
 
-from keyhint.window import WindowHandler  # pylint: disable=wrong-import-position
+from keyhint.window import WindowHandler  # noqa: E402
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -79,18 +81,18 @@ class Application(Gtk.Application):
         )
 
     def do_activate(self, *args, **kwargs):
-        """Create and activate a window with self as application the window belongs to."""
+        """Create and activate a window."""
         Gtk.Application.do_activate(self, *args, **kwargs)
 
         if not self.window:
             builder = Gtk.Builder()
             builder.set_application(self)
-            ui_path = (
+            ui_path = str(
                 importlib.resources.files("keyhint")
                 / "resources"
                 / "ApplicationWindow.glade"
             )
-            ui_file = str(ui_path.absolute())
+            ui_file = str(Path(ui_path).absolute())
             builder.add_from_file(ui_file)
             builder.connect_signals(WindowHandler(builder, self.options))
 

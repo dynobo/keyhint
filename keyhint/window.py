@@ -235,7 +235,6 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
         self._window.show_all()
 
     def _adjust_window_dimensions(self):
-
         screen_width, screen_height = self._get_screen_dims()
         hints_box_width, hints_box_height = self._get_hints_box_dims()
         header_height = self._header_bar.size_request().height

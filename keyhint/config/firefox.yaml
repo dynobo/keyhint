@@ -4,7 +4,7 @@ source: https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-
 match:
   regex_process: Firefox
   regex_title: .*
-  
+
 hints:
   URL Navigation:
     Ctrl + L: Location bar
