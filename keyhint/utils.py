@@ -1,6 +1,7 @@
 """Various utility functions."""
 
 import importlib.resources
+import json
 import logging
 import os
 import re
@@ -135,28 +136,28 @@ def get_active_window_info_wayland() -> Tuple[str, str]:
 
     def _get_cmd_result(cmd: str) -> str:
         stdout_bytes: bytes = subprocess.check_output(cmd, shell=True)
-        stdout = stdout_bytes.decode()
+        stdout = stdout_bytes.decode("utf-8")
         if match := re.search(r"'(.+)'", stdout):
             return match.groups()[0].strip('"')
         return ""
 
-    cmd_eval = (
-        "gdbus call -e -d org.gnome.Shell -o /org/gnome/Shell -m org.gnome.Shell.Eval"
+    cmd_windows_list = (
+        "gdbus call --session --dest org.gnome.Shell "
+        + "--object-path /org/gnome/Shell/Extensions/Windows "
+        + "--method org.gnome.Shell.Extensions.Windows.List"
     )
-    cmd_win_idx = (
-        ' "global.get_window_actors().findIndex(a=>a.meta_window.has_focus()===true)"'
-    )
-    window_idx = _get_cmd_result(cmd_eval + cmd_win_idx)
+    stdout = _get_cmd_result(cmd_windows_list)
+    windows = json.loads(stdout)
+    focused_window = list(filter(lambda x: x["focus"], windows))[0]
+    wm_class = focused_window["wm_class"]
 
-    cmd_wm_class = (
-        f' "global.get_window_actors()[{window_idx}].get_meta_window().get_wm_class()"'
+    cmd_windows_gettitle = (
+        "gdbus call --session --dest org.gnome.Shell "
+        + "--object-path /org/gnome/Shell/Extensions/Windows "
+        + "--method org.gnome.Shell.Extensions.Windows.GetTitle "
+        + f"{focused_window['id']}"
     )
-    wm_class = _get_cmd_result(cmd_eval + cmd_wm_class)
-
-    cmd_wm_title = (
-        f' "global.get_window_actors()[{window_idx}].get_meta_window().get_title()"'
-    )
-    title = _get_cmd_result(cmd_eval + cmd_wm_title)
+    title = _get_cmd_result(cmd_windows_gettitle)
 
     return wm_class, title
 
@@ -240,15 +241,18 @@ def detect_active_window() -> Tuple[str, str]:
         traceback.print_stack()
         logger.error(
             "Couldn't detect active application window."
-            "KeyHint currently should support Wayland and X. If you are using one "
-            "of those and see this error, please create and issue incl. the traceback "
-            "above on https://github.com/dynobo/keyhint/issues."
+            "KeyHint supports Wayland and X.\n"
+            "For Wayland, the installation of the 'Window Calls' gnome extension is "
+            "required: https://extensions.gnome.org/extension/4724/window-calls/\n"
+            "For Xorg, the 'xprop' command is required, check your systems repository "
+            "to identify its package.\n"
+            "If you met the prerequisits but still see this, please create an issue"
+            "incl. the traceback above on https://github.com/dynobo/keyhint/issues."
         )
 
     logger.debug(
         f"Detected wm_class: '{wm_class}'. Detected window_title: '{window_title}'."
     )
-
     if "" in [wm_class, window_title]:
         logger.error(
             "Couldn't detect active window! Please report this errror "
