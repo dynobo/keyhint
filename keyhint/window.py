@@ -44,7 +44,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         logger.debug(f"Loaded {len(self._hints)} hints.")
         self.connect("realize", self.on_realize)
 
-        evk = Gtk.EventControllerKey.new()
+        evk = Gtk.EventControllerKey()
         evk.connect("key-released", self.on_key_release)
         self.add_controller(evk)  # add to window
         self.screen_width, self.screen_height = self._get_screen_dims()
@@ -115,7 +115,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         grid = Gtk.Grid(column_spacing=20, row_spacing=10)
         spacing = grid.get_row_spacing()
 
-        section_title = self._create_section_title("dummy")
+        section_title = self._create_section_title("placeholder")
         grid.attach(section_title, column=1, row=0, width=1, height=1)
         bindings_box = self._create_bindings("Ctrl + A")
         label = Gtk.Label(label="TestingLabel", xalign=0.0)
@@ -157,7 +157,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     # GENERATE/MODIFY WIDGETS
     def _load_css(self):
         css_path = importlib.resources.files("keyhint") / "style.css"
-        provider = Gtk.CssProvider.new()
+        provider = Gtk.CssProvider()
         provider.load_from_path(str(css_path.absolute()))
         Gtk.StyleContext().add_provider_for_display(
             self.get_display(), provider, Gtk.STYLE_PROVIDER_PRIORITY_USER
@@ -178,7 +178,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         keys = [text.replace("`", "")] if text.startswith("`") else text.split()
         for key in keys:
             key = keyhint.utils.replace_keys(key.strip())
-            label = Gtk.Label.new()
+            label = Gtk.Label()
             if key in ["+", "/"]:
                 label.set_css_classes(["dim-label"])
             else:
@@ -265,12 +265,12 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def on_select_hints_combo_changed(self, _):
         """Execute on change of the hints selection dropdown."""
         self.set_active_keyhint(self.shortcuts_combo_box.get_active_id())
-        self.header_bar_title.set_text(self._active_keyhint["title"])
+        self.header_bar_title.set_text(self._active_keyhint["title"] + " - Shortcuts")
         self._clear_hints_container()
         self._populate_hints_container()
         self._adjust_window_dimensions()
 
-    def on_window_destroy(self, _):  # pylint: disable=unused-argument,no-self-use
+    def on_window_destroy(self, _):
         """Execute on window close."""
         logger.debug("Closing application window.")
 
@@ -284,18 +284,18 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def open_about_dialog(self, _):
         """Execute on click "about" in application menu."""
         self._dialog_is_open = True
-        dialog = Gtk.AboutDialog.new()
-        dialog.set_program_name("KeyHint")
-        dialog.set_version("v0.2.4")
-        dialog.set_comments("Cheatsheat for keyboard shortcuts &amp; commands")
-        dialog.set_website("https://github.com/dynobo/keyhint")
-        dialog.set_website_label("Website")
-        dialog.set_logo_icon_name("keyhint")
-        dialog.set_system_information(self._get_debug_info())
-        dialog.set_modal(True)
-        dialog.set_resizable(True)
-        dialog.set_transient_for(self)
-        dialog.show()
+        Gtk.AboutDialog(
+            program_name="KeyHint",
+            comments="Cheatsheat for keyboard shortcuts &amp; commands",
+            version="v0.2.4",
+            website_label="Website",
+            website="https://github.com/dynobo/keyhint",
+            logo_icon_name="keyhint",
+            system_information=self._get_debug_info(),
+            modal=True,
+            resizable=True,
+            transient_for=self,
+        ).show()
 
     def _get_debug_info(self) -> str:
         text = "Active Window:\n"

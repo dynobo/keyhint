@@ -237,7 +237,7 @@ def detect_active_window() -> Tuple[str, str]:
             wm_class, window_title = get_active_window_info_wayland()
         else:
             wm_class, window_title = get_active_window_info_x()
-    except Exception:  # pylint: disable=broad-except
+    except Exception:
         traceback.print_stack()
         logger.error(
             "Couldn't detect active application window."
