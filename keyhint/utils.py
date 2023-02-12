@@ -109,6 +109,7 @@ def replace_keys(text: str) -> str:
     text = text.replace("PlusMinus", "±")
     text = text.replace("Plus", "＋")
     text = text.replace("Minus", "−")
+    text = text.replace("Slash", "/")
     return text
 
 
