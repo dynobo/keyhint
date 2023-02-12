@@ -4,7 +4,6 @@ Cheatsheat for keyboard shortcuts & commands.
 Main entry point that get's executed on start.
 """
 
-import importlib
 import logging
 import sys
 from typing import Optional
