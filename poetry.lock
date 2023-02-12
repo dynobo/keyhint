@@ -711,13 +711,13 @@ setuptools = "*"
 
 [[package]]
 name = "nuitka"
-version = "1.4.4"
+version = "1.4.5"
 description = "Python compiler with full language support and CPython compatibility"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "Nuitka-1.4.4.tar.gz", hash = "sha256:3bd4269e920e1415e30d7edf637ca9a88161a09e299627b749583077dd5e288a"},
+    {file = "Nuitka-1.4.5.tar.gz", hash = "sha256:c4e31be4f838ac9075a146432df27574e2e211fcbd44953662180ef053fce043"},
 ]
 
 [[package]]
@@ -936,20 +936,6 @@ files = [
 
 [package.dependencies]
 pycairo = ">=1.16,<2.0"
-
-[[package]]
-name = "pygobject-stubs"
-version = "2.2.0"
-description = "Typing stubs for PyGObject"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "PyGObject-stubs-2.2.0.tar.gz", hash = "sha256:eb99b255a33823651d416a309dd5ac5bf0aad0730da0093d7a16f6696d41ff65"},
-]
-
-[package.extras]
-dev = ["PyGObject", "black", "mypy"]
 
 [[package]]
 name = "pyparsing"
@@ -1313,14 +1299,14 @@ files = [
 
 [[package]]
 name = "types-pyyaml"
-version = "6.0.12.4"
+version = "6.0.12.5"
 description = "Typing stubs for PyYAML"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-PyYAML-6.0.12.4.tar.gz", hash = "sha256:ade6e328a5a3df816c47c912c2e1e946ae2bace90744aa73111ee6834b03a314"},
-    {file = "types_PyYAML-6.0.12.4-py3-none-any.whl", hash = "sha256:de3bacfc4e0772d9b1baf007c37354f3c34c8952e90307d5155b6de0fc183a67"},
+    {file = "types-PyYAML-6.0.12.5.tar.gz", hash = "sha256:3b61b7a8111ce368eb366e4a13f3e94e568bc2ed6227e01520a50ee07993bf38"},
+    {file = "types_PyYAML-6.0.12.5-py3-none-any.whl", hash = "sha256:dcaf87b65b839e7b641721346ef8b12a87f94071e15205a64ac93ca0e0afc77a"},
 ]
 
 [[package]]
@@ -1399,14 +1385,14 @@ files = [
 
 [[package]]
 name = "zipp"
-version = "3.12.1"
+version = "3.13.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "zipp-3.12.1-py3-none-any.whl", hash = "sha256:6c4fe274b8f85ec73c37a8e4e3fa00df9fb9335da96fb789e3b96b318e5097b3"},
-    {file = "zipp-3.12.1.tar.gz", hash = "sha256:a3cac813d40993596b39ea9e93a18e8a2076d5c378b8bc88ec32ab264e04ad02"},
+    {file = "zipp-3.13.0-py3-none-any.whl", hash = "sha256:e8b2a36ea17df80ffe9e2c4fda3f693c3dad6df1697d3cd3af232db680950b0b"},
+    {file = "zipp-3.13.0.tar.gz", hash = "sha256:23f70e964bc11a34cef175bc90ba2914e1e4545ea1e3e2f67c079671883f9cb6"},
 ]
 
 [package.extras]
@@ -1416,4 +1402,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "dd454189de10dfc5195765b5715c7362cb15edf3d52317013e38687beb25e82a"
+content-hash = "9a4ab157a18012230fd737a668f9e9b950f8986bfe4afb8bc330f9840cdf56dd"
