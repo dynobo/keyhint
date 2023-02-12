@@ -1,80 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.22.2 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <requires lib="gtk" version="4.0" />
   <!-- interface-css-provider-path style.css -->
-  <object class="GtkMenu" id="app_menu">
-    <property name="visible">True</property>
+  <menu id="app_menu">
+    <item> <!-- id="debug_info_button" -->
+      <attribute name="id">debug_info_button</attribute>
+      <attribute name="label" translatable="yes">Debug Info</attribute>
+    </item>
+    <item>
+      <attribute name="id">prefs_button</attribute>
+      <attribute name="label" translatable="yes">Preferences</attribute>
+    </item>
+    <item>
+      <attribute name="id">about_button</attribute>
+      <attribute name="label" translatable="yes">About</attribute>
+    </item>
+    <item>
+      <attribute name="id">quit_button</attribute>
+      <attribute name="label" translatable="yes">Quit</attribute>
+    </item>
+  </menu>
+  <template class="main_window" parent="GtkApplicationWindow">
     <property name="can_focus">False</property>
-    <child>
-      <object class="GtkMenuItem" id="debug_info_button">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Debug Info</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="on_menu_debug_info" swapped="no"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="prefs_button">
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Preferences</property>
-        <property name="use_underline">True</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="about_button">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">About</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="on_menu_about" swapped="no"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="quit_button">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Quit</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="on_menu_quit" swapped="no"/>
-      </object>
-    </child>
-  </object>
-  <object class="GtkApplicationWindow" id="keyhint_app_window">
-    <property name="can_focus">False</property>
-    <signal name="destroy" handler="on_window_destroy" swapped="no"/>
-    <signal name="key-release-event" handler="on_key_release" swapped="no"/>
-    <signal name="realize" handler="on_window_realize" swapped="no"/>
     <child type="titlebar">
       <object class="GtkHeaderBar" id="header_bar">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="title" translatable="yes">KeyHint</property>
-        <property name="subtitle" translatable="yes">Cheat-sheets for shortcuts &amp; commands at your fingertips.</property>
-        <property name="show_close_button">True</property>
+        <property name="title-widget">
+          <object class="GtkLabel">
+            <property name="label" translatable="yes">Label</property>
+            <property name="single-line-mode">True</property>
+            <property name="ellipsize">end</property>
+            <property name="width-chars">5</property>
+            <style>
+              <class name="title" />
+            </style>
+          </object>
+        </property>
         <child>
           <object class="GtkComboBoxText" id="select_hints_combo">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <signal name="changed" handler="on_select_hints_combo_changed" swapped="no"/>
+            <!--<signal
+            name="changed" handler="on_select_hints_combo_changed" swapped="no"/>-->
           </object>
         </child>
-        <child>
+        <child type="end">
           <object class="GtkMenuButton" id="menu_button">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="focus_on_click">False</property>
             <property name="receives_default">True</property>
-            <property name="popup">app_menu</property>
+            <property name="menu-model">app_menu</property>
             <child>
-              <placeholder/>
+              <placeholder />
             </child>
           </object>
-          <packing>
-            <property name="pack_type">end</property>
-            <property name="position">1</property>
-          </packing>
         </child>
       </object>
     </child>
@@ -82,15 +64,12 @@
       <object class="GtkScrolledWindow" id="scrolled_window">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="margin_left">20</property>
-        <property name="margin_right">20</property>
         <property name="vscrollbar_policy">never</property>
         <child>
           <object class="GtkViewport" id="scrolled_viewport">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="hscroll_policy">natural</property>
-            <property name="shadow_type">none</property>
             <child>
               <object class="GtkBox" id="hints_container_box">
                 <property name="visible">True</property>
@@ -111,11 +90,11 @@
                         <property name="halign">end</property>
                         <property name="label" translatable="yes">Shortcuts</property>
                         <property name="justify">right</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">1</property>
+                        </layout>
                       </object>
-                      <packing>
-                        <property name="left_attach">0</property>
-                        <property name="top_attach">1</property>
-                      </packing>
                     </child>
                     <child>
                       <object class="GtkLabel">
@@ -123,11 +102,11 @@
                         <property name="can_focus">False</property>
                         <property name="halign">start</property>
                         <property name="label" translatable="yes">Description</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">1</property>
+                        </layout>
                       </object>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="top_attach">1</property>
-                      </packing>
                     </child>
                     <child>
                       <object class="GtkLabel">
@@ -136,11 +115,11 @@
                         <property name="halign">end</property>
                         <property name="label" translatable="yes">Shortcuts 2</property>
                         <property name="justify">right</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">2</property>
+                        </layout>
                       </object>
-                      <packing>
-                        <property name="left_attach">0</property>
-                        <property name="top_attach">2</property>
-                      </packing>
                     </child>
                     <child>
                       <object class="GtkLabel">
@@ -148,11 +127,11 @@
                         <property name="can_focus">False</property>
                         <property name="halign">start</property>
                         <property name="label" translatable="yes">Description 2</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">2</property>
+                        </layout>
                       </object>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="top_attach">2</property>
-                      </packing>
                     </child>
                     <child>
                       <object class="GtkLabel">
@@ -160,44 +139,28 @@
                         <property name="can_focus">False</property>
                         <property name="halign">start</property>
                         <property name="label" translatable="yes">Section Title</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">0</property>
+                        </layout>
                       </object>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="top_attach">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <placeholder/>
                     </child>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">0</property>
-                  </packing>
                 </child>
-                <child>
-                  <placeholder/>
-                </child>
+
               </object>
             </child>
           </object>
         </child>
       </object>
     </child>
-  </object>
+  </template>
   <object class="GtkAboutDialog" id="about_dialog">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">About KeyHint</property>
     <property name="resizable">False</property>
     <property name="modal">True</property>
-    <property name="window_position">center</property>
     <property name="destroy_with_parent">True</property>
-    <property name="type_hint">dialog</property>
-    <property name="skip_taskbar_hint">True</property>
-    <property name="skip_pager_hint">True</property>
-    <property name="gravity">center</property>
-    <property name="transient_for">keyhint_app_window</property>
     <property name="program_name">KeyHint</property>
     <property name="version">v0.2.4</property>
     <property name="comments" translatable="yes">Cheatsheat for keyboard shortcuts &amp; commands</property>
@@ -209,25 +172,30 @@
       <object class="GtkHeaderBar">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="title" translatable="yes">About - KeyHint</property>
-        <property name="show_close_button">True</property>
+        <!--<property
+        name="title" translatable="yes">About - KeyHint</property>-->
+        <property name="title-widget">
+          <object class="GtkLabel">
+            <property name="label" translatable="yes">Label</property>
+            <property name="single-line-mode">True</property>
+            <property name="ellipsize">end</property>
+            <property name="width-chars">5</property>
+            <style>
+              <class name="title" />
+            </style>
+          </object>
+        </property>
       </object>
     </child>
-    <child internal-child="vbox">
+    <child>
       <object class="GtkBox">
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
+        <child type="end">
+          <object class="GtkBox">
             <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
         </child>
       </object>
     </child>
@@ -235,47 +203,42 @@
   <object class="GtkDialog" id="debug_info_dialog">
     <property name="can_focus">False</property>
     <property name="modal">True</property>
-    <property name="window_position">center</property>
     <property name="destroy_with_parent">True</property>
     <property name="icon_name">dialog-information</property>
-    <property name="type_hint">dialog</property>
-    <property name="skip_taskbar_hint">True</property>
-    <property name="skip_pager_hint">True</property>
-    <property name="gravity">center</property>
-    <property name="transient_for">keyhint_app_window</property>
     <child type="titlebar">
       <object class="GtkHeaderBar">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="title" translatable="yes">Debug Info</property>
-        <property name="subtitle" translatable="yes">How KeyHint selected what to display</property>
-        <property name="show_close_button">True</property>
+        <!--<property
+        name="title" translatable="yes">Debug Info</property>
+        <property name="subtitle" translatable="yes">How KeyHint selected what to display</property> -->
+        <property name="title-widget">
+          <object class="GtkLabel">
+            <property name="label" translatable="yes">Label</property>
+            <property name="single-line-mode">True</property>
+            <property name="ellipsize">end</property>
+            <property name="width-chars">5</property>
+            <style>
+              <class name="title" />
+            </style>
+          </object>
+        </property>
       </object>
     </child>
-    <child internal-child="vbox">
+    <child>
       <object class="GtkBox">
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
+        <child type="end">
+          <object class="GtkBox">
             <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
         </child>
         <child>
           <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">20</property>
-            <property name="margin_right">20</property>
-            <property name="margin_top">10</property>
-            <property name="margin_bottom">10</property>
             <property name="row_spacing">5</property>
             <property name="column_spacing">15</property>
             <child>
@@ -286,14 +249,13 @@
                 <property name="margin_top">10</property>
                 <property name="label" translatable="yes">Active window on KeyHint startup:</property>
                 <attributes>
-                  <attribute name="weight" value="bold"/>
+                  <attribute name="weight" value="bold" />
                 </attributes>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">0</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">0</property>
-                <property name="width">2</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel">
@@ -301,11 +263,11 @@
                 <property name="can_focus">False</property>
                 <property name="halign">end</property>
                 <property name="label" translatable="yes">wm_class:</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">1</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">1</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel" id="debug_wm_class">
@@ -315,11 +277,11 @@
                 <property name="label" translatable="yes">NA</property>
                 <property name="wrap">True</property>
                 <property name="wrap_mode">word-char</property>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">1</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">1</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel">
@@ -327,11 +289,11 @@
                 <property name="can_focus">False</property>
                 <property name="halign">end</property>
                 <property name="label" translatable="yes">title:</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">2</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">2</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel" id="debug_title">
@@ -341,11 +303,11 @@
                 <property name="label" translatable="yes">NA</property>
                 <property name="wrap">True</property>
                 <property name="wrap_mode">word-char</property>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">2</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">2</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel">
@@ -355,14 +317,13 @@
                 <property name="margin_top">15</property>
                 <property name="label" translatable="yes">Info about selected hints:</property>
                 <attributes>
-                  <attribute name="weight" value="bold"/>
+                  <attribute name="weight" value="bold" />
                 </attributes>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">3</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">3</property>
-                <property name="width">2</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel">
@@ -370,11 +331,11 @@
                 <property name="can_focus">False</property>
                 <property name="halign">end</property>
                 <property name="label" translatable="yes">id:</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">4</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">4</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel">
@@ -382,11 +343,11 @@
                 <property name="can_focus">False</property>
                 <property name="halign">end</property>
                 <property name="label" translatable="yes">wm_class regex:</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">5</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">5</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel">
@@ -394,11 +355,11 @@
                 <property name="can_focus">False</property>
                 <property name="halign">end</property>
                 <property name="label" translatable="yes">title regex:</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">6</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">6</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel">
@@ -406,11 +367,11 @@
                 <property name="can_focus">False</property>
                 <property name="halign">end</property>
                 <property name="label" translatable="yes">yaml file:</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">7</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">7</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel" id="debug_hint_id">
@@ -420,11 +381,11 @@
                 <property name="label" translatable="yes">NA</property>
                 <property name="wrap">True</property>
                 <property name="wrap_mode">word-char</property>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">4</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">4</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel" id="debug_hint_wmclass">
@@ -434,11 +395,11 @@
                 <property name="label" translatable="yes">NA</property>
                 <property name="wrap">True</property>
                 <property name="wrap_mode">word-char</property>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">5</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">5</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel" id="debug_hint_title">
@@ -448,11 +409,11 @@
                 <property name="label" translatable="yes">NA</property>
                 <property name="wrap">True</property>
                 <property name="wrap_mode">word-char</property>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">6</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">6</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel" id="debug_hint_yaml">
@@ -462,11 +423,11 @@
                 <property name="label" translatable="yes">NA</property>
                 <property name="wrap">True</property>
                 <property name="wrap_mode">word-char</property>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">7</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">7</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLabel">
@@ -474,11 +435,11 @@
                 <property name="can_focus">False</property>
                 <property name="halign">end</property>
                 <property name="label" translatable="yes">link:</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">8</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">8</property>
-              </packing>
             </child>
             <child>
               <object class="GtkLinkButton" id="debug_hint_source">
@@ -488,19 +449,13 @@
                 <property name="focus_on_click">False</property>
                 <property name="receives_default">False</property>
                 <property name="halign">start</property>
-                <property name="relief">none</property>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">8</property>
+                </layout>
               </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">8</property>
-              </packing>
             </child>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
         </child>
       </object>
     </child>

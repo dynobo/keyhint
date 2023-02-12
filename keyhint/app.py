@@ -13,7 +13,7 @@ from typing import Optional
 import gi
 
 # TODO: Update to 4.0
-gi.require_version("Gtk", "3.0")
+gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gio, GLib, Gtk  # noqa: E402
 
@@ -85,20 +85,22 @@ class Application(Gtk.Application):
         Gtk.Application.do_activate(self, *args, **kwargs)
 
         if not self.window:
-            builder = Gtk.Builder()
-            builder.set_application(self)
+            Gtk.Builder()
+            # builder.set_application(self)
             ui_path = str(
                 importlib.resources.files("keyhint")
                 / "resources"
-                / "ApplicationWindow.glade"
+                / "ApplicationWindow.ui"
             )
-            ui_file = str(Path(ui_path).absolute())
-            builder.add_from_file(ui_file)
-            builder.connect_signals(WindowHandler(builder, self.options))
+            str(Path(ui_path).absolute())
+            # builder.add_from_file(ui_file)
+            # builder.connect_signals(WindowHandler(builder, self.options))
 
-            self.window = builder.get_object("keyhint_app_window")
+            # self.window = builder.get_object("keyhint_app_window")
+            self.window = WindowHandler(self, self.options)
             self.window.set_application(self)
-            self.window.show_all()
+            # self.window.connect()
+            # self.window.show()
 
         self.window.present()
 

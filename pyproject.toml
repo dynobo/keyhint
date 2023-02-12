@@ -40,7 +40,7 @@ ruff = "^0.0.243"
 pip-audit = "^2.4.14"
 mdformat = "^0.7.16"
 pygobject-stubs = "^2.2.0"
-pyright = "^1.1.293"
+mypy = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

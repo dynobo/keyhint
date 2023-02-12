@@ -15,9 +15,17 @@ import keyhint.utils
 logger = logging.getLogger(__name__)
 
 
-class WindowHandler:  # pylint: disable=too-many-instance-attributes
+@Gtk.Template(
+    filename=str(
+        importlib.resources.files("keyhint") / "resources" / "ApplicationWindow.ui"
+    )
+)
+class WindowHandler(
+    Gtk.ApplicationWindow
+):  # pylint: disable=too-many-instance-attributes
     """Handler for main ApplicationWindow."""
 
+    __gtype_name__ = "main_window"
     _section_title_height: Optional[int] = None
     _row_height: Optional[int] = None
     _hints: List[dict] = keyhint.utils.load_hints()
@@ -25,30 +33,31 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
     _wm_class: str = ""
     _window_title: str = ""
     _hint_id: str = ""
+    select_hints_combo = Gtk.Template.Child()
+    hints_container_box = Gtk.Template.Child()
 
     def __init__(self, builder, options):
         """Initialize during window creation."""
+        super().__init__()
         self._options = options
 
-        self._builder = builder
-        self._about_dialog = builder.get_object("about_dialog")
-        self._debug_info_dialog = builder.get_object("debug_info_dialog")
-        self._window = builder.get_object("keyhint_app_window")
-        self._header_bar = builder.get_object("header_bar")
-        self._select_hints_combo = builder.get_object("select_hints_combo")
-        self._hints_box = builder.get_object("hints_container_box")
-
+        self.app = builder
+        # self._about_dialog = builder.get_object("about_dialog")
+        # self._debug_info_dialog = builder.get_object("debug_info_dialog")
+        # self._header_bar = builder.get_object("header_bar")
+        self._load_css()
         logger.debug(f"Loaded {len(self._hints)} hints.")
+        self.connect("realize", self.on_realize)
+        self.select_hints_combo.connect("changed", self.on_select_hints_combo_changed)
 
     def _get_screen_dims(self) -> Tuple[int, int]:
-        screen = self._window.get_screen()
-        display = screen.get_display()
-        monitor = display.get_monitor_at_window(screen.get_root_window())
-        workarea = monitor.get_workarea()
-        return workarea.width, workarea.height
+        display = self.get_display()
+        monitors = display.get_monitors()
+        geometry = monitors[0].get_geometry()  # TODO: Find correct monitor
+        return geometry.width, geometry.height
 
     def _get_hints_box_dims(self) -> Tuple[int, int]:
-        size = self._hints_box.size_request()
+        size = self.hints_container_box.get_preferred_size().natural_size
         return size.width, size.height
 
     def _get_hint_ids_titles(self) -> List[Tuple[str, str]]:
@@ -94,7 +103,7 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
 
         # Last fallback to first entry in list
         if not hint_id:
-            model = self._select_hints_combo.get_model()
+            model = self.select_hints_combo.get_model()
             hint_id = model.get_value(model.get_iter_first(), 1)
             logger.debug("No matching hints found. Using first hint in list.")
 
@@ -108,24 +117,24 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
         spacing = grid.get_row_spacing()
 
         section_title = self._create_section_title("dummy")
-        grid.attach(section_title, left=1, top=0, width=1, height=1)
+        grid.attach(section_title, column=1, row=0, width=1, height=1)
 
         bindings_box = self._create_bindings("Ctrl + A")
         label = self._create_label("testlabel")
-        grid.attach(bindings_box, left=0, top=1, width=1, height=1)
-        grid.attach(label, left=1, top=1, width=1, height=1)
+        grid.attach(bindings_box, column=0, row=1, width=1, height=1)
+        grid.attach(label, column=1, row=1, width=1, height=1)
 
-        grid.show_all()
+        grid.show()
 
-        title_height = section_title.size_request().height + spacing
-        row_height = bindings_box.size_request().height + spacing
+        title_height = section_title.get_preferred_size().natural_size.height + spacing
+        row_height = section_title.get_preferred_size().natural_size.height + spacing
 
         logger.debug(f"Title height: {title_height}, Row height: {row_height}")
         return title_height, row_height
 
     def _distribute_hints_in_columns(self, keyhints: dict) -> List[dict]:
         _, screen_height = self._get_screen_dims()
-        max_column_height = screen_height // 1.3
+        max_column_height = screen_height // 1.2
 
         self._section_title_height, self._row_height = self._get_row_heights()
 
@@ -149,103 +158,103 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
         return hint_columns
 
     # GENERATE/MODIFY WIDGETS
+    def _load_css(self):
+        css_path = importlib.resources.files("keyhint") / "style.css"
+        provider = Gtk.CssProvider.new()
+        provider.load_from_path(str(css_path.absolute()))
+        Gtk.StyleContext().add_provider_for_display(
+            self.get_display(), provider, Gtk.STYLE_PROVIDER_PRIORITY_USER
+        )
 
     def _set_icons(self):
         ui_path = importlib.resources.files("keyhint") / "resources" / "keyhint.svg"
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(ui_path.absolute()))
+        GdkPixbuf.Pixbuf.new_from_file(str(ui_path.absolute()))
 
-        self._window.set_icon(pixbuf)
-        self._about_dialog.set_logo(pixbuf)
-        self._about_dialog.set_icon(pixbuf)
+        print()
+        # self.set_icon(pixbuf)
+        # self._about_dialog.set_logo(pixbuf)
+        # self._about_dialog.set_icon(pixbuf)
 
     @staticmethod
     def _create_column_grid() -> Gtk.Grid:
-        column_grid = Gtk.Grid()
+        column_grid = Gtk.Grid.new()
         column_grid.set_column_spacing(20)
         column_grid.set_row_spacing(10)
         return column_grid
 
     @staticmethod
     def _create_label(text) -> Gtk.Label:
-        label = Gtk.Label()
+        label = Gtk.Label.new()
         label.set_text(text)
         label.set_xalign(0.0)
         return label
 
     @staticmethod
     def _create_bindings(text) -> Gtk.Box:
-        box = Gtk.Box()
+        box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 6)
         box.set_halign(Gtk.Align.END)
-        box.set_spacing(6)
         keys = [text.replace("`", "")] if text.startswith("`") else text.split()
         for key in keys:
-            label = Gtk.Label()
             key = keyhint.utils.replace_keys(key.strip())
-            label_context = label.get_style_context()
+            label = Gtk.Label.new()
             if key in ["+", "/"]:
-                label_context.add_class("dim-label")
+                label.set_css_classes(["dim-label"])
             else:
                 key = key.replace("\\/", "/")
                 key = key.replace("\\+", "+")
-                label_context.add_class("keycap")
+                label.set_css_classes(["keycap"])
             label.set_markup(f"{GLib.markup_escape_text(key)}")
-            box.add(label)
+            box.append(label)
         return box
 
     def _create_section_title(self, text) -> Gtk.Label:
-        label = Gtk.Label()
+        label = Gtk.Label.new()
         label.set_markup(f"<b>{text}</b>")
         label.set_xalign(0.0)
-        label.set_margin_top(24)
-        text_color = self._options.get("accent-color", "#FF2E88")
-        label.modify_fg(
-            state=Gtk.StateType.NORMAL, color=Gdk.Color.parse(text_color).color
-        )
+        label.set_css_classes(["section-title"])
         return label
 
     def _clear_hints_container(self):
-        for child in self._hints_box.get_children():
-            self._hints_box.remove(child)
+        while child := self.hints_container_box.get_first_child():
+            child.get_parent().remove(child)
 
     def _populate_select_hints_combo(self):
         for hint_id, title in self._get_hint_ids_titles():
-            self._select_hints_combo.append(id=hint_id, text=title)
+            self.select_hints_combo.append(id=hint_id, text=title)
 
     def _populate_hints_container(self):
-        hint_id = self._select_hints_combo.get_active_id()
+        hint_id = self.select_hints_combo.get_active_id()
         keyhints = self._get_hints_by_id(hint_id)
         hint_columns = self._distribute_hints_in_columns(keyhints)
 
         for column in hint_columns:
             grid = self._create_column_grid()
+            grid.set_halign(Gtk.Align.START)
+            grid.set_hexpand(False)
             idx = 0
             for section, shortcuts in column.items():
                 section_title = self._create_section_title(section)
-                grid.attach(section_title, left=1, top=idx, width=1, height=1)
+                grid.attach(section_title, column=1, row=idx, width=1, height=1)
                 idx += 1
                 for bindings in shortcuts:
                     bindings_box = self._create_bindings(bindings)
                     label = self._create_label(shortcuts[bindings])
-                    grid.attach(bindings_box, left=0, top=idx, width=1, height=1)
-                    grid.attach(label, left=1, top=idx, width=1, height=1)
+                    grid.attach(bindings_box, column=0, row=idx, width=1, height=1)
+                    grid.attach(label, column=1, row=idx, width=1, height=1)
                     idx += 1
-
-            self._hints_box.pack_start(grid, False, False, 0)
-
-        self._window.show_all()
+            self.hints_container_box.append(grid)
 
     def _adjust_window_dimensions(self):
         screen_width, screen_height = self._get_screen_dims()
         hints_box_width, hints_box_height = self._get_hints_box_dims()
-        header_height = self._header_bar.size_request().height
+        header_height = 80  #  self._header_bar.get_preferred_size().natural_size.height
         target_height = min(hints_box_height + header_height, screen_height // 1.1)
         target_width = min(hints_box_width + 80, screen_width // 1.1)
 
-        position_x = (screen_width - target_width) // 2
-        position_y = (screen_height - target_height) // 2
 
-        self._window.resize(target_width, target_height)
-        self._window.move(position_x, position_y)
+        self.set_default_size(target_width, target_height)
+
+        # TODO: self.move(position_x, position_y)
 
     # EVENT HANDLERS
     def on_quit(self):
@@ -276,13 +285,13 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
         """Execute on window close."""
         logger.debug("Closing application window.")
 
-    def on_window_realize(self, _):
+    def on_realize(self, *_):
         """Execute on window realization on startup."""
         self._set_icons()
         self._populate_select_hints_combo()
         self._hint_id = self._get_appropriate_hint_id()
-        self._select_hints_combo.set_active_id(self._hint_id)
-        self._select_hints_combo.grab_focus()
+        self.select_hints_combo.set_active_id(self._hint_id)
+        self.select_hints_combo.grab_focus()
 
     def on_menu_about(self, _):
         """Execute on click "about" in application menu."""
