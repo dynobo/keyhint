@@ -38,10 +38,3 @@ hints:
     "`history 10`": Print last 10 cmds
     "!3": Execute cmd 3 from history
     Ctrl + r: Reverse cmd search / find next
-
-  Tools cmds:
-    bc: Calculator
-    gtop / htop: System Monitors
-    ranger: File manager
-    moc: Music Player in Console
-    alsamixer: Audio Mixer
