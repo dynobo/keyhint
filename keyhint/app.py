@@ -4,10 +4,8 @@ Cheatsheat for keyboard shortcuts & commands.
 Main entry point that get's executed on start.
 """
 
-import importlib.resources
 import logging
 import sys
-from pathlib import Path
 from typing import Optional
 
 import gi
@@ -85,19 +83,7 @@ class Application(Gtk.Application):
         Gtk.Application.do_activate(self, *args, **kwargs)
 
         if not self.window:
-            Gtk.Builder()
-            # builder.set_application(self)
-            ui_path = str(
-                importlib.resources.files("keyhint")
-                / "resources"
-                / "ApplicationWindow.ui"
-            )
-            str(Path(ui_path).absolute())
-            # builder.add_from_file(ui_file)
-            # builder.connect_signals(WindowHandler(builder, self.options))
-
-            # self.window = builder.get_object("keyhint_app_window")
-            self.window = WindowHandler(self, self.options)
+            self.window = WindowHandler(self.options)
             self.window.set_application(self)
             # self.window.connect()
             # self.window.show()
