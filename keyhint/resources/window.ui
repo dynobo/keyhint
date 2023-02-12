@@ -24,7 +24,7 @@
             </child>
             <child>
               <object class="GtkLabel">
-                <property name="label" translatable="yes">KeyHint Cheatsheets v0.2.4</property>
+                <property name="label" translatable="yes">KeyHint v0.2.4</property>
                 <property name="single-line-mode">True</property>
                 <property name="ellipsize">end</property>
                 <style>
@@ -35,10 +35,10 @@
           </object>
         </property>
         <child>
-          <object class="GtkComboBoxText" id="shortcuts_combo_box">
+          <object class="GtkComboBoxText" id="hints_combo_box">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <signal name="changed" handler="on_shortcuts_combo_box_changed" swapped="no" />
+            <signal name="changed" handler="on_hints_combo_box_changed" swapped="no" />
           </object>
         </child>
         <child type="end">

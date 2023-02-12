@@ -28,7 +28,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     _wm_class: str = ""
     _window_title: str = ""
     _hint_id: str = ""
-    shortcuts_combo_box: Gtk.ComboBox = Gtk.Template.Child()  # type: ignore
+    hints_combo_box: Gtk.ComboBox = Gtk.Template.Child()  # type: ignore
     hints_container_box: Gtk.Box = Gtk.Template.Child()  # type: ignore
     about_button: Gtk.Button = Gtk.Template.Child()  # type: ignore
     header_bar_title: Gtk.Label = Gtk.Template.Child()  # type: ignore
@@ -102,7 +102,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
         # Last fallback to first entry in list
         if not hint_id:
-            model = self.shortcuts_combo_box.get_model()
+            model = self.hints_combo_box.get_model()
             hint_id = model.get_value(model.get_iter_first(), 1)
             logger.debug("No matching hints found. Using first hint in list.")
 
@@ -187,16 +187,16 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         label.set_markup(f"<b>{text}</b>")
         return label
 
-    def _populate_shortcuts_combo_box(self):
+    def _populate_hints_combo_box(self):
         for hint_id, title in self._get_hint_ids_titles():
-            self.shortcuts_combo_box.append(id=hint_id, text=title)
+            self.hints_combo_box.append(id=hint_id, text=title)
 
     def _clear_hints_container(self):
         while child := self.hints_container_box.get_first_child():
             child.get_parent().remove(child)
 
     def _populate_hints_container(self):
-        hint_id = self.shortcuts_combo_box.get_active_id()
+        hint_id = self.hints_combo_box.get_active_id()
         keyhints = self._get_hints_by_id(hint_id)
         hint_columns = self._distribute_hints_in_columns(keyhints)
 
@@ -234,13 +234,13 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             else:
                 self.close()
         elif keycode == Gdk.KEY_Down:
-            idx = self.shortcuts_combo_box.get_active()
-            if idx + 1 < self.shortcuts_combo_box.get_model().iter_n_children():
-                self.shortcuts_combo_box.set_active(idx + 1)
+            idx = self.hints_combo_box.get_active()
+            if idx + 1 < self.hints_combo_box.get_model().iter_n_children():
+                self.hints_combo_box.set_active(idx + 1)
         elif keycode == Gdk.KEY_Up:
-            idx = self.shortcuts_combo_box.get_active()
+            idx = self.hints_combo_box.get_active()
             if idx > 0:
-                self.shortcuts_combo_box.set_active(idx - 1)
+                self.hints_combo_box.set_active(idx - 1)
         elif keycode == Gdk.KEY_Right:
             hadj = self.scrolled_window.get_hadjustment()
             hadj.set_value(hadj.get_value() + self.screen_width // 3)
@@ -254,10 +254,10 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self._hint_id = hint_id
         self._active_keyhint = self._get_hints_by_id(self._hint_id)
 
-    @Gtk.Template.Callback("on_shortcuts_combo_box_changed")
+    @Gtk.Template.Callback("on_hints_combo_box_changed")
     def on_select_hints_combo_changed(self, _):
         """Execute on change of the hints selection dropdown."""
-        self.set_active_keyhint(self.shortcuts_combo_box.get_active_id())
+        self.set_active_keyhint(self.hints_combo_box.get_active_id())
         self.header_bar_title.set_text(self._active_keyhint["title"] + " - Shortcuts")
         self._clear_hints_container()
         self._populate_hints_container()
@@ -269,9 +269,9 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
     def on_realize(self, *_):
         """Execute on window realization on startup."""
-        self._populate_shortcuts_combo_box()
-        self.shortcuts_combo_box.set_active_id(self._get_appropriate_hint_id())
-        self.shortcuts_combo_box.grab_focus()
+        self._populate_hints_combo_box()
+        self.hints_combo_box.set_active_id(self._get_appropriate_hint_id())
+        self.hints_combo_box.grab_focus()
 
     @Gtk.Template.Callback("on_about_button_clicked")
     def open_about_dialog(self, _):
@@ -295,7 +295,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         text = "Active Window:\n"
         text += f"\ttitle: {self._window_title}\n"
         text += f"\twmclass: {self._wm_class}\n"
-        text += "\nSelected Shortcuts:\n"
+        text += "\nSelected Hints:\n"
         text += f"\tID: {self._hint_id}\n"
         hints = self._get_hints_by_id(self._hint_id)
         if hints:
