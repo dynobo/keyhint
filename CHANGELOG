@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.0 (2023-02-12)
+
+- Update app to Gtk4
+- Adjust hint files
+
 ## v0.2.4 (2022-03-09)
 
 - Switch to Nuitka for building binary release
