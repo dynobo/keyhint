@@ -4,7 +4,7 @@
   <!-- interface-css-provider-path style.css -->
   <template class="main_window" parent="GtkApplicationWindow">
     <property name="can_focus">False</property>
-    <property name="icon_name">keyhint</property>
+    <!-- <property name="icon_name">keyhint</property> -->
     <child type="titlebar">
       <object class="GtkHeaderBar" id="header_bar">
         <property name="visible">True</property>
@@ -44,8 +44,9 @@
         <child type="end">
           <object class="GtkButton" id="about_button">
             <property name="visible">True</property>
-            <property name="icon_name">help</property>
+            <property name="label">ℹ</property>
             <property name="can_focus">True</property>
+            <property name="css_classes">circular</property>
             <property name="focus_on_click">False</property>
             <property name="receives_default">True</property>
             <signal name="clicked" handler="on_about_button_clicked" swapped="no" />

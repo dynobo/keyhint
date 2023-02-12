@@ -3,7 +3,6 @@
 Does the rendering of the hints as well interface actions.
 """
 
-import importlib.resources
 import logging
 import re
 from typing import List, Optional, Tuple
@@ -14,10 +13,10 @@ import keyhint
 
 logger = logging.getLogger(__name__)
 
+RESOURCE_PATH = __file__.rstrip("window.py") + "resources"
 
-@Gtk.Template(
-    filename=str(importlib.resources.files("keyhint")) + "/resources/window.ui"
-)
+
+@Gtk.Template(filename=f"{RESOURCE_PATH}/window.ui")
 class KeyhintWindow(Gtk.ApplicationWindow):
     """Handler for main ApplicationWindow."""
 
@@ -41,7 +40,6 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self._options = options
 
         self._load_css()
-        self._add_icon_paths()
         self.set_icon_name("keyhint")
         logger.debug(f"Loaded {len(self._hints)} hints.")
         self.connect("realize", self.on_realize)
@@ -158,19 +156,12 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
     # GENERATE/MODIFY WIDGETS
     def _load_css(self):
-        css_path = str(importlib.resources.files("keyhint")) + "/resources/style.css"
+        css_path = f"{RESOURCE_PATH}/style.css"
         provider = Gtk.CssProvider()
         provider.load_from_path(css_path)
         Gtk.StyleContext().add_provider_for_display(
             self.get_display(), provider, Gtk.STYLE_PROVIDER_PRIORITY_USER
         )
-
-    def _add_icon_paths(self):
-        icon_theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
-        module_spec = importlib.util.find_spec("keyhint.resources")
-        search_locations = module_spec.submodule_search_locations if module_spec else ()
-        for path in search_locations:
-            icon_theme.add_search_path(path)
 
     @staticmethod
     def _create_bindings(text) -> Gtk.Box:
@@ -286,13 +277,14 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def open_about_dialog(self, _):
         """Execute on click "about" in application menu."""
         self._dialog_is_open = True
+        logo = Gtk.Image.new_from_file(f"{RESOURCE_PATH}/keyhint.svg")
         Gtk.AboutDialog(
             program_name="KeyHint",
             comments="Cheatsheat for keyboard shortcuts &amp; commands",
             version=keyhint.__version__,
             website_label="Website",
             website="https://github.com/dynobo/keyhint",
-            logo_icon_name="keyhint",
+            logo=logo.get_paintable(),
             system_information=self._get_debug_info(),
             modal=True,
             resizable=True,
