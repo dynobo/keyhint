@@ -87,7 +87,7 @@ search = "KeyHint-{current_version}"
 src = "keyhint/__init__.py"
 
 [[tool.tbump.file]]
-src = "keyhint/window.ui"
+src = "keyhint/resources/window.ui"
 
 [[tool.tbump.before_commit]]
 name = "check changelog"
