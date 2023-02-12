@@ -4,6 +4,7 @@ Cheatsheat for keyboard shortcuts & commands.
 Main entry point that get's executed on start.
 """
 
+import importlib
 import logging
 import sys
 from typing import Optional
@@ -15,7 +16,7 @@ gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gio, GLib, Gtk  # noqa: E402
 
-from keyhint.window import WindowHandler  # noqa: E402
+from keyhint.window import KeyhintWindow  # noqa: E402
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -83,7 +84,7 @@ class Application(Gtk.Application):
         Gtk.Application.do_activate(self, *args, **kwargs)
 
         if not self.window:
-            self.window = WindowHandler(self.options)
+            self.window = KeyhintWindow(self.options)
             self.window.set_application(self)
             # self.window.connect()
             # self.window.show()

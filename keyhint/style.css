@@ -1,6 +1,6 @@
 @define-color bg_color rgba(0,0,0,0.2);
 @define-color borders_color rgba(0,0,0,0.5);
-@define-color shadow_color rgba(0,0,0,0.6);
+@define-color shadow_color rgba(0,0,0,0.3);
 @define-color accent_color #FF2E88;
 
 .keycap {
