@@ -201,7 +201,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         hint_columns = self._distribute_hints_in_columns(keyhints)
 
         for column in hint_columns:
-            grid = Gtk.Grid(column_spacing=20, row_spacing=10)
+            grid = Gtk.Grid(column_spacing=20, row_spacing=8)
             grid.set_halign(Gtk.Align.START)
             grid.set_hexpand(False)
             idx = 0
