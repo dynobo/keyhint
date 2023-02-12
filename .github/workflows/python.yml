@@ -72,8 +72,8 @@ jobs:
           files: |
             *.AppImage
           body:
-            See [CHANGELOG](https://github.com/dynobo/keyhint/blob/main/CHANGELOG) for
-            details.
+            See [CHANGELOG](https://github.com/dynobo/keyhint/blob/main/CHANGELOG.md)
+            for details.
           draft: true
           prerelease: true
         env:

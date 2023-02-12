@@ -17,7 +17,7 @@ build:
 		--linux-icon=keyhint/resources/keyhint.svg \
 		--file-version=0.2.4 \
 		--product-name=KeyHint \
-		-o KeyHint-0.2.4-x86_64.AppImage \
+		-o KeyHint-0.3.0-x86_64.AppImage \
 		keyhint/app.py
 
 clean-build: clean build

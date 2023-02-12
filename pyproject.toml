@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "keyhint"
-version = "0.2.4"
+version = "0.3.0"
 description = "Cheat-sheets for shortcuts & commands at your fingertips."
 keywords = ["shortcuts", "keybindings", "hints", "helper", "cheatsheet"]
 license = "MIT"
@@ -61,7 +61,7 @@ follow_imports_for_stubs = true
 [tool.tbump]
 
 [tool.tbump.version]
-current = "0.2.4"
+current = "0.3.0"
 regex = '''
   (?P<major>\d+)
   \.

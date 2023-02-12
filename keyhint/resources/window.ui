@@ -24,7 +24,7 @@
             </child>
             <child>
               <object class="GtkLabel">
-                <property name="label" translatable="yes">KeyHint v0.2.4</property>
+                <property name="label" translatable="yes">KeyHint v0.3.0</property>
                 <property name="single-line-mode">True</property>
                 <property name="ellipsize">end</property>
                 <style>
