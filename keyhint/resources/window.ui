@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0" />
+  <!-- interface-css-provider-path style.css -->
+  <template class="main_window" parent="GtkApplicationWindow">
+    <property name="can_focus">False</property>
+    <property name="icon_name">keyhint</property>
+    <child type="titlebar">
+      <object class="GtkHeaderBar" id="header_bar">
+        <property name="visible">True</property>
+        <property name="title-widget">
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <property name="valign">center</property>
+            <child>
+              <object class="GtkLabel" id="header_bar_title">
+                <property name="label" translatable="yes">Keyhint</property>
+                <property name="single-line-mode">True</property>
+                <property name="ellipsize">end</property>
+                <style>
+                  <class name="title" />
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="label" translatable="yes">KeyHint Cheatsheets v0.2.4</property>
+                <property name="single-line-mode">True</property>
+                <property name="ellipsize">end</property>
+                <style>
+                  <class name="subtitle" />
+                </style>
+              </object>
+            </child>
+          </object>
+        </property>
+        <child>
+          <object class="GtkComboBoxText" id="shortcuts_combo_box">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <signal name="changed" handler="on_shortcuts_combo_box_changed" swapped="no" />
+          </object>
+        </child>
+        <child type="end">
+          <object class="GtkButton" id="about_button">
+            <property name="visible">True</property>
+            <property name="icon_name">help</property>
+            <property name="can_focus">True</property>
+            <property name="focus_on_click">False</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_about_button_clicked" swapped="no" />
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkScrolledWindow" id="scrolled_window">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="vscrollbar_policy">never</property>
+        <child>
+          <object class="GtkViewport" id="scrolled_viewport">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="hscroll_policy">natural</property>
+            <child>
+              <object class="GtkBox" id="hints_container_box">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="halign">center</property>
+                <property name="margin_start">30</property>
+                <property name="margin_end">30</property>
+                <property name="spacing">50</property>
+                <property name="orientation">horizontal</property>
+                <child>
+                  <object class="GtkGrid" id="hints_column_grid">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="column_spacing">10</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">end</property>
+                        <property name="label" translatable="yes">Shortcuts</property>
+                        <property name="justify">right</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">Description</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">1</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">end</property>
+                        <property name="label" translatable="yes">Shortcuts 2</property>
+                        <property name="justify">right</property>
+                        <layout>
+                          <property name="column">0</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">Description 2</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">2</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">Section Title</property>
+                        <layout>
+                          <property name="column">1</property>
+                          <property name="row">0</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

@@ -6,11 +6,9 @@ Main entry point that get's executed on start.
 
 import logging
 import sys
-from typing import Optional
 
 import gi
 
-# TODO: Update to 4.0
 gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gio, GLib, Gtk  # noqa: E402
@@ -34,7 +32,6 @@ class Application(Gtk.Application):
         Gtk (Gtk.Application): Application Class
     """
 
-    window: Optional[Gtk.ApplicationWindow] = None
     options: dict = {}
 
     def __init__(self, *args, **kwargs):
@@ -72,27 +69,18 @@ class Application(Gtk.Application):
 
     def do_activate(self, *args, **kwargs):
         """Create and activate a window."""
-        Gtk.Application.do_activate(self, *args, **kwargs)
-
-        if not self.window:
-            self.window = KeyhintWindow(self.options)
-            self.window.set_application(self)
-            # self.window.connect()
-            # self.window.show()
-
-        self.window.present()
+        window = KeyhintWindow(self.options)
+        window.set_application(self)
+        window.present()
 
     def do_command_line(self, *args, **kwargs):
         """Store command line options in class attribute for later usage."""
-        Gtk.Application.do_command_line(self, *args, **kwargs)
-
         self.options = args[0].get_options_dict().end().unpack()
 
         if "verbose" in self.options:
             logging.getLogger().setLevel("DEBUG")
-            logger.info("Log level is set to 'DEBUG'")
+            logger.debug(f"CLI Options: {self.options}")
 
-        logger.debug(f"CLI Options: {self.options}")
         self.activate()
         return 0
 

@@ -10,12 +10,14 @@ from typing import List, Optional, Tuple
 
 from gi.repository import Gdk, GLib, Gtk
 
-import keyhint.utils
+import keyhint
 
 logger = logging.getLogger(__name__)
 
 
-@Gtk.Template(filename=str(importlib.resources.files("keyhint") / "window.ui"))
+@Gtk.Template(
+    filename=str(importlib.resources.files("keyhint")) + "/resources/window.ui"
+)
 class KeyhintWindow(Gtk.ApplicationWindow):
     """Handler for main ApplicationWindow."""
 
@@ -52,7 +54,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def _get_screen_dims(self) -> Tuple[int, int]:
         display = self.get_display()
         monitors = display.get_monitors()
-        geometry = monitors[0].get_geometry()  # TODO: Find correct monitor
+        geometry = monitors.get_item(0).get_geometry()  # TODO: Find correct monitor
         return geometry.width, geometry.height
 
     def _get_hints_box_dims(self) -> Tuple[int, int]:
@@ -156,9 +158,9 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
     # GENERATE/MODIFY WIDGETS
     def _load_css(self):
-        css_path = importlib.resources.files("keyhint") / "style.css"
+        css_path = str(importlib.resources.files("keyhint")) + "/resources/style.css"
         provider = Gtk.CssProvider()
-        provider.load_from_path(str(css_path.absolute()))
+        provider.load_from_path(css_path)
         Gtk.StyleContext().add_provider_for_display(
             self.get_display(), provider, Gtk.STYLE_PROVIDER_PRIORITY_USER
         )
@@ -287,7 +289,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         Gtk.AboutDialog(
             program_name="KeyHint",
             comments="Cheatsheat for keyboard shortcuts &amp; commands",
-            version="v0.2.4",
+            version=keyhint.__version__,
             website_label="Website",
             website="https://github.com/dynobo/keyhint",
             logo_icon_name="keyhint",
