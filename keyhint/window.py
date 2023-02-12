@@ -3,21 +3,24 @@
 Does the rendering of the hints as well interface actions.
 """
 
-import importlib.resources
 import logging
 import re
 from typing import List, Optional, Tuple
 
-from gi.repository import Gdk, GdkPixbuf, GLib, Gtk
+from gi.repository import Gdk, GLib, Gtk
 
-import keyhint.utils
+import keyhint
 
 logger = logging.getLogger(__name__)
 
+RESOURCE_PATH = __file__.rstrip("window.py") + "resources"
 
-class WindowHandler:  # pylint: disable=too-many-instance-attributes
+
+@Gtk.Template(filename=f"{RESOURCE_PATH}/window.ui")
+class KeyhintWindow(Gtk.ApplicationWindow):
     """Handler for main ApplicationWindow."""
 
+    __gtype_name__ = "main_window"
     _section_title_height: Optional[int] = None
     _row_height: Optional[int] = None
     _hints: List[dict] = keyhint.utils.load_hints()
@@ -25,30 +28,35 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
     _wm_class: str = ""
     _window_title: str = ""
     _hint_id: str = ""
+    shortcuts_combo_box: Gtk.ComboBox = Gtk.Template.Child()  # type: ignore
+    hints_container_box: Gtk.Box = Gtk.Template.Child()  # type: ignore
+    about_button: Gtk.Button = Gtk.Template.Child()  # type: ignore
+    header_bar_title: Gtk.Label = Gtk.Template.Child()  # type: ignore
+    scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()  # type: ignore
 
-    def __init__(self, builder, options):
+    def __init__(self, options):
         """Initialize during window creation."""
+        super().__init__()
         self._options = options
 
-        self._builder = builder
-        self._about_dialog = builder.get_object("about_dialog")
-        self._debug_info_dialog = builder.get_object("debug_info_dialog")
-        self._window = builder.get_object("keyhint_app_window")
-        self._header_bar = builder.get_object("header_bar")
-        self._select_hints_combo = builder.get_object("select_hints_combo")
-        self._hints_box = builder.get_object("hints_container_box")
-
+        self._load_css()
+        self.set_icon_name("keyhint")
         logger.debug(f"Loaded {len(self._hints)} hints.")
+        self.connect("realize", self.on_realize)
+
+        evk = Gtk.EventControllerKey()
+        evk.connect("key-released", self.on_key_release)
+        self.add_controller(evk)  # add to window
+        self.screen_width, self.screen_height = self._get_screen_dims()
 
     def _get_screen_dims(self) -> Tuple[int, int]:
-        screen = self._window.get_screen()
-        display = screen.get_display()
-        monitor = display.get_monitor_at_window(screen.get_root_window())
-        workarea = monitor.get_workarea()
-        return workarea.width, workarea.height
+        display = self.get_display()
+        monitors = display.get_monitors()
+        geometry = monitors.get_item(0).get_geometry()  # TODO: Find correct monitor
+        return geometry.width, geometry.height
 
     def _get_hints_box_dims(self) -> Tuple[int, int]:
-        size = self._hints_box.size_request()
+        size = self.hints_container_box.get_preferred_size().natural_size
         return size.width, size.height
 
     def _get_hint_ids_titles(self) -> List[Tuple[str, str]]:
@@ -94,7 +102,7 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
 
         # Last fallback to first entry in list
         if not hint_id:
-            model = self._select_hints_combo.get_model()
+            model = self.shortcuts_combo_box.get_model()
             hint_id = model.get_value(model.get_iter_first(), 1)
             logger.debug("No matching hints found. Using first hint in list.")
 
@@ -104,28 +112,26 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
         if self._section_title_height and self._row_height:
             return self._section_title_height, self._row_height
 
-        grid = self._create_column_grid()
+        grid = Gtk.Grid(column_spacing=20, row_spacing=10)
         spacing = grid.get_row_spacing()
 
-        section_title = self._create_section_title("dummy")
-        grid.attach(section_title, left=1, top=0, width=1, height=1)
-
+        section_title = self._create_section_title("placeholder")
+        grid.attach(section_title, column=1, row=0, width=1, height=1)
         bindings_box = self._create_bindings("Ctrl + A")
-        label = self._create_label("testlabel")
-        grid.attach(bindings_box, left=0, top=1, width=1, height=1)
-        grid.attach(label, left=1, top=1, width=1, height=1)
+        label = Gtk.Label(label="TestingLabel", xalign=0.0)
+        grid.attach(bindings_box, column=0, row=1, width=1, height=1)
+        grid.attach(label, column=1, row=1, width=1, height=1)
 
-        grid.show_all()
+        grid.show()
 
-        title_height = section_title.size_request().height + spacing
-        row_height = bindings_box.size_request().height + spacing
+        title_height = section_title.get_preferred_size().natural_size.height + spacing
+        row_height = section_title.get_preferred_size().natural_size.height + spacing
 
         logger.debug(f"Title height: {title_height}, Row height: {row_height}")
         return title_height, row_height
 
     def _distribute_hints_in_columns(self, keyhints: dict) -> List[dict]:
-        _, screen_height = self._get_screen_dims()
-        max_column_height = screen_height // 1.3
+        max_column_height = self.screen_height // 1.2
 
         self._section_title_height, self._row_height = self._get_row_heights()
 
@@ -149,167 +155,153 @@ class WindowHandler:  # pylint: disable=too-many-instance-attributes
         return hint_columns
 
     # GENERATE/MODIFY WIDGETS
-
-    def _set_icons(self):
-        ui_path = importlib.resources.files("keyhint") / "resources" / "keyhint.svg"
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(ui_path.absolute()))
-
-        self._window.set_icon(pixbuf)
-        self._about_dialog.set_logo(pixbuf)
-        self._about_dialog.set_icon(pixbuf)
-
-    @staticmethod
-    def _create_column_grid() -> Gtk.Grid:
-        column_grid = Gtk.Grid()
-        column_grid.set_column_spacing(20)
-        column_grid.set_row_spacing(10)
-        return column_grid
-
-    @staticmethod
-    def _create_label(text) -> Gtk.Label:
-        label = Gtk.Label()
-        label.set_text(text)
-        label.set_xalign(0.0)
-        return label
+    def _load_css(self):
+        css_path = f"{RESOURCE_PATH}/style.css"
+        provider = Gtk.CssProvider()
+        provider.load_from_path(css_path)
+        Gtk.StyleContext().add_provider_for_display(
+            self.get_display(), provider, Gtk.STYLE_PROVIDER_PRIORITY_USER
+        )
 
     @staticmethod
     def _create_bindings(text) -> Gtk.Box:
-        box = Gtk.Box()
-        box.set_halign(Gtk.Align.END)
-        box.set_spacing(6)
+        box = Gtk.Box(
+            orientation=Gtk.Orientation.HORIZONTAL, spacing=6, halign=Gtk.Align.END
+        )
         keys = [text.replace("`", "")] if text.startswith("`") else text.split()
         for key in keys:
-            label = Gtk.Label()
             key = keyhint.utils.replace_keys(key.strip())
-            label_context = label.get_style_context()
+            label = Gtk.Label()
             if key in ["+", "/"]:
-                label_context.add_class("dim-label")
+                label.set_css_classes(["dim-label"])
             else:
                 key = key.replace("\\/", "/")
                 key = key.replace("\\+", "+")
-                label_context.add_class("keycap")
+                label.set_css_classes(["keycap"])
             label.set_markup(f"{GLib.markup_escape_text(key)}")
-            box.add(label)
+            box.append(label)
         return box
 
     def _create_section_title(self, text) -> Gtk.Label:
-        label = Gtk.Label()
+        label = Gtk.Label(xalign=0.0, css_classes=["section-title"])
         label.set_markup(f"<b>{text}</b>")
-        label.set_xalign(0.0)
-        label.set_margin_top(24)
-        text_color = self._options.get("accent-color", "#FF2E88")
-        label.modify_fg(
-            state=Gtk.StateType.NORMAL, color=Gdk.Color.parse(text_color).color
-        )
         return label
 
-    def _clear_hints_container(self):
-        for child in self._hints_box.get_children():
-            self._hints_box.remove(child)
-
-    def _populate_select_hints_combo(self):
+    def _populate_shortcuts_combo_box(self):
         for hint_id, title in self._get_hint_ids_titles():
-            self._select_hints_combo.append(id=hint_id, text=title)
+            self.shortcuts_combo_box.append(id=hint_id, text=title)
+
+    def _clear_hints_container(self):
+        while child := self.hints_container_box.get_first_child():
+            child.get_parent().remove(child)
 
     def _populate_hints_container(self):
-        hint_id = self._select_hints_combo.get_active_id()
+        hint_id = self.shortcuts_combo_box.get_active_id()
         keyhints = self._get_hints_by_id(hint_id)
         hint_columns = self._distribute_hints_in_columns(keyhints)
 
         for column in hint_columns:
-            grid = self._create_column_grid()
+            grid = Gtk.Grid(column_spacing=20, row_spacing=10)
+            grid.set_halign(Gtk.Align.START)
+            grid.set_hexpand(False)
             idx = 0
             for section, shortcuts in column.items():
                 section_title = self._create_section_title(section)
-                grid.attach(section_title, left=1, top=idx, width=1, height=1)
+                grid.attach(section_title, column=1, row=idx, width=1, height=1)
                 idx += 1
                 for bindings in shortcuts:
                     bindings_box = self._create_bindings(bindings)
-                    label = self._create_label(shortcuts[bindings])
-                    grid.attach(bindings_box, left=0, top=idx, width=1, height=1)
-                    grid.attach(label, left=1, top=idx, width=1, height=1)
+                    label = Gtk.Label(label=shortcuts[bindings], xalign=0.0)
+                    grid.attach(bindings_box, column=0, row=idx, width=1, height=1)
+                    grid.attach(label, column=1, row=idx, width=1, height=1)
                     idx += 1
-
-            self._hints_box.pack_start(grid, False, False, 0)
-
-        self._window.show_all()
+            self.hints_container_box.append(grid)
 
     def _adjust_window_dimensions(self):
-        screen_width, screen_height = self._get_screen_dims()
         hints_box_width, hints_box_height = self._get_hints_box_dims()
-        header_height = self._header_bar.size_request().height
-        target_height = min(hints_box_height + header_height, screen_height // 1.1)
-        target_width = min(hints_box_width + 80, screen_width // 1.1)
+        header_height = 80  #  self._header_bar.get_preferred_size().natural_size.height
+        target_height = min(hints_box_height + header_height, self.screen_height // 1.1)
+        target_width = min(hints_box_width + 80, self.screen_width // 1.1)
+        self.set_default_size(target_width, target_height)
 
-        position_x = (screen_width - target_width) // 2
-        position_y = (screen_height - target_height) // 2
+        # TODO: self.move(position_x, position_y)
 
-        self._window.resize(target_width, target_height)
-        self._window.move(position_x, position_y)
-
-    # EVENT HANDLERS
-    def on_quit(self):
-        """Shutdown the application."""
-        self._window.get_application().quit()
-
-    def on_menu_quit(self, _):
-        """Execute on click 'quit' in application menu."""
-        self.on_quit()
-
-    def on_key_release(
-        self, widget, event, data=None  # pylint: disable=unused-argument
-    ):
+    def on_key_release(self, evk: Gtk.EventControllerKey, keycode, keyval, modifier):
         """Execute on key release."""
-        if event.keyval == Gdk.KEY_Escape:
+        if keycode == Gdk.KEY_Escape:
             if self._dialog_is_open:
                 self._dialog_is_open = False
             else:
-                self.on_quit()
+                self.close()
+        elif keycode == Gdk.KEY_Down:
+            idx = self.shortcuts_combo_box.get_active()
+            if idx + 1 < self.shortcuts_combo_box.get_model().iter_n_children():
+                self.shortcuts_combo_box.set_active(idx + 1)
+        elif keycode == Gdk.KEY_Up:
+            idx = self.shortcuts_combo_box.get_active()
+            if idx > 0:
+                self.shortcuts_combo_box.set_active(idx - 1)
+        elif keycode == Gdk.KEY_Right:
+            hadj = self.scrolled_window.get_hadjustment()
+            hadj.set_value(hadj.get_value() + self.screen_width // 3)
+        elif keycode == Gdk.KEY_Left:
+            hadj = self.scrolled_window.get_hadjustment()
+            hadj.set_value(hadj.get_value() - self.screen_width // 3)
 
+    def set_active_keyhint(self, hint_id):
+        if hint_id == self._hint_id:
+            return
+        self._hint_id = hint_id
+        self._active_keyhint = self._get_hints_by_id(self._hint_id)
+
+    @Gtk.Template.Callback("on_shortcuts_combo_box_changed")
     def on_select_hints_combo_changed(self, _):
         """Execute on change of the hints selection dropdown."""
+        self.set_active_keyhint(self.shortcuts_combo_box.get_active_id())
+        self.header_bar_title.set_text(self._active_keyhint["title"] + " - Shortcuts")
         self._clear_hints_container()
         self._populate_hints_container()
         self._adjust_window_dimensions()
 
-    def on_window_destroy(self, _):  # pylint: disable=unused-argument,no-self-use
+    def on_window_destroy(self, _):
         """Execute on window close."""
         logger.debug("Closing application window.")
 
-    def on_window_realize(self, _):
+    def on_realize(self, *_):
         """Execute on window realization on startup."""
-        self._set_icons()
-        self._populate_select_hints_combo()
-        self._hint_id = self._get_appropriate_hint_id()
-        self._select_hints_combo.set_active_id(self._hint_id)
-        self._select_hints_combo.grab_focus()
+        self._populate_shortcuts_combo_box()
+        self.shortcuts_combo_box.set_active_id(self._get_appropriate_hint_id())
+        self.shortcuts_combo_box.grab_focus()
 
-    def on_menu_about(self, _):
+    @Gtk.Template.Callback("on_about_button_clicked")
+    def open_about_dialog(self, _):
         """Execute on click "about" in application menu."""
         self._dialog_is_open = True
-        self._about_dialog.run()
-        self._about_dialog.hide()
+        logo = Gtk.Image.new_from_file(f"{RESOURCE_PATH}/keyhint.svg")
+        Gtk.AboutDialog(
+            program_name="KeyHint",
+            comments="Cheatsheat for keyboard shortcuts &amp; commands",
+            version=keyhint.__version__,
+            website_label="Website",
+            website="https://github.com/dynobo/keyhint",
+            logo=logo.get_paintable(),
+            system_information=self._get_debug_info(),
+            modal=True,
+            resizable=True,
+            transient_for=self,
+        ).show()
 
-    def on_menu_debug_info(self, _):
-        """Execute on click "debug info" in application menu."""
+    def _get_debug_info(self) -> str:
+        text = "Active Window:\n"
+        text += f"\ttitle: {self._window_title}\n"
+        text += f"\twmclass: {self._wm_class}\n"
+        text += "\nSelected Shortcuts:\n"
+        text += f"\tID: {self._hint_id}\n"
         hints = self._get_hints_by_id(self._hint_id)
-
-        self._builder.get_object("debug_wm_class").set_text(self._wm_class)
-        self._builder.get_object("debug_title").set_text(self._window_title)
-        self._builder.get_object("debug_hint_id").set_text(hints["id"])
-        self._builder.get_object("debug_hint_wmclass").set_text(
-            hints["match"]["regex_process"]
-        )
-        self._builder.get_object("debug_hint_title").set_text(
-            hints["match"]["regex_title"]
-        )
-        self._builder.get_object("debug_hint_source").set_label(
-            "website with shortcuts"
-        )
-        logger.info(hints["source"])
-        self._builder.get_object("debug_hint_source").set_uri(hints["source"])
-        self._builder.get_object("debug_hint_yaml").set_text("not implemented")
-
-        self._dialog_is_open = True
-        self._debug_info_dialog.run()
-        self._debug_info_dialog.hide()
+        if hints:
+            text += f"\tregex_process: {hints['match']['regex_process']}\n"
+            text += f"\tregex_title: {hints['match']['regex_title']}\n"
+            text += f"\tsource: {hints['source']}\n"
+        else:
+            text += "No hints for this ID found!"
+        return text

@@ -1,6 +1,5 @@
 """Various utility functions."""
 
-import importlib.resources
 import json
 import logging
 import os
@@ -8,14 +7,16 @@ import re
 import subprocess
 import traceback
 from pathlib import Path
-from typing import Iterable, List, Tuple, Union
+from typing import List, Tuple, Union
 
 import yaml
 
 logger = logging.getLogger(__name__)
 
+CONFIG_PATH = __file__.rstrip("utils.py") + "config"
 
-def _load_yaml(file: Union[str, os.PathLike], from_resources=False) -> dict:
+
+def _load_yaml(file: Union[str, os.PathLike]) -> dict:
     """Safely load a yaml file from resource path or other path.
 
     Args:
@@ -27,25 +28,12 @@ def _load_yaml(file: Union[str, os.PathLike], from_resources=False) -> dict:
         dict: [description]
     """
     try:
-        if from_resources:
-            file = Path(str(importlib.resources.files("keyhint"))) / "config" / file
         with open(file, "r", encoding="utf-8") as stream:
             result = yaml.safe_load(stream)
-
     except yaml.YAMLError as exc:
         print(exc)
         result = {}
     return result
-
-
-def _discover_hint_files() -> Iterable[Union[str, os.PathLike]]:
-    """Get paths of yaml files shipped with the package.
-
-    Returns:
-        Iterable[str]: List of paths to keyhint yaml files
-    """
-    config_path = Path(str(importlib.resources.files("keyhint"))) / "config"
-    return config_path.glob("*.yaml")
 
 
 def load_default_hints() -> List[dict]:
@@ -54,8 +42,7 @@ def load_default_hints() -> List[dict]:
     Returns:
         List[dict]: List of application keyhints and metainfos.
     """
-    files = _discover_hint_files()
-    hints = [_load_yaml(f, True) for f in files]
+    hints = [_load_yaml(f) for f in Path(CONFIG_PATH).glob("*.yaml")]
     hints = sorted(hints, key=lambda k: k["title"])
     return hints
 
@@ -237,7 +224,7 @@ def detect_active_window() -> Tuple[str, str]:
             wm_class, window_title = get_active_window_info_wayland()
         else:
             wm_class, window_title = get_active_window_info_x()
-    except Exception:  # pylint: disable=broad-except
+    except Exception:
         traceback.print_stack()
         logger.error(
             "Couldn't detect active application window."

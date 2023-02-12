@@ -3,9 +3,13 @@ cheatsheet.jpeg
 .vscode
 run.sh
 *.*~
+*.AppImage
+*.bin
 keyhint.dist-info/
 app.build
+app.onefile-build
 app.dist
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

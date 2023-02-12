@@ -34,13 +34,15 @@ pytest-cov = "^4.0.0"
 pre-commit = "^3.0.4"
 coveralls = "^3.3.1"
 types-PyYAML = "^6.0.12.4"
-Nuitka = "^1.4.3"
+Nuitka = "^1.4.5"
 tbump = "^6.9.0"
 ruff = "^0.0.243"
 pip-audit = "^2.4.14"
 mdformat = "^0.7.16"
-pygobject-stubs = "^2.2.0"
-pyright = "^1.1.293"
+mypy = "^1.0.0"
+ordered-set = "^4.1.0"
+zstandard = "^0.19.0"
+viztracer = "^0.15.6"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -50,17 +52,11 @@ build-backend = "poetry.core.masonry.api"
 profile = "black"
 multi_line_output = 3
 
-[tool.pylint.master]
-load-plugins = "pylint.extensions.mccabe"
-ignored-modules = "gi"
-
-[tool.pylint.'MESSAGES CONTROL']
-disable = ['logging-fstring-interpolation']
-
 [tool.mypy]
+
 files = ["keyhint/**/*.py", "tests/**/*.py"]
-follow_imports = "skip"
 ignore_missing_imports = true
+follow_imports_for_stubs = true
 
 [tool.tbump]
 
@@ -88,7 +84,10 @@ src = "Makefile"
 search = "KeyHint-{current_version}"
 
 [[tool.tbump.file]]
-src = "keyhint/resources/ApplicationWindow.glade"
+src = "keyhint/__init__.py"
+
+[[tool.tbump.file]]
+src = "keyhint/window.ui"
 
 [[tool.tbump.before_commit]]
 name = "check changelog"

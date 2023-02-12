@@ -4,20 +4,16 @@ Cheatsheat for keyboard shortcuts & commands.
 Main entry point that get's executed on start.
 """
 
-import importlib.resources
 import logging
 import sys
-from pathlib import Path
-from typing import Optional
 
 import gi
 
-# TODO: Update to 4.0
-gi.require_version("Gtk", "3.0")
+gi.require_version("Gtk", "4.0")
 
 from gi.repository import Gio, GLib, Gtk  # noqa: E402
 
-from keyhint.window import WindowHandler  # noqa: E402
+from keyhint.window import KeyhintWindow  # noqa: E402
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -36,7 +32,6 @@ class Application(Gtk.Application):
         Gtk (Gtk.Application): Application Class
     """
 
-    window: Optional[Gtk.ApplicationWindow] = None
     options: dict = {}
 
     def __init__(self, *args, **kwargs):
@@ -64,14 +59,6 @@ class Application(Gtk.Application):
             "HINT-ID",
         )
         self.add_main_option(
-            "accent-color",
-            ord("a"),
-            GLib.OptionFlags.NONE,
-            GLib.OptionArg.STRING,
-            "Accent color, used e.g. for section titles",
-            "css color string",
-        )
-        self.add_main_option(
             "verbose",
             ord("v"),
             GLib.OptionFlags.NONE,
@@ -82,37 +69,18 @@ class Application(Gtk.Application):
 
     def do_activate(self, *args, **kwargs):
         """Create and activate a window."""
-        Gtk.Application.do_activate(self, *args, **kwargs)
-
-        if not self.window:
-            builder = Gtk.Builder()
-            builder.set_application(self)
-            ui_path = str(
-                importlib.resources.files("keyhint")
-                / "resources"
-                / "ApplicationWindow.glade"
-            )
-            ui_file = str(Path(ui_path).absolute())
-            builder.add_from_file(ui_file)
-            builder.connect_signals(WindowHandler(builder, self.options))
-
-            self.window = builder.get_object("keyhint_app_window")
-            self.window.set_application(self)
-            self.window.show_all()
-
-        self.window.present()
+        window = KeyhintWindow(self.options)
+        window.set_application(self)
+        window.present()
 
     def do_command_line(self, *args, **kwargs):
         """Store command line options in class attribute for later usage."""
-        Gtk.Application.do_command_line(self, *args, **kwargs)
-
         self.options = args[0].get_options_dict().end().unpack()
 
         if "verbose" in self.options:
             logging.getLogger().setLevel("DEBUG")
-            logger.info("Log level is set to 'DEBUG'")
+            logger.debug(f"CLI Options: {self.options}")
 
-        logger.debug(f"CLI Options: {self.options}")
         self.activate()
         return 0
 
