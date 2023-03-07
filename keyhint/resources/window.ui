@@ -35,10 +35,16 @@
           </object>
         </property>
         <child>
-          <object class="GtkComboBoxText" id="hints_combo_box">
+          <object class="GtkDropDown" id="hints_drop_down">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <signal name="changed" handler="on_hints_combo_box_changed" swapped="no" />
+            <property name="model">
+              <object class="GtkStringList">
+                <items>
+                </items>
+              </object>
+            </property>
+            <signal name="notify::selected-item" handler="on_hints_drop_down_changed" swapped="no" />
           </object>
         </child>
         <child type="end">

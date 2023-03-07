@@ -31,17 +31,26 @@ hints:
     Ctrl+ Alt + Shift + Up Down: Duplicate line
     Shift + Alt + Left Right: Expand/shrink selection
     Ctrl + H: Search and replace
+    D: Delete from cursor till end of line
 
   Language Editing:
-    Ctrl + Space: Trigger IntelliSense and Hint
+    Ctrl + Space: Trigger suggestion
+    Ctrl + Shift + Space: Trigger parameter suggestion
     Ctrl + K I: Show hover docs
-    Ctrl + Shift + O: Search and jump to symbol
-    F12: Goto defintion
-    Alt + F12: Peek definition
-    Shift + F12: Peek usage
+    F12: Go to definition
+    Ctrl + K + F12: Open definition to the side
+    Ctrl + Shift + F10: Peek definition
     F2: Rename symbol
-    F8: Cycle through errors
-    Shift + F8: Cycle through errors backwards
+
+  Navigation:
+    Ctrl + G: Go to line...
+    Ctrl + P: Go to file...
+    Ctrl + T: Go to any symbol...
+    Ctrl + Shift + O: Go to symbol in current file...
+    Ctrl + Alt + -: Go back
+    Ctrl + Shift + -: Go forward
+    F8: Go to next error
+    Shift + F8: Go to previous error
 
   Debugging:
     F9: Toogle breakpoint
@@ -54,38 +63,3 @@ hints:
   File/Tab Management:
     Ctrl + Tab: Switch between tabs
     Ctrl + P: Quick open file
-
-  Vimium - Navigating:
-    f / F + {c}: Jump to next / previous char
-    t / T + {c}: Move until next / previous char
-    ; / ,: Go to next / previous occurance
-    "{ / }": Paragraph down / up
-    Ctrl + D / U": Half page down / up
-    gg / G: Jump to top/bottom of file
-    gd: Jump to definition
-    gf: Jump to file in import
-    "%": Jump to matching bracket
-
-  Vimium - Search:
-    \/ / ?: Search forward / backwards
-    n / N: Jump to next / previous match
-    "* / #": Search next / previous word under cursor
-
-  Vimium - Editing:
-    d: Delete / whole line
-    c: Change (delete + insert)
-    "y": Yank / whole line
-    p: Paste
-    d + 5 + j: Delete 5 lines downwards
-    d + f + ": Delete in line until "
-    d + t + ": Delete in line until before "
-    d + / + foo: Delete from cursor util foo
-    "> / <": Add / remove indentation
-    "=": Format code
-
-  Vimium - Syntax:
-    cc: Double modify whole line
-    D: Capitalize for stronger/alt
-    "{op} + a / i + {obj}": around / inner
-    c + i + w: Change inner word
-    d + a + w: Delete a word

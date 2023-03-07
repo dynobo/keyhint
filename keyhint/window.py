@@ -28,7 +28,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     _wm_class: str = ""
     _window_title: str = ""
     _hint_id: str = ""
-    hints_combo_box: Gtk.ComboBox = Gtk.Template.Child()  # type: ignore
+    hints_drop_down: Gtk.DropDown = Gtk.Template.Child()  # type: ignore
     hints_container_box: Gtk.Box = Gtk.Template.Child()  # type: ignore
     about_button: Gtk.Button = Gtk.Template.Child()  # type: ignore
     header_bar_title: Gtk.Label = Gtk.Template.Child()  # type: ignore
@@ -76,6 +76,14 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         ]
 
         if matching_hints:
+            # First sort by secondary criterion
+            matching_hints.sort(
+                key=lambda h: len(h["match"]["regex_title"]), reverse=True
+            )
+            # Then sort by primary criterion
+            matching_hints.sort(
+                key=lambda h: len(h["match"]["regex_process"]), reverse=True
+            )
             hint_id = matching_hints[0]["id"]
         else:
             hint_id = None
@@ -102,7 +110,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
         # Last fallback to first entry in list
         if not hint_id:
-            model = self.hints_combo_box.get_model()
+            model = self.hints_drop_down.get_model()
             hint_id = model.get_value(model.get_iter_first(), 1)
             logger.debug("No matching hints found. Using first hint in list.")
 
@@ -187,16 +195,17 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         label.set_markup(f"<b>{text}</b>")
         return label
 
-    def _populate_hints_combo_box(self):
+    def _populate_hints_drop_down(self):
+        model = self.hints_drop_down.get_model()
         for hint_id, title in self._get_hint_ids_titles():
-            self.hints_combo_box.append(id=hint_id, text=title)
+            model.append(hint_id)
 
     def _clear_hints_container(self):
         while child := self.hints_container_box.get_first_child():
             child.get_parent().remove(child)
 
     def _populate_hints_container(self):
-        hint_id = self.hints_combo_box.get_active_id()
+        hint_id = self.hints_drop_down.get_selected_item().get_string()
         keyhints = self._get_hints_by_id(hint_id)
         hint_columns = self._distribute_hints_in_columns(keyhints)
 
@@ -234,13 +243,13 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             else:
                 self.close()
         elif keycode == Gdk.KEY_Down:
-            idx = self.hints_combo_box.get_active()
-            if idx + 1 < self.hints_combo_box.get_model().iter_n_children():
-                self.hints_combo_box.set_active(idx + 1)
+            idx = self.hints_drop_down.get_selected()
+            if idx + 1 < len(self.hints_drop_down.get_model()):
+                self.hints_drop_down.set_selected(idx + 1)
         elif keycode == Gdk.KEY_Up:
-            idx = self.hints_combo_box.get_active()
+            idx = self.hints_drop_down.get_selected()
             if idx > 0:
-                self.hints_combo_box.set_active(idx - 1)
+                self.hints_drop_down.set_selected(idx - 1)
         elif keycode == Gdk.KEY_Right:
             hadj = self.scrolled_window.get_hadjustment()
             hadj.set_value(hadj.get_value() + self.screen_width // 3)
@@ -254,10 +263,12 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self._hint_id = hint_id
         self._active_keyhint = self._get_hints_by_id(self._hint_id)
 
-    @Gtk.Template.Callback("on_hints_combo_box_changed")
-    def on_select_hints_combo_changed(self, _):
+    @Gtk.Template.Callback("on_hints_drop_down_changed")
+    def on_select_hints_combo_changed(
+        self, drop_down: Gtk.DropDown, selected_item: int
+    ):
         """Execute on change of the hints selection dropdown."""
-        self.set_active_keyhint(self.hints_combo_box.get_active_id())
+        self.set_active_keyhint(drop_down.get_selected_item().get_string())
         self.header_bar_title.set_text(self._active_keyhint["title"] + " - Shortcuts")
         self._clear_hints_container()
         self._populate_hints_container()
@@ -269,9 +280,11 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
     def on_realize(self, *_):
         """Execute on window realization on startup."""
-        self._populate_hints_combo_box()
-        self.hints_combo_box.set_active_id(self._get_appropriate_hint_id())
-        self.hints_combo_box.grab_focus()
+        self._populate_hints_drop_down()
+        drop_down_strings = [s.get_string() for s in self.hints_drop_down.get_model()]
+        select_idx = drop_down_strings.index(self._get_appropriate_hint_id())
+        self.hints_drop_down.set_selected(select_idx)
+        self.hints_drop_down.grab_focus()
 
     @Gtk.Template.Callback("on_about_button_clicked")
     def open_about_dialog(self, _):

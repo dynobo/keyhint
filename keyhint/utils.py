@@ -62,6 +62,32 @@ def load_user_hints() -> List[dict]:
     return hints
 
 
+def _expand_includes(hints: List[dict]) -> List[dict]:
+    new_hints = []
+    for h in hints:
+        if includes := h.get("include", []):
+            for include in includes:
+                included_hints = [h for h in hints if h["id"] == include]
+                if not included_hints:
+                    raise ValueError(
+                        f"Hint ID '{included_hints}' included by '{h['id']}' not found!"
+                    )
+                included_hint = included_hints[0]
+                included_hint["hints"] = {
+                    f"{included_hint['title']} - {k}": v
+                    for k, v in included_hint["hints"].items()
+                }
+                h["hints"].update(included_hints[0]["hints"])
+        new_hints.append(h)
+    return new_hints
+
+
+def _remove_empty_sections(hints: List[dict]) -> List[dict]:
+    for hint in hints:
+        hint["hints"] = {k: v for k, v in hint["hints"].items() if v}
+    return hints
+
+
 def load_hints() -> List[dict]:
     """Load unified default keyhints and keyhints from user config.
 
@@ -79,13 +105,17 @@ def load_hints() -> List[dict]:
         for hint in hints:
             # Update default hints by user hint (if existing)
             if hint["id"] == user_hint["id"]:
+                user_hint_hints = user_hint.pop("hints")
                 hint.update(user_hint)
+                hint["hints"].update(user_hint_hints)
                 existed = True
                 break
         # If it didn't exist, append as new
         if not existed:
             hints.append(user_hint)
 
+    hints = _expand_includes(hints)
+    hints = _remove_empty_sections(hints)
     return hints
 
 

@@ -1,0 +1,30 @@
+id: foot-terminal
+title: Foot Terminal
+source: https://codeberg.org/dnkl/foot#user-content-shortcuts
+match:
+  regex_process: foot
+  regex_title: .*
+
+hints:
+  Foot:
+    Shift + PageUp / PageDown: Scroll up/down
+    Ctrl + Shift + c / v: Copy/paste from clipboard
+    Ctrl + Shift + r: Search mode
+    Ctrl + r / s: Search for previous / next match
+    Ctrl + Shift + u: URL mode
+    t: Toggle URL in label
+  Zsh:
+    Ctrl + r: Reverse cmd search / find next
+  Data Wrangling:
+    "`awk '{print $1}'`": Column base manipulations
+    "`sed -E 's/.*(d+)/\\1/'`": Line base manipulations
+    "`paste -sd,`": Concatenate lines
+    "`tail -n10`": Last lines
+    "`head -n10`": First lines
+    "`uniq -c`": Count unique lines
+    "`sort -nk1,1": Sort by column 1
+  Tools:
+    bc: Calculator
+    gtop / htop: System Monitors
+    ranger: File manager
+    moc: Music Player in Console

@@ -18,6 +18,9 @@ hints:
     Ctrl + r: Reverse cmd search / find next
 
   Tools:
+    "`awk '{print $1}'`": Column base manipulations
+    "`sed -E 's/.*(d+)/\\1/'`": Line base manipulations
+    "`paste -sd,`": Concatenate lines
     bc: Calculator
     gtop / htop: System Monitors
     ranger: File manager
