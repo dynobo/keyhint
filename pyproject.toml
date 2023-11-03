@@ -22,14 +22,13 @@ classifiers = [
 keyhint = "keyhint.app:main"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11"
 PyGObject = "^3.42.2"
 PyYAML = "^6.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"
 rope = "^1.7.0"
-black = "^23.1.0"
 pytest-cov = "^4.0.0"
 pre-commit = "^3.0.4"
 coveralls = "^3.3.1"
@@ -48,15 +47,70 @@ viztracer = "^0.15.6"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-
 [tool.mypy]
-
 files = ["keyhint/**/*.py", "tests/**/*.py"]
 ignore_missing_imports = true
 follow_imports_for_stubs = true
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+exclude = [".venv"]
+select = [
+  "F",    # Pyflakes
+  "E",    # pycodestyle
+  "I",    # Isort
+  "D",    # pydocstyle
+  "W",    # warning
+  "UP",   # pyupgrad
+  "N",    # pep8-naming
+  "C90",  # mccabe
+  "TRY",  # tryceratops (exception handling)
+  "ANN",  # flake8-annotations
+  "S",    # flake8-bandits
+  "C4",   # flake8-comprehensions
+  "B",    # flake8-bugbear
+  "A",    # flake8-builtins
+  "ISC",  # flake8-implicit-str-concat
+  "ICN",  # flake8-import-conventions
+  "T20",  # flake8-print
+  "PYI",  # flake8-pyi
+  "PT",   # flake8-pytest-style
+  "Q",    # flake8-quotes
+  "RET",  # flake8-return
+  "SIM",  # flake8-simplify
+  "PTH",  # flake8-use-pathlib
+  "G",    # flake8-logging-format
+  "PL",   # pylint
+  "RUF",  # meta rules (unused noqa)
+  "PL",   # meta rules (unused noqa)
+  "PERF", # perflint
+]
+ignore = [
+  "D100",   # Missing docstring in public module
+  "D101",   # Missing docstring in public class
+  "D102",   # Missing docstring in public method
+  "D103",   # Missing docstring in public function
+  "D104",   # Missing docstring in public package
+  "D105",   # Missing docstring in magic method
+  "D107",   # Missing docstring in __init__
+  "ANN101", # Missing type annotation for `self` in method
+  "TRY003", # Avoid specifying long messages outside the exception class
+  "ISC001", # Rule conflicts with ruff's formaatter
+]
+
+[tool.ruff.per-file-ignores]
+"tests/**/*" = ["PLR2004", "PLR0913", "S101", "TID252", "ANN", "D"]
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+[tool.ruff.isort]
+known-first-party = ["normcap"]
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"
+
 
 [tool.tbump]
 

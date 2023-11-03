@@ -24,11 +24,11 @@ repos:
         entry: poetry run mdformat --wrap 88
         types: [markdown]
 
-      - id: black
-        name: black
+      - id: ruff-format
+        name: ruff-format
         stages: [commit]
         language: system
-        entry: poetry run black keyhint/ tests/
+        entry: poetry run ruff format .
         types: [python]
 
       - id: pip-audit
