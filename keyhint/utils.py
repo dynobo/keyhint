@@ -7,7 +7,7 @@ import re
 import subprocess
 import traceback
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import Union
 
 import yaml
 
@@ -16,42 +16,42 @@ logger = logging.getLogger(__name__)
 CONFIG_PATH = __file__.rstrip("utils.py") + "config"
 
 
-def _load_yaml(file: Union[str, os.PathLike]) -> dict:
+def _load_yaml(file_path: Union[str, os.PathLike]) -> dict:
     """Safely load a yaml file from resource path or other path.
 
     Args:
-        file (Union[Path, str]): Filename in resources, or complete path to file.
-        from_resources (bool, optional): Set to true to load from resource. Defaults
+        file_path: Filename in resources, or complete path to file.
+        from_resources: Set to true to load from resource. Defaults
             to False.
 
     Returns:
-        dict: [description]
+        [description]
     """
     try:
-        with open(file, "r", encoding="utf-8") as stream:
+        with Path(file_path).open(encoding="utf-8") as stream:
             result = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
-        print(exc)
+        print(exc)  # noqa: T201
         result = {}
     return result
 
 
-def load_default_hints() -> List[dict]:
+def load_default_hints() -> list[dict]:
     """Load default keyhints from yaml files shipped with the package.
 
     Returns:
-        List[dict]: List of application keyhints and metainfos.
+        List[dict]: List of application keyhints and meta info.
     """
     hints = [_load_yaml(f) for f in Path(CONFIG_PATH).glob("*.yaml")]
     hints = sorted(hints, key=lambda k: k["title"])
-    return hints
+    return hints  # noqa: RET504
 
 
-def load_user_hints() -> List[dict]:
+def load_user_hints() -> list[dict]:
     """Load keyhints from yaml files in the users .config/keyhint/ directory.
 
     Returns:
-        List[dict]: List of application keyhints and metainfos.
+        List[dict]: List of application keyhints and meta info.
     """
     if config_path := get_users_config_path():
         files = (config_path / "keyhint").glob("*.yaml")
@@ -62,16 +62,17 @@ def load_user_hints() -> List[dict]:
     return hints
 
 
-def _expand_includes(hints: List[dict]) -> List[dict]:
+def _expand_includes(hints: list[dict]) -> list[dict]:
     new_hints = []
     for h in hints:
         if includes := h.get("include", []):
             for include in includes:
                 included_hints = [h for h in hints if h["id"] == include]
                 if not included_hints:
-                    raise ValueError(
+                    message = (
                         f"Hint ID '{included_hints}' included by '{h['id']}' not found!"
                     )
+                    raise ValueError(message)
                 included_hint = included_hints[0]
                 included_hint["hints"] = {
                     f"{included_hint['title']} - {k}": v
@@ -82,20 +83,20 @@ def _expand_includes(hints: List[dict]) -> List[dict]:
     return new_hints
 
 
-def _remove_empty_sections(hints: List[dict]) -> List[dict]:
+def _remove_empty_sections(hints: list[dict]) -> list[dict]:
     for hint in hints:
         hint["hints"] = {k: v for k, v in hint["hints"].items() if v}
     return hints
 
 
-def load_hints() -> List[dict]:
+def load_hints() -> list[dict]:
     """Load unified default keyhints and keyhints from user config.
 
     First the default keyhints are loaded, then they are update (added/overwritten)
     by the keyhints loaded from user config.
 
     Returns:
-        List[dict]: List of application keyhints and metainfos.
+        List[dict]: List of application keyhints and meta info.
     """
     hints = load_default_hints()
     user_hints = load_user_hints()
@@ -116,7 +117,7 @@ def load_hints() -> List[dict]:
 
     hints = _expand_includes(hints)
     hints = _remove_empty_sections(hints)
-    return hints
+    return hints  # noqa: RET504
 
 
 def replace_keys(text: str) -> str:
@@ -126,7 +127,7 @@ def replace_keys(text: str) -> str:
         text (str): Text with key names.
 
     Returns:
-        str: Text where some key names have been replaced by unicode symbole.
+        str: Text where some key names have been replaced by unicode symbol.
     """
     if text in {"PageUp", "PageDown"}:
         text = text.replace("Page", "Page ")
@@ -137,13 +138,14 @@ def replace_keys(text: str) -> str:
     text = text.replace("Right", "→")
     text = text.replace("Direction", "←↓↑→")
     text = text.replace("PlusMinus", "±")
-    text = text.replace("Plus", "＋")
-    text = text.replace("Minus", "−")
+    text = text.replace("Plus", "＋")  # noqa: RUF001
+    text = text.replace("Minus", "−")  # noqa: RUF001
     text = text.replace("Slash", "/")
-    return text
+
+    return text  # noqa: RET504
 
 
-def get_active_window_info_wayland() -> Tuple[str, str]:
+def get_active_window_info_wayland() -> tuple[str, str]:
     """Retrieve active window class and active window title on Wayland.
 
     Inspired by https://gist.github.com/rbreaves/257c3edfa301786e66e964d7ac036269
@@ -153,7 +155,7 @@ def get_active_window_info_wayland() -> Tuple[str, str]:
     """
 
     def _get_cmd_result(cmd: str) -> str:
-        stdout_bytes: bytes = subprocess.check_output(cmd, shell=True)
+        stdout_bytes: bytes = subprocess.check_output(cmd, shell=True)  # noqa: S602
         stdout = stdout_bytes.decode("utf-8")
         if match := re.search(r"'(.+)'", stdout):
             return match.groups()[0].strip('"')
@@ -161,26 +163,26 @@ def get_active_window_info_wayland() -> Tuple[str, str]:
 
     cmd_windows_list = (
         "gdbus call --session --dest org.gnome.Shell "
-        + "--object-path /org/gnome/Shell/Extensions/Windows "
-        + "--method org.gnome.Shell.Extensions.Windows.List"
+        "--object-path /org/gnome/Shell/Extensions/Windows "
+        "--method org.gnome.Shell.Extensions.Windows.List"
     )
     stdout = _get_cmd_result(cmd_windows_list)
     windows = json.loads(stdout)
-    focused_window = list(filter(lambda x: x["focus"], windows))[0]
+    focused_window = next(filter(lambda x: x["focus"], windows))
     wm_class = focused_window["wm_class"]
 
-    cmd_windows_gettitle = (
+    cmd_windows_get_title = (
         "gdbus call --session --dest org.gnome.Shell "
-        + "--object-path /org/gnome/Shell/Extensions/Windows "
-        + "--method org.gnome.Shell.Extensions.Windows.GetTitle "
-        + f"{focused_window['id']}"
+        "--object-path /org/gnome/Shell/Extensions/Windows "
+        "--method org.gnome.Shell.Extensions.Windows.GetTitle "
+        f"{focused_window['id']}"
     )
-    title = _get_cmd_result(cmd_windows_gettitle)
+    title = _get_cmd_result(cmd_windows_get_title)
 
     return wm_class, title
 
 
-def get_active_window_info_x() -> Tuple[str, str]:
+def get_active_window_info_x() -> tuple[str, str]:
     """Retrieve active window class and active window title on Xorg desktops.
 
     Returns:
@@ -188,7 +190,8 @@ def get_active_window_info_x() -> Tuple[str, str]:
     """
     # Query id of active window
     stdout_bytes: bytes = subprocess.check_output(
-        "xprop -root _NET_ACTIVE_WINDOW", shell=True
+        "xprop -root _NET_ACTIVE_WINDOW",  # noqa: S607
+        shell=True,  # noqa: S602
     )
     stdout = stdout_bytes.decode()
 
@@ -201,7 +204,8 @@ def get_active_window_info_x() -> Tuple[str, str]:
 
     # Query app_title and app_process
     stdout_bytes = subprocess.check_output(
-        f"xprop -id {window_id} WM_NAME WM_CLASS", shell=True
+        f"xprop -id {window_id} WM_NAME WM_CLASS",
+        shell=True,  # noqa: S602
     )
     stdout = stdout_bytes.decode()
 
@@ -222,7 +226,7 @@ def get_active_window_info_x() -> Tuple[str, str]:
 def is_using_wayland() -> bool:
     """Check if we are running on Wayland DE.
 
-    Returns
+    Returns:
         [bool] -- {True} if probably Wayland
     """
     return "WAYLAND_DISPLAY" in os.environ
@@ -231,7 +235,7 @@ def is_using_wayland() -> bool:
 def get_users_config_path() -> Union[Path, None]:
     """Retrieve path for config files.
 
-    Returns
+    Returns:
         Path -- Root of config folder
     """
     if xdg_conf := os.getenv("XDG_CONFIG_HOME", None):
@@ -240,7 +244,7 @@ def get_users_config_path() -> Union[Path, None]:
     return Path.home() / ".config"
 
 
-def detect_active_window() -> Tuple[str, str]:
+def detect_active_window() -> tuple[str, str]:
     """Get class and title of active window.
 
     Identify the OS and display server and pick the method accordingly.
@@ -257,23 +261,23 @@ def detect_active_window() -> Tuple[str, str]:
             wm_class, window_title = get_active_window_info_x()
     except Exception:
         traceback.print_stack()
-        logger.error(
+        logger.exception(
             "Couldn't detect active application window."
             "KeyHint supports Wayland and X.\n"
             "For Wayland, the installation of the 'Window Calls' gnome extension is "
             "required: https://extensions.gnome.org/extension/4724/window-calls/\n"
             "For Xorg, the 'xprop' command is required, check your systems repository "
             "to identify its package.\n"
-            "If you met the prerequisits but still see this, please create an issue"
+            "If you met the prerequisites but still see this, please create an issue"
             "incl. the traceback above on https://github.com/dynobo/keyhint/issues."
         )
 
     logger.debug(
-        f"Detected wm_class: '{wm_class}'. Detected window_title: '{window_title}'."
+        "Detected wm_class: '%s'. Detected window_title: '%s'", wm_class, window_title
     )
     if "" in [wm_class, window_title]:
         logger.error(
-            "Couldn't detect active window! Please report this errror "
+            "Couldn't detect active window! Please report this error "
             "together with information about your OS and display server on "
             "https://github.com/dynobo/keyhint/issues"
         )

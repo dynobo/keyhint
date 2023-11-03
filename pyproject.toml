@@ -1,59 +1,76 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
 name = "keyhint"
 version = "0.3.0"
 description = "Cheat-sheets for shortcuts & commands at your fingertips."
 keywords = ["shortcuts", "keybindings", "hints", "helper", "cheatsheet"]
-license = "MIT"
-authors = ["dynobo <dynobo@mailbox.org>"]
 readme = "README.md"
-repository = "https://github.com/dynobo/keyhint"
+requires-python = ">=3.7"
+license = "MIT"
+authors = [{ name = "dynobo", email = "dynobo@mailbox.org" }]
 classifiers = [
   "Development Status :: 4 - Beta",
   "License :: OSI Approved :: MIT License",
-  "Programming Language :: Python :: 3",
+  "Programming Language :: Python",
   "Programming Language :: Python :: 3.7",
   "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
   "Topic :: Utilities",
   "Intended Audience :: End Users/Desktop",
   "Operating System :: POSIX :: Linux",
 ]
+dependencies = ["PyGObject>=3.42.2", "PyYAML>=6.0"]
 
-[tool.poetry.scripts]
-keyhint = "keyhint.app:main"
+[project.urls]
+Documentation = "https://github.com/dynobo/keyhint#readme"
+Issues = "https://github.com/dynobo/keyhint/issues"
+Source = "https://github.com/dynobo/keyhint"
 
-[tool.poetry.dependencies]
-python = "^3.11"
-PyGObject = "^3.42.2"
-PyYAML = "^6.0"
+[[tool.hatch.envs.all.matrix]]
+python = ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.2.1"
-rope = "^1.7.0"
-pytest-cov = "^4.0.0"
-pre-commit = "^3.0.4"
-coveralls = "^3.3.1"
-types-PyYAML = "^6.0.12.4"
-Nuitka = "^1.4.5"
-tbump = "^6.9.0"
-ruff = "^0.0.243"
-pip-audit = "^2.4.14"
-mdformat = "^0.7.16"
-mypy = "^1.0.0"
-ordered-set = "^4.1.0"
-zstandard = "^0.19.0"
-viztracer = "^0.15.6"
+[tool.hatch.envs.default]
+dependencies = [
+  "coverage[toml]>=6.5",
+  "pytest",
+  "pytest-cov",
+  "pre-commit",
+  "coveralls",
+  "types-PyYAML",
+  "tbump",
+  "ruff",
+  "pip-audit",
+  "mypy",
+  "mdformat",
+]
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.mypy]
-files = ["keyhint/**/*.py", "tests/**/*.py"]
-ignore_missing_imports = true
-follow_imports_for_stubs = true
-
+[tool.hatch.envs.default.scripts]
+style = [
+  "ruff {args:.}",
+  "ruff format --check --diff {args:.}",
+  "mdformat --check --end-of-line keep {args:.}",
+]
+typing = "mypy"
+test = ["pytest {args:tests}", "coverage lcov"]
+security = "pip-audit"
+fmt = [
+  "ruff --fix {args:.}",
+  "ruff format {args:.}",
+  "mdformat --end-of-line keep {args:.}",
+]
+# Main tasks:
+check = ["style", "typing", "test", "security"]
+pre-commit = ["fmt", "check"]
+version = "tbump {args:current-version}"
 [tool.ruff]
-target-version = "py311"
+target-version = "py39"
 line-length = 88
 exclude = [".venv"]
 select = [
@@ -106,11 +123,36 @@ ignore = [
 convention = "google"
 
 [tool.ruff.isort]
-known-first-party = ["normcap"]
+known-first-party = ["keyhint"]
 
 [tool.ruff.flake8-tidy-imports]
 ban-relative-imports = "all"
 
+[tool.mypy]
+files = ["keyhint/**/*.py", "tests/**/*.py"]
+follow_imports = "skip"
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+  "--durations=5",
+  "--showlocals",
+  "--cov",
+  "--cov-report=xml",
+  "--cov-report=html",
+]
+
+[tool.coverage.run]
+source_pkgs = ["keyhint"]
+branch = true
+parallel = true
+omit = []
+
+[tool.mdformat]
+wrap = 88
+number = true
+end_of_line = "keep"
 
 [tool.tbump]
 
@@ -132,10 +174,6 @@ tag_template = "v{new_version}"
 [[tool.tbump.file]]
 src = "pyproject.toml"
 search = 'version = "{current_version}"'
-
-[[tool.tbump.file]]
-src = "Makefile"
-search = "KeyHint-{current_version}"
 
 [[tool.tbump.file]]
 src = "keyhint/__init__.py"

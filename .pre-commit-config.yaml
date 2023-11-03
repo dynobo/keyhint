@@ -1,13 +1,16 @@
 # See https://pre-commit.com/ for usage and config
+fail_fast: true
+
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v2.1.1
+    rev: v2.4.0
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.5.0
     hooks:
+      - id: check-ast
       - id: check-yaml
       - id: check-toml
       - id: end-of-file-fixer
@@ -17,53 +20,9 @@ repos:
       - id: mixed-line-ending
   - repo: local
     hooks:
-      - id: mdformat
-        name: mdformat
+      - id: check
+        name: run project checks
         stages: [commit]
         language: system
-        entry: poetry run mdformat --wrap 88
-        types: [markdown]
-
-      - id: ruff-format
-        name: ruff-format
-        stages: [commit]
-        language: system
-        entry: poetry run ruff format .
-        types: [python]
-
-      - id: pip-audit
-        name: pip-audit
-        stages: [commit]
-        language: system
-        entry:
-          bash -c "poetry run pip-audit --strict -r <(poetry export -f requirements.txt
-          --with dev | sed 's/\[.*\]//g' | sed -z 's/\n\W//g' | sed -z 's/\\//g' | uniq
-          )"
-        # First `sed` removes potential "[<extra>]" after package names
-        # Second `sed` removes "\n" in front of "--hash" to get one line per package
-        # Final `uniq` is the used to de-duplicated those lines
-        pass_filenames: false
-
-      - id: ruff
-        name: ruff
-        stages: [commit]
-        language: system
-        entry: poetry run ruff --fix .
-        types: [python]
-        pass_filenames: false
-
-      - id: mypy
-        name: mypy
-        stages: [commit]
-        language: system
-        entry: poetry run mypy
-        types: [python]
-        pass_filenames: false
-
-      - id: pytest
-        name: pytest
-        stages: [commit]
-        language: system
-        entry: poetry run pytest tests/ -vv --cov  --cov-report html
-        types: [python]
+        entry: hatch run pre-commit
         pass_filenames: false

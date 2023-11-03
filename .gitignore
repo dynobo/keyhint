@@ -1,14 +1,10 @@
 cheatsheet.jpeg
-.venv
+.virtualenvs
 .vscode
 run.sh
 *.*~
-*.AppImage
-*.bin
-keyhint.dist-info/
-app.build
-app.onefile-build
-app.dist
+.envrc
+.ruff_cache
 
 
 # Byte-compiled / optimized / DLL files
