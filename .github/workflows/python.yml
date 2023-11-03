@@ -11,12 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install poetry
-        run: pipx install poetry==1.3.2
+
+      - name: Install hatch
+        run: pipx install hatch
+
       - uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
-          cache: "poetry"
+          python-version: "3.11"
+
       - name: Install system deps
         run: |
           sudo apt-get update
@@ -26,18 +28,9 @@ jobs:
              python3-gi \
              gobject-introspection \
              libgtk-4-dev
-      - name: Poetry install
-        run: poetry install
-      - name: Ruff
-        run: poetry run ruff check .
-      - name: Ruff format
-        run: poetry run ruff format --check --diff .
-      - name: Mypy
-        run: poetry run mypy
-      - name: Pytest
-        run: poetry run pytest
-      - name: Test AppImage build
-        run: poetry run make clean-build
+
+      - name: Run project checks
+        run: hatch run check
 
   publish:
     name: Build & Publish
@@ -46,12 +39,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install poetry
-        run: pipx install poetry==1.3.2
+
+      - name: Install hatch
+        run: pipx install hatch
+
       - uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
-          cache: "poetry"
+          python-version: "3.11"
+
       - name: Install system deps
         run: |
           sudo apt-get update
@@ -61,27 +56,18 @@ jobs:
              python3-gi \
              gobject-introspection \
              libgtk-4-dev
-      - name: Poetry install
-        run: poetry install
-      # Prepare Release
-      - name: Build AppImage
-        run: poetry run make clean-build
-      - name: Draft release
-        uses: softprops/action-gh-release@v1
+
+      - name: Build Python package
+        run: hatch build
+
+      - name: Publish to PyPi
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          files: |
-            *.AppImage
-          body:
-            See [CHANGELOG](https://github.com/dynobo/keyhint/blob/main/CHANGELOG.md)
-            for details.
-          draft: true
-          prerelease: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Publish to PyPi
-      - name: Build and publish to PyPi
-        run: |
-          poetry publish \
-            --build \
-            --username __token__ \
-            --password ${{ secrets.PYPI_KEYHINT_TOKEN }}
+          verbose: true
+          print-hash: true
+
+      - name: Sign published artifacts
+        uses: sigstore/gh-action-sigstore-python@v2.1.0
+        with:
+          inputs: ./dist/*.tar.gz ./dist/*.whl
+          release-signing-artifacts: true

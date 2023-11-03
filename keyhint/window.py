@@ -5,7 +5,9 @@ Does the rendering of the hints as well interface actions.
 
 import logging
 import re
-from typing import List, Optional, Tuple
+from collections.abc import Iterable, Mapping
+from pathlib import Path
+from typing import Any, Optional
 
 from gi.repository import Gdk, GLib, Gtk
 
@@ -13,7 +15,7 @@ import keyhint
 
 logger = logging.getLogger(__name__)
 
-RESOURCE_PATH = __file__.rstrip("window.py") + "resources"
+RESOURCE_PATH = Path(__file__).parent / "resources"
 
 
 @Gtk.Template(filename=f"{RESOURCE_PATH}/window.ui")
@@ -23,7 +25,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     __gtype_name__ = "main_window"
     _section_title_height: Optional[int] = None
     _row_height: Optional[int] = None
-    _hints: List[dict] = keyhint.utils.load_hints()
+    _hints: list[dict] = keyhint.utils.load_hints()
     _dialog_is_open: bool = False
     _wm_class: str = ""
     _window_title: str = ""
@@ -34,14 +36,14 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     header_bar_title: Gtk.Label = Gtk.Template.Child()  # type: ignore
     scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()  # type: ignore
 
-    def __init__(self, options):
+    def __init__(self, options: Mapping) -> None:
         """Initialize during window creation."""
         super().__init__()
         self._options = options
 
         self._load_css()
         self.set_icon_name("keyhint")
-        logger.debug(f"Loaded {len(self._hints)} hints.")
+        logger.debug("Loaded %s hints.", len(self._hints))
         self.connect("realize", self.on_realize)
 
         evk = Gtk.EventControllerKey()
@@ -49,20 +51,20 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.add_controller(evk)  # add to window
         self.screen_width, self.screen_height = self._get_screen_dims()
 
-    def _get_screen_dims(self) -> Tuple[int, int]:
+    def _get_screen_dims(self) -> tuple[int, int]:
         display = self.get_display()
         monitors = display.get_monitors()
         geometry = monitors.get_item(0).get_geometry()  # TODO: Find correct monitor
         return geometry.width, geometry.height
 
-    def _get_hints_box_dims(self) -> Tuple[int, int]:
+    def _get_hints_box_dims(self) -> tuple[int, int]:
         size = self.hints_container_box.get_preferred_size().natural_size
         return size.width, size.height
 
-    def _get_hint_ids_titles(self) -> List[Tuple[str, str]]:
+    def _get_hint_ids_titles(self) -> list[tuple[str, str]]:
         return [(k["id"], k["title"]) for k in self._hints]
 
-    def _get_hints_by_id(self, hint_id: str) -> Optional[dict]:
+    def _get_hints_by_id(self, hint_id: str) -> Optional[dict[str, Any]]:
         return next((hint for hint in self._hints if hint["id"] == hint_id), None)
 
     def _get_hint_id_by_active_window(self) -> Optional[str]:
@@ -96,17 +98,17 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         # If hint-id was provided by option, use that one:
         if "hint" in self._options:
             hint_id = self._options["hint"]
-            logger.debug(f"Using provided hint-id: {hint_id}")
+            logger.debug("Using provided hint-id: %s", hint_id)
 
         # Else try to find hints for active window
         if not hint_id:
             hint_id = self._get_hint_id_by_active_window()
-            logger.debug(f"Found matching hints '{hint_id}'.")
+            logger.debug("Found matching hints %s", hint_id)
 
         # First fallback to cli provided default
         if (not hint_id) and ("default-hint" in self._options):
             hint_id = self._options["default-hint"]
-            logger.debug(f"Using provided default hint-id: {hint_id}")
+            logger.debug("Using provided default hint-id: %s", hint_id)
 
         # Last fallback to first entry in list
         if not hint_id:
@@ -116,7 +118,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
         return hint_id
 
-    def _get_row_heights(self) -> Tuple[int, int]:
+    def _get_row_heights(self) -> tuple[int, int]:
         if self._section_title_height and self._row_height:
             return self._section_title_height, self._row_height
 
@@ -135,10 +137,10 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         title_height = section_title.get_preferred_size().natural_size.height + spacing
         row_height = section_title.get_preferred_size().natural_size.height + spacing
 
-        logger.debug(f"Title height: {title_height}, Row height: {row_height}")
+        logger.debug("Title height: %s, Row height: %s", title_height, row_height)
         return title_height, row_height
 
-    def _distribute_hints_in_columns(self, keyhints: dict) -> List[dict]:
+    def _distribute_hints_in_columns(self, keyhints: dict) -> list[dict]:
         max_column_height = self.screen_height // 1.2
 
         self._section_title_height, self._row_height = self._get_row_heights()
@@ -163,7 +165,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         return hint_columns
 
     # GENERATE/MODIFY WIDGETS
-    def _load_css(self):
+    def _load_css(self) -> None:
         css_path = f"{RESOURCE_PATH}/style.css"
         provider = Gtk.CssProvider()
         provider.load_from_path(css_path)
@@ -172,13 +174,13 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         )
 
     @staticmethod
-    def _create_bindings(text) -> Gtk.Box:
+    def _create_bindings(text: str) -> Gtk.Box:
         box = Gtk.Box(
             orientation=Gtk.Orientation.HORIZONTAL, spacing=6, halign=Gtk.Align.END
         )
         keys = [text.replace("`", "")] if text.startswith("`") else text.split()
-        for key in keys:
-            key = keyhint.utils.replace_keys(key.strip())
+        for k in keys:
+            key = keyhint.utils.replace_keys(k.strip())
             label = Gtk.Label()
             if key in ["+", "/"]:
                 label.set_css_classes(["dim-label"])
@@ -190,24 +192,24 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             box.append(label)
         return box
 
-    def _create_section_title(self, text) -> Gtk.Label:
+    def _create_section_title(self, text: str) -> Gtk.Label:
         label = Gtk.Label(xalign=0.0, css_classes=["section-title"])
         label.set_markup(f"<b>{text}</b>")
         return label
 
-    def _populate_hints_drop_down(self):
+    def _populate_hints_drop_down(self) -> None:
         model = self.hints_drop_down.get_model()
-        for hint_id, title in self._get_hint_ids_titles():
+        for hint_id, _ in self._get_hint_ids_titles():
             model.append(hint_id)
 
-    def _clear_hints_container(self):
+    def _clear_hints_container(self) -> None:
         while child := self.hints_container_box.get_first_child():
             child.get_parent().remove(child)
 
-    def _populate_hints_container(self):
+    def _populate_hints_container(self) -> None:
         hint_id = self.hints_drop_down.get_selected_item().get_string()
         keyhints = self._get_hints_by_id(hint_id)
-        hint_columns = self._distribute_hints_in_columns(keyhints)
+        hint_columns = self._distribute_hints_in_columns(keyhints or {})
 
         for column in hint_columns:
             grid = Gtk.Grid(column_spacing=20, row_spacing=8)
@@ -226,7 +228,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
                     idx += 1
             self.hints_container_box.append(grid)
 
-    def _adjust_window_dimensions(self):
+    def _adjust_window_dimensions(self) -> None:
         hints_box_width, hints_box_height = self._get_hints_box_dims()
         header_height = 80  #  self._header_bar.get_preferred_size().natural_size.height
         target_height = min(hints_box_height + header_height, self.screen_height // 1.1)
@@ -235,7 +237,13 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
         # TODO: self.move(position_x, position_y)
 
-    def on_key_release(self, evk: Gtk.EventControllerKey, keycode, keyval, modifier):
+    def on_key_release(
+        self,
+        evk: Gtk.EventControllerKey,
+        keycode,  # noqa: ANN001
+        keyval,  # noqa: ANN001
+        modifier,  # noqa: ANN001
+    ) -> None:
         """Execute on key release."""
         if keycode == Gdk.KEY_Escape:
             if self._dialog_is_open:
@@ -257,7 +265,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             hadj = self.scrolled_window.get_hadjustment()
             hadj.set_value(hadj.get_value() - self.screen_width // 3)
 
-    def set_active_keyhint(self, hint_id):
+    def set_active_keyhint(self, hint_id: str) -> None:
         if hint_id == self._hint_id:
             return
         self._hint_id = hint_id
@@ -266,19 +274,24 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     @Gtk.Template.Callback("on_hints_drop_down_changed")
     def on_select_hints_combo_changed(
         self, drop_down: Gtk.DropDown, selected_item: int
-    ):
+    ) -> None:
         """Execute on change of the hints selection dropdown."""
         self.set_active_keyhint(drop_down.get_selected_item().get_string())
-        self.header_bar_title.set_text(self._active_keyhint["title"] + " - Shortcuts")
+        title = (
+            self._active_keyhint.get("title", "Unknown")
+            if self._active_keyhint
+            else "Unknown"
+        )
+        self.header_bar_title.set_text(title + " - Shortcuts")
         self._clear_hints_container()
         self._populate_hints_container()
         self._adjust_window_dimensions()
 
-    def on_window_destroy(self, _):
+    def on_window_destroy(self, event) -> None:  # noqa: ANN001
         """Execute on window close."""
         logger.debug("Closing application window.")
 
-    def on_realize(self, *_):
+    def on_realize(self, *_: Iterable) -> None:
         """Execute on window realization on startup."""
         self._populate_hints_drop_down()
         drop_down_strings = [s.get_string() for s in self.hints_drop_down.get_model()]
@@ -287,7 +300,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.hints_drop_down.grab_focus()
 
     @Gtk.Template.Callback("on_about_button_clicked")
-    def open_about_dialog(self, _):
+    def open_about_dialog(self, event) -> None:  # noqa: ANN001
         """Execute on click "about" in application menu."""
         self._dialog_is_open = True
         logo = Gtk.Image.new_from_file(f"{RESOURCE_PATH}/keyhint.svg")
