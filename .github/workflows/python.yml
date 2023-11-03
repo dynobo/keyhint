@@ -30,8 +30,8 @@ jobs:
         run: poetry install
       - name: Ruff
         run: poetry run ruff check .
-      - name: Black
-        run: poetry run black --check .
+      - name: Ruff format
+        run: poetry run ruff format --check --diff .
       - name: Mypy
         run: poetry run mypy
       - name: Pytest
