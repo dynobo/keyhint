@@ -7,17 +7,16 @@ import re
 import subprocess
 import traceback
 from pathlib import Path
-from typing import Union
 
-import yaml
+import toml
 
 logger = logging.getLogger(__name__)
 
 CONFIG_PATH = __file__.rstrip("utils.py") + "config"
 
 
-def _load_yaml(file_path: Union[str, os.PathLike]) -> dict:
-    """Safely load a yaml file from resource path or other path.
+def _load_toml(file_path: str | os.PathLike) -> dict:
+    """Load a toml file from resource path or other path.
 
     Args:
         file_path: Filename in resources, or complete path to file.
@@ -28,68 +27,68 @@ def _load_yaml(file_path: Union[str, os.PathLike]) -> dict:
         [description]
     """
     try:
-        with Path(file_path).open(encoding="utf-8") as stream:
-            result = yaml.safe_load(stream)
-    except yaml.YAMLError as exc:
+        result = toml.load(str(Path(file_path).resolve()))
+    except Exception as exc:
         print(exc)  # noqa: T201
         result = {}
     return result
 
 
-def load_default_hints() -> list[dict]:
-    """Load default keyhints from yaml files shipped with the package.
+def load_default_sheets() -> list[dict]:
+    """Load default keyhints from toml files shipped with the package.
 
     Returns:
         List[dict]: List of application keyhints and meta info.
     """
-    hints = [_load_yaml(f) for f in Path(CONFIG_PATH).glob("*.yaml")]
-    hints = sorted(hints, key=lambda k: k["title"])
-    return hints  # noqa: RET504
+    sheets = [_load_toml(f) for f in Path(CONFIG_PATH).glob("*.toml")]
+    sheets = sorted(sheets, key=lambda k: k["title"])
+    return sheets  # noqa: RET504
 
 
-def load_user_hints() -> list[dict]:
-    """Load keyhints from yaml files in the users .config/keyhint/ directory.
+def load_user_sheets() -> list[dict]:
+    """Load cheatsheets from toml files in the users .config/keyhint/ directory.
 
     Returns:
         List[dict]: List of application keyhints and meta info.
     """
     if config_path := get_users_config_path():
-        files = (config_path / "keyhint").glob("*.yaml")
-        hints = [_load_yaml(f) for f in files]
-        hints = sorted(hints, key=lambda k: k["title"])
+        files = (config_path / "keyhint").glob("*.toml")
+        sheets = [_load_toml(f) for f in files]
+        sheets = sorted(sheets, key=lambda k: k["title"])
     else:
-        hints = []
-    return hints
+        sheets = []
+    return sheets
 
 
-def _expand_includes(hints: list[dict]) -> list[dict]:
-    new_hints = []
-    for h in hints:
-        if includes := h.get("include", []):
+def _expand_includes(sheets: list[dict]) -> list[dict]:
+    new_sheets = []
+    for s in sheets:
+        if includes := s.get("include", []):
             for include in includes:
-                included_hints = [h for h in hints if h["id"] == include]
-                if not included_hints:
+                included_sheets = [c for c in sheets if c["id"] == include]
+                if not included_sheets:
                     message = (
-                        f"Hint ID '{included_hints}' included by '{h['id']}' not found!"
+                        f"Cheatsheet ID '{included_sheets}' "
+                        f"included by '{s['id']}' not found!"
                     )
                     raise ValueError(message)
-                included_hint = included_hints[0]
-                included_hint["hints"] = {
-                    f"{included_hint['title']} - {k}": v
-                    for k, v in included_hint["hints"].items()
+                included_sheet = included_sheets[0]
+                included_sheet["section"] = {
+                    f"{included_sheet['title']} - {k}": v
+                    for k, v in included_sheet["section"].items()
                 }
-                h["hints"].update(included_hints[0]["hints"])
-        new_hints.append(h)
-    return new_hints
+                s["section"].update(included_sheets[0]["section"])
+        new_sheets.append(s)
+    return new_sheets
 
 
-def _remove_empty_sections(hints: list[dict]) -> list[dict]:
-    for hint in hints:
-        hint["hints"] = {k: v for k, v in hint["hints"].items() if v}
-    return hints
+def _remove_empty_sections(sheets: list[dict]) -> list[dict]:
+    for sheet in sheets:
+        sheet["section"] = {k: v for k, v in sheet["section"].items() if v}
+    return sheets
 
 
-def load_hints() -> list[dict]:
+def load_sheets() -> list[dict]:
     """Load unified default keyhints and keyhints from user config.
 
     First the default keyhints are loaded, then they are update (added/overwritten)
@@ -98,26 +97,26 @@ def load_hints() -> list[dict]:
     Returns:
         List[dict]: List of application keyhints and meta info.
     """
-    hints = load_default_hints()
-    user_hints = load_user_hints()
+    sheets = load_default_sheets()
+    user_sheets = load_user_sheets()
 
-    for user_hint in user_hints:
+    for user_sheet in user_sheets:
         existed = False
-        for hint in hints:
-            # Update default hints by user hint (if existing)
-            if hint["id"] == user_hint["id"]:
-                user_hint_hints = user_hint.pop("hints")
-                hint.update(user_hint)
-                hint["hints"].update(user_hint_hints)
+        for sheet in sheets:
+            # Update default sheet by user sheet (if existing)
+            if sheet["id"] == user_sheet["id"]:
+                user_sheet_sections = user_sheet.pop("section")
+                sheet.update(user_sheet)
+                sheet["section"].update(user_sheet_sections)
                 existed = True
                 break
         # If it didn't exist, append as new
         if not existed:
-            hints.append(user_hint)
+            sheets.append(user_sheet)
 
-    hints = _expand_includes(hints)
-    hints = _remove_empty_sections(hints)
-    return hints  # noqa: RET504
+    sheets = _expand_includes(sheets)
+    sheets = _remove_empty_sections(sheets)
+    return sheets  # noqa: RET504
 
 
 def replace_keys(text: str) -> str:
@@ -232,7 +231,7 @@ def is_using_wayland() -> bool:
     return "WAYLAND_DISPLAY" in os.environ
 
 
-def get_users_config_path() -> Union[Path, None]:
+def get_users_config_path() -> Path | None:
     """Retrieve path for config files.
 
     Returns:
@@ -286,4 +285,4 @@ def detect_active_window() -> tuple[str, str]:
 
 
 if __name__ == "__main__":
-    load_hints()
+    load_sheets()

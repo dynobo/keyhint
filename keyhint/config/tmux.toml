@@ -1,0 +1,31 @@
+id = "tmux"
+title = "Tmux"
+source = "https://github.com/gnunn1/tilix/blob/master/data/resources/ui/shortcuts.ui"
+
+[match]
+regex_process = "foot"
+regex_title = "tmux"
+
+[section]
+[section.General]
+"Ctrl + a" = "Prefix key for all shortcuts!"
+"?" = "Show shortcuts"
+
+[section.Panes]
+"\"" = "Split vertically"
+"%" = "Split horizontally"
+Space = "Switch layouts"
+z = "Zoom current"
+x = "Kill current"
+"`Up Down Left Right`" = "Select"
+"Alt + Up Down Left Right" = "Resize"
+o = "Switch to next"
+"Ctrl + o" = "Rotate"
+e = "Spread equally"
+
+[section.Window]
+"&" = "Kill current"
+
+[section.Session]
+d = "Detach"
+"$" = "Rename"

@@ -1,0 +1,26 @@
+id = "firefox"
+title = "Firefox"
+source = "https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly"
+
+[match]
+regex_process = "Firefox"
+regex_title = ".*"
+
+[section]
+[section."URL Navigation"]
+"Ctrl + L" = "Location bar"
+"Alt + Left" = "Back in History"
+"Alt + Right" = "Forward in History"
+
+[section."Tab Management"]
+"Ctrl + T" = "New tab"
+"Ctrl + Tab" = "Next tab"
+"Ctrl + 1..8" = "Select tab 1..8"
+"Ctrl + W" = "Close tab"
+"Ctrl + Shift + T" = "Undo close tab"
+"\\/" = "Quick Find"
+
+[section.Various]
+"Ctrl + Shift + Y" = "Show downloads"
+"Ctrl + g" = "Search in site"
+"Ctrl + G" = "Search next match"

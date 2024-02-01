@@ -1,0 +1,66 @@
+id = "code"
+title = "VS Code"
+source = "https://code.visualstudio.com/shortcuts/keyboard-shortcuts-linux.pdf"
+
+[match]
+regex_process = "code"
+regex_title = ".*"
+
+[section]
+[section."Navigating UI"]
+"Ctrl + 0" = "Focus sidebar"
+"Ctrl + 1" = "Focus editor 1"
+"Ctrl + 2" = "Focus editor 2"
+
+[section.Sidebar]
+"Ctrl + B" = "Toggle sidebar"
+"Ctrl + Shift + E" = "Explorer in sidebar"
+"Ctrl + Shift + G" = "Git in sidebar"
+"Ctrl + Shift + D" = "Debug in sidebar"
+
+[section.Panel]
+"Ctrl + J" = "Toggle panel"
+"Ctrl + `" = "Toggle terminal"
+"Ctrl + Shift + M" = "Toggle problems"
+"Ctrl + Shift + Y" = "Toggle debug console"
+
+[section."Basic Editing"]
+"Ctrl + L" = "Select current line"
+"Ctrl + Backspace" = "Delete last word"
+"Alt + Up Down" = "Move line up/down"
+"Alt + Shift + Up Down" = "Duplicate cursor"
+"Ctrl+ Alt + Shift + Up Down" = "Duplicate line"
+"Shift + Alt + Left Right" = "Expand/shrink selection"
+"Ctrl + H" = "Search and replace"
+D = "Delete from cursor till end of line"
+
+[section."Language Editing"]
+"Ctrl + Space" = "Trigger suggestion"
+"Ctrl + Shift + Space" = "Trigger parameter suggestion"
+"Ctrl + K I" = "Show hover docs"
+F12 = "Go to definition"
+"Ctrl + K + F12" = "Open definition to the side"
+"Ctrl + Shift + F10" = "Peek definition"
+F2 = "Rename symbol"
+
+[section.Navigation]
+"Ctrl + G" = "Go to line..."
+"Ctrl + P" = "Go to file..."
+"Ctrl + T" = "Go to any symbol..."
+"Ctrl + Shift + O" = "Go to symbol in current file..."
+"Ctrl + Alt + -" = "Go back"
+"Ctrl + Shift + -" = "Go forward"
+F8 = "Go to next error"
+"Shift + F8" = "Go to previous error"
+
+[section.Debugging]
+F9 = "Toogle breakpoint"
+F5 = "Start/continue"
+"Shift + F5" = "Stop"
+F11 = "Step into"
+"Shift + F11" = "Step out"
+F10 = "Step over"
+
+[section."File/Tab Management"]
+"Ctrl + Tab" = "Switch between tabs"
+"Ctrl + P" = "Quick open file"

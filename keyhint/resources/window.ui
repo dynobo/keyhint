@@ -1,159 +1,113 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.16.0 -->
 <interface>
+  <!-- interface-name window.ui -->
   <requires lib="gtk" version="4.0" />
-  <!-- interface-css-provider-path style.css -->
+  <requires lib="libadwaita" version="1.4" />
+  <menu id="window_menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="true">Developer Documentation</attribute>
+        <attribute name="action">win.open_uri</attribute>
+        <attribute name="target">https://developer.gnome.org/documentation/index.html</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="true">About App</attribute>
+        <attribute name="action">win.about</attribute>
+      </item>
+    </section>
+  </menu>
   <template class="main_window" parent="GtkApplicationWindow">
-    <property name="can_focus">False</property>
-    <!-- <property name="icon_name">keyhint</property> -->
-    <child type="titlebar">
-      <object class="GtkHeaderBar" id="header_bar">
-        <property name="visible">True</property>
-        <property name="title-widget">
-          <object class="GtkBox">
-            <property name="orientation">vertical</property>
-            <property name="valign">center</property>
-            <child>
-              <object class="GtkLabel" id="header_bar_title">
-                <property name="label" translatable="yes">Keyhint</property>
-                <property name="single-line-mode">True</property>
-                <property name="ellipsize">end</property>
-                <style>
-                  <class name="title" />
-                </style>
-              </object>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="label" translatable="yes">KeyHint v0.3.0</property>
-                <property name="single-line-mode">True</property>
-                <property name="ellipsize">end</property>
-                <style>
-                  <class name="subtitle" />
-                </style>
-              </object>
-            </child>
-          </object>
-        </property>
-        <child>
-          <object class="GtkDropDown" id="hints_drop_down">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
+    <property name="height-request">300</property>
+    <property name="width-request">800</property>
+    <property name="title" translatable="true">KeyHint</property>
+    <property name="titlebar">
+      <object class="AdwHeaderBar" id="header_bar">
+        <child type="start">
+          <object class="GtkDropDown" id="sheet_drop_down">
+            <property name="can-focus">True</property>
             <property name="model">
               <object class="GtkStringList">
-                <items>
-                </items>
+                <items />
               </object>
             </property>
-            <signal name="notify::selected-item" handler="on_hints_drop_down_changed" swapped="no" />
+            <signal name="notify::selected-item" handler="on_sheet_drop_down_changed"
+              swapped="no" />
+          </object>
+        </child>
+        <child type="title">
+          <object class="GtkSearchEntry" id="search_entry">
+            <property name="placeholder-text" translatable="true">Ctrl+F to filter...</property>
+            <property name="width-request">400</property>
+            <signal name="search-changed" handler="on_search_entry_changed" />
           </object>
         </child>
         <child type="end">
-          <object class="GtkButton" id="about_button">
-            <property name="visible">True</property>
-            <property name="label">ℹ</property>
-            <property name="can_focus">True</property>
-            <property name="css_classes">circular</property>
-            <property name="focus_on_click">False</property>
-            <property name="receives_default">True</property>
-            <signal name="clicked" handler="on_about_button_clicked" swapped="no" />
+          <object class="GtkMenuButton">
+            <property name="icon-name">open-menu-symbolic</property>
+            <property name="tooltip-text" translatable="true">Main Menu</property>
+            <property name="primary">true</property>
+            <property name="menu-model">window_menu</property>
           </object>
         </child>
       </object>
-    </child>
+    </property>
     <child>
-      <object class="GtkScrolledWindow" id="scrolled_window">
-        <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="vscrollbar_policy">never</property>
+      <object class="GtkBox" id="container">
+        <property name="orientation">1</property>
         <child>
-          <object class="GtkViewport" id="scrolled_viewport">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="hscroll_policy">natural</property>
-            <child>
-              <object class="GtkBox" id="hints_container_box">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="halign">center</property>
-                <property name="margin_start">30</property>
-                <property name="margin_end">30</property>
-                <property name="spacing">50</property>
-                <property name="orientation">horizontal</property>
-                <child>
-                  <object class="GtkGrid" id="hints_column_grid">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="orientation">vertical</property>
-                    <property name="column_spacing">10</property>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="halign">end</property>
-                        <property name="label" translatable="yes">Shortcuts</property>
-                        <property name="justify">right</property>
-                        <layout>
-                          <property name="column">0</property>
-                          <property name="row">1</property>
-                        </layout>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="halign">start</property>
-                        <property name="label" translatable="yes">Description</property>
-                        <layout>
-                          <property name="column">1</property>
-                          <property name="row">1</property>
-                        </layout>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="halign">end</property>
-                        <property name="label" translatable="yes">Shortcuts 2</property>
-                        <property name="justify">right</property>
-                        <layout>
-                          <property name="column">0</property>
-                          <property name="row">2</property>
-                        </layout>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="halign">start</property>
-                        <property name="label" translatable="yes">Description 2</property>
-                        <layout>
-                          <property name="column">1</property>
-                          <property name="row">2</property>
-                        </layout>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="halign">start</property>
-                        <property name="label" translatable="yes">Section Title</property>
-                        <layout>
-                          <property name="column">1</property>
-                          <property name="row">0</property>
-                        </layout>
-                      </object>
-                    </child>
+          <object class="AdwHeaderBar" id="header_bar_fullscreen">
+            <property name="visible">False</property>
+            <child type="start">
+              <object class="GtkDropDown" id="sheet_drop_down_fullscreen">
+                <property name="can-focus">True</property>
+                <property name="model">
+                  <object class="GtkStringList">
+                    <items />
                   </object>
-                </child>
+                </property>
+                <signal name="notify::selected-item" handler="on_sheet_drop_down_fullscreen_changed"
+                  swapped="no" />
+              </object>
+            </child>
+            <child type="title">
+              <object class="GtkSearchEntry" id="search_entry_fullscreen">
+                <property name="placeholder-text" translatable="true">Ctrl+F to filter...</property>
+                <property name="width-request">400</property>
+                <signal name="search-changed" handler="on_search_entry_fullscreen_changed" />
+              </object>
+            </child>
+            <child type="end">
+              <object class="GtkMenuButton">
+                <property name="icon-name">open-menu-symbolic</property>
+                <property name="tooltip-text" translatable="true">Main Menu</property>
+                <property name="primary">true</property>
+                <property name="menu-model">window_menu</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolled_window">
+            <property name="propagate-natural-height">true</property>
+            <child>
+              <object class="GtkFlowBox" id="sheet_container_box">
+                <property name="column-spacing">0</property>
+                <property name="row-spacing">0</property>
+                <property name="homogeneous">false</property>
+                <property name="orientation">0</property>
+                <property name="selection-mode">none</property>
+                <property name="vexpand">true</property>
+                <property name="can-focus">false</property>
+                <property name="can-target">false</property>
+                <property name="max-children-per-line">999</property>
               </object>
             </child>
           </object>
         </child>
       </object>
     </child>
+
   </template>
+
 </interface>

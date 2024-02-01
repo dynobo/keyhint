@@ -1,0 +1,41 @@
+id = "tilix"
+title = "Tilix"
+source = "https://github.com/gnunn1/tilix/blob/master/data/resources/ui/shortcuts.ui"
+
+[match]
+regex_process = "tilix"
+regex_title = ".*"
+
+[section]
+[section.Window]
+F11 = "Toggle fullscreen"
+F12 = "View session sidebar"
+
+[section.Sessions]
+"Ctrl + Shift + T" = "Open new session"
+"Ctrl + PageUp / PageDown" = "Switch to next/preview session"
+"Ctrl + Shift + Q" = "Close current session"
+
+[section.Tiling]
+"Ctrl + Alt + A" = "Add terminal automatically"
+"Ctrl + Alt + R" = "Add terminal right"
+"Ctrl + Alt + D" = "Add terminal down"
+"Shift + Alt + Up Down Left Right" = "Resize terminal"
+"Ctrl + Shift + W" = "Close"
+
+[section.Terminal]
+"Shift + Ctrl + F" = "Find"
+"Shift + Ctrl + G / H" = "Find next / previous"
+"Shift + Ctrl + Up Down" = "Scroll up / down"
+"Shift + PageUp PageDown" = "Page up / down"
+
+[section."Navigate cmds"]
+pwd = "Print working dir"
+cd = "Change to home dir"
+"`cd -`" = "Change to previous dir"
+
+[section."History cmds"]
+"`history | grep <term>`" = "Search for \"<term>\""
+"`history 10`" = "Print last 10 cmds"
+"!3" = "Execute cmd 3 from history"
+"Ctrl + r" = "Reverse cmd search / find next"

@@ -1,0 +1,34 @@
+id = "kitty"
+title = "Kitty Terminal"
+source = "https://sw.kovidgoyal.net/kitty/overview/"
+
+[match]
+regex_process = "kitty"
+regex_title = ".*"
+
+[section]
+[section.Scrolling]
+"Ctrl + Shift + UpDown" = "Line up/down"
+"Ctrl + Shift + PageUpDown" = "Page up/down"
+"Ctrl + Shift + Home" = "Top"
+"Ctrl + Shift + End" = "Bottom"
+"Ctrl + Shift + z" = "Previous shell prompt"
+"Ctrl + Shift + x" = "Next shell prompt"
+
+[section.Clipboard]
+"Ctrl + Shift + C" = "Copy to clipboard"
+"Ctrl + Shift + V" = "Paste from clipboard"
+"Ctrl + Shift + S" = "Paste from selection"
+
+[section.Windows]
+"Ctrl + Shift + Enter" = "New window"
+"Ctrl + Shift + w" = "Close window"
+"Ctrl + Shift + ]" = "Next window"
+"Ctrl + Shift + [" = "Previous window"
+"Ctrl + Shift + f" = "Move window forward"
+"Ctrl + Shift + b" = "Move window backward"
+"Ctrl + Shift + l" = "Switch between 7 layouts"
+
+[section.Miscellaneous]
+"Ctrl + Shift + PlusMinus" = "Increase/decrease font size"
+"Ctrl + Shift + e" = "Open URL in browser"
