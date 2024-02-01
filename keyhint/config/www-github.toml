@@ -1,0 +1,28 @@
+id = "www-github"
+title = "GitHub"
+source = "https://help.github.com/en/github/getting-started-with-github/keyboard-shortcuts"
+
+[match]
+regex_process = ".*"
+regex_title = ".*github\\.com.*"
+
+[section]
+[section."Side Wide"]
+"S / \\/" = "Focus search bar"
+gn = "Goto notifications"
+esc = "Close hovercard, if open"
+
+[section.Repositories]
+gc = "Goto code tab"
+gi = "Goto issues tab"
+gp = "Goto pull request tab"
+gb = "Goto projects tab"
+gw = "Goto wiki tab"
+
+[section."Browse Code"]
+t = "Activate file finder"
+l = "Jump to line"
+w = "Switch to new branch/tag"
+y = "Expand URL to canonical"
+i = "Toggle comments on diffs"
+b = "Open blame view"

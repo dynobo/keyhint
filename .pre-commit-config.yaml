@@ -11,7 +11,6 @@ repos:
     rev: v4.5.0
     hooks:
       - id: check-ast
-      - id: check-yaml
       - id: check-toml
       - id: end-of-file-fixer
         exclude: ".srt$"

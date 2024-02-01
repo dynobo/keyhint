@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.0 (Upcoming)
+
+- Breaking: Switch from yaml to toml format for shortcuts
+- Add filtering
+
 ## v0.3.0 (2023-02-12)
 
 - Update app to Gtk4

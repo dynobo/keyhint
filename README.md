@@ -1,7 +1,7 @@
 # KeyHint
 
-**_Display keyboard shortcuts or other hints based on the the active window. (GTK, Linux
-only!)_**
+**_Linux utility to display keyboard shortcuts or other hints based on the active
+window. (GTK 4.6+ required!)_**
 
 <p align="center"><br>
 <img alt="Tests passing" src="https://github.com/dynobo/keyhint/workflows/Test/badge.svg">
@@ -12,22 +12,25 @@ only!)_**
 
 <p align="center"><br><img src="https://raw.githubusercontent.com/dynobo/keyhint/main/keyhint/resources/keyhint_128.png"></p>
 
-## Dependencies
+## Prerequisites
 
-Make sure to install the following dependencies:
+- Python 3.11+
+- GTK 4.6+ (since Ubuntu 22.04)
+- `libcairo2-dev libgirepository1.0-dev`
 
-```
-sudo apt install pkg-config python3-dev libcairo2-dev libgirepository1.0-dev
-```
+## Installation
+
+- `pipx install keyhint` (recommended, requires [pipx](https://pipx.pypa.io/))
+- _or_ `pip install keyhint`
 
 ## Usage
 
-- Install from **PyPi** with `pip install keyhint` and run `keyhint`.
-- _Or_ download the **Binary** from
-  [releases](https://github.com/dynobo/keyhint/releases), make it executable and run it.
-- Configure a **global hotkey** (e.g. `F1`) to start KeyHint on demand.
+- Configure a **global hotkey** (e.g. `Ctrl + F1`) **via your system settings** to
+  launch `keyhint`.
+- If KeyHint is launched via hotkey, it detects the current active application and shows
+  the appropriate hints.
 
-_KeyHint with KeyBindings for VS Code:_
+_KeyHint with shortcuts for VS Code:_
 
 ![VS Code Shortcuts](https://raw.githubusercontent.com/dynobo/keyhint/main/keyhint/resources/vscode.png)
 
@@ -35,64 +38,79 @@ _KeyHint with KeyBindings for VS Code:_
 
 ```
 Application Options:
-  -h, --hint=HINT-ID                      Show hints by specified ID
-  -d, --default-hint=HINT-ID              Hint to show in case no hints for active application were found
-  -v, --verbose                           Verbose log output for debugging
-  --display=DISPLAY                       X display to use
+  -c, --cheatsheet=SHEET-ID                 Show cheatsheet with this ID on startup
+  -d, --default-cheatsheet=SHEET-ID         Cheatsheet to show in case no cheatsheet is found for active application
+  -f, --no-fullscreen                       Launch window in normal window state instead of fullscreen mode
+  -s, --no-section-sort                     Do not sort sections by size, keep order from config toml file
+  -o, --orientation=horizontal|vertical     Orientation and scroll direction. Default: 'vertical'
+  -v, --verbose                             Verbose log output for debugging
 ```
 
 ## Configuration
 
 - The **config directory** is `~/.config/keyhint/`.
-- To **customize existing** hints, copy
-  [the corresponding .yaml-file](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config)
+- To **customize existing** cheatsheets, copy
+  [the corresponding .toml-file](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config)
   into the config directory. Make your changes in a text editor. As long as you don't
   change the `id` it will overwrite the defaults.
-- To **create new** hints, I suggest you also start with
-  [one of the existing .yaml-file](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config):
+- To **create new** cheatsheets, I suggest you also start with
+  [one of the existing .toml-file](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config):
   - Place it in the config directory and give it a good file name.
   - Change the value `id` to something unique.
   - Adjust `regex_process` and `regex_title` so it will be selected based on the active
     window. (See [Tips](#tips))
-  - Add the `hints` to be displayed.
-  - If you think the hints might be useful for others, please consider opening a pull
-    request or an issue.
+  - Add the `shortcuts` & `label` to a `section`.
+  - If you think your cheatsheet might be useful for others, please consider opening a
+    pull request or an issue.
 - You can always **reset a configuration** to the shipped version by deleting the
-  `.yaml` files from the config folder.
+  `.toml` files from the config folder.
+- You can include shortcuts from other cheatsheets add `include = ["<Cheatsheet ID>"]`
+  in the top block (same level as `id` and `title`).
 
 ## Tips
 
-**Hints selection:**
+**Cheatsheet selection:**
 
-- The hints to be displayed on startup are selected by comparing the value of
+- The cheatsheet to be displayed on startup are selected by comparing the value of
   `regex_process` with the wm_class of the active window and the value of `regex_title`
   with the title of the active window.
-- The potential hints are processed alphabetically by filename, the first file that
-  matches both wm_class and title are gettin displayed.
+- The potential cheatsheets are processed alphabetically by filename, the first file
+  that matches both wm_class and title are getting displayed.
 - Both of `regex_` values are interpreted as **case insensitive regular expressions**.
 - Check "Debug Info" in the application menu to get insights about the active window and
-  the selected hints file.
+  the selected cheatsheet file.
 
-**Available hints:**
+**Available cheatsheets:**
 
 - Check the
-  [included yaml-files](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config)
-  to see wich applications are available by default.
-- Feel free submit additional `yaml-files` for further applications.
+  [included toml-files](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config)
+  to see which applications are available by default.
+- Feel free submit additional `toml-files` for further applications.
 
-**Differentiate hints per website:**
+**Differentiate cheatsheets per website:**
 
-- For showing different browser-hints depending on the current website, you might want
-  to use a browser extension like
+- For showing different browser-cheatsheets depending on the current website, you might
+  want to use a browser extension like
   "[Add URL To Window Title](https://addons.mozilla.org/en-US/firefox/addon/add-url-to-window-title/)"
-  and then configure the sections in `hints.yaml` to look for the URL in the window
-  title.
+  and then configure the sections in `<cheatsheet>.toml` to look for the URL in the
+  window title.
+
+**KeyHint's shortcuts:**
+
+- `Ctrl+F`: Start filtering
+- `Ctrl+S`: Focus sheet selection dropdown (press `Enter` to open it)
+- `Esc`: Exit KeyHint
+- `→`, `↓`, `l` or `k`: scroll forward
+- `←`, `↑`, `h` or `j`: scroll backward
+- `PageDown`: scroll page forward
+- `PageUP`: scroll page backward
 
 ## Contribute
 
 I'm happy about any contribution! Especially I would appreciate submissions to improve
-the [shipped hints](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config).
-(The current set are the hints I personally use).
+the
+[shipped cheatsheets](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config).
+(The current set are the cheatsheets I personally use).
 
 ## Design Principles
 

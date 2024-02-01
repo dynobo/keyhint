@@ -11,8 +11,9 @@ from typing import Any
 import gi
 
 gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
 
-from gi.repository import Gio, GLib, Gtk  # noqa: E402
+from gi.repository import Adw, Gio, GLib, Gtk  # noqa: E402
 
 from keyhint.window import KeyhintWindow  # noqa: E402
 
@@ -24,7 +25,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class Application(Gtk.Application):
+class Application(Adw.Application):
     """Main application class.
 
     Handle command line options and display the window.
@@ -44,20 +45,44 @@ class Application(Gtk.Application):
         self.options: dict = {}
 
         self.add_main_option(
-            "hint",
-            ord("h"),
+            "cheatsheet",
+            ord("c"),
             GLib.OptionFlags.NONE,
             GLib.OptionArg.STRING,
-            "Show hints by specified ID",
-            "HINT-ID",
+            "Show cheatsheet with this ID on startup",
+            "SHEET-ID",
         )
         self.add_main_option(
-            "default-hint",
+            "default-cheatsheet",
             ord("d"),
             GLib.OptionFlags.NONE,
             GLib.OptionArg.STRING,
-            "Hint to show in case no hints for active application were found",
-            "HINT-ID",
+            "Cheatsheet to show in case no cheatsheet is found for active application",
+            "SHEET-ID",
+        )
+        self.add_main_option(
+            "no-fullscreen",
+            ord("f"),
+            GLib.OptionFlags.NONE,
+            GLib.OptionArg.NONE,
+            "Launch window in normal window state instead of fullscreen mode",
+            None,
+        )
+        self.add_main_option(
+            "no-section-sort",
+            ord("s"),
+            GLib.OptionFlags.NONE,
+            GLib.OptionArg.NONE,
+            "Do not sort sections by size, keep order from config toml file",
+            None,
+        )
+        self.add_main_option(
+            "orientation",
+            ord("o"),
+            GLib.OptionFlags.NONE,
+            GLib.OptionArg.STRING,
+            "Orientation and scroll direction. Default: 'vertical'",
+            "horizontal|vertical",
         )
         self.add_main_option(
             "verbose",
