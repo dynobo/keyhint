@@ -1,6 +1,7 @@
 id = "tridactyl"
 title = "Tridactyl"
 source = "https://github.com/tridactyl/tridactyl"
+hidden = true
 
 [match]
 regex_process = "$^"

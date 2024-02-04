@@ -88,6 +88,10 @@ def _remove_empty_sections(sheets: list[dict]) -> list[dict]:
     return sheets
 
 
+def _remove_hidden(sheets: list[dict]) -> list[dict]:
+    return [s for s in sheets if not s.get("hidden", False)]
+
+
 def load_sheets() -> list[dict]:
     """Load unified default keyhints and keyhints from user config.
 
@@ -115,6 +119,7 @@ def load_sheets() -> list[dict]:
             sheets.append(user_sheet)
 
     sheets = _expand_includes(sheets)
+    sheets = _remove_hidden(sheets)
     sheets = _remove_empty_sections(sheets)
     return sheets  # noqa: RET504
 

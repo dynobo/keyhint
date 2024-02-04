@@ -16,7 +16,7 @@ window. (GTK 4.6+ required!)_**
 
 - Python 3.11+
 - GTK 4.6+ (since Ubuntu 22.04)
-- `libcairo2-dev libgirepository1.0-dev`
+- `libcairo2-dev libgirepository1.0-dev` (Package name on Ubuntu/Debian)
 
 ## Installation
 
@@ -64,8 +64,10 @@ Application Options:
     pull request or an issue.
 - You can always **reset a configuration** to the shipped version by deleting the
   `.toml` files from the config folder.
-- You can include shortcuts from other cheatsheets add `include = ["<Cheatsheet ID>"]`
-  in the top block (same level as `id` and `title`).
+- You can **include shortcuts from other cheatsheets** add
+  `include = ["<Cheatsheet ID>"]`
+- You can **hide a cheatsheet** by add `hidden = true` in the top block (same level as
+  `id` and `title`).
 
 ## Tips
 
@@ -76,7 +78,7 @@ Application Options:
   with the title of the active window.
 - The potential cheatsheets are processed alphabetically by filename, the first file
   that matches both wm_class and title are getting displayed.
-- Both of `regex_` values are interpreted as **case insensitive regular expressions**.
+- Both of `regex_` values are interpreted as **case in-sensitive regular expressions**.
 - Check "Debug Info" in the application menu to get insights about the active window and
   the selected cheatsheet file.
 
