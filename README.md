@@ -1,7 +1,7 @@
 # KeyHint
 
-**_Linux utility to display keyboard shortcuts or other hints based on the active
-window. (GTK 4.6+ required!)_**
+**_Utility to display keyboard shortcuts or other hints based on the active window on
+Linux. (GTK 4.6+ required!)_**
 
 <p align="center"><br>
 <img alt="Tests passing" src="https://github.com/dynobo/keyhint/workflows/Test/badge.svg">
@@ -10,7 +10,7 @@ window. (GTK 4.6+ required!)_**
 <a href='https://coveralls.io/github/dynobo/keyhint'><img src='https://coveralls.io/repos/github/dynobo/keyhint/badge.svg' alt='Coverage Status' /></a>
 </p>
 
-<p align="center"><br><img src="https://raw.githubusercontent.com/dynobo/keyhint/main/keyhint/resources/keyhint_128.png"></p>
+![Keyhint Screenshot](https://raw.githubusercontent.com/dynobo/keyhint/main/keyhint/resources/keyhint.png)
 
 ## Prerequisites
 
@@ -36,10 +36,6 @@ window. (GTK 4.6+ required!)_**
   launch `keyhint`.
 - If KeyHint is launched via hotkey, it detects the current active application and shows
   the appropriate hints.
-
-_KeyHint with shortcuts for VS Code:_
-
-![VS Code Shortcuts](https://raw.githubusercontent.com/dynobo/keyhint/main/keyhint/resources/vscode.png)
 
 ## CLI Options
 

@@ -219,7 +219,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def on_about_action(self, _: Gio.SimpleAction, __: None) -> None:
         """Execute on click "about" in application menu."""
         self.dialog_is_open = True
-        logo = Gtk.Image.new_from_file(f"{RESOURCE_PATH}/keyhint.svg")
+        logo = Gtk.Image.new_from_file(f"{RESOURCE_PATH}/keyhint_icon.svg")
         Gtk.AboutDialog(
             program_name="KeyHint",
             comments="Cheatsheet for keyboard shortcuts &amp; commands",
