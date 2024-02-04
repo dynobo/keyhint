@@ -5,6 +5,7 @@ run.sh
 *.*~
 .envrc
 .ruff_cache
+coverage.lcov
 
 
 # Byte-compiled / optimized / DLL files

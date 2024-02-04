@@ -307,7 +307,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         # Last fallback to first entry in list
         if not sheet_id:
             model = self.sheet_drop_down.get_model()
-            sheet_id = model.get_value(model.get_iter_first(), 1)
+            sheet_id = model.get_item(0).get_string()
             logger.debug("No matching sheet found. Using first sheet in list.")
 
         return sheet_id
