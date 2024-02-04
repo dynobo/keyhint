@@ -5,10 +5,9 @@ import logging
 import os
 import re
 import subprocess
+import tomllib
 import traceback
 from pathlib import Path
-
-import toml
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +26,8 @@ def _load_toml(file_path: str | os.PathLike) -> dict:
         [description]
     """
     try:
-        result = toml.load(str(Path(file_path).resolve()))
+        with Path(file_path).open("rb") as fh:
+            result = tomllib.load(fh)
     except Exception as exc:
         print(exc)  # noqa: T201
         result = {}

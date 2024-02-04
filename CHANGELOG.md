@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.1 (2024-02-04)
+
+- Fix `No module named 'toml'`.
+
 ## v0.4.0 (2024-02-04)
 
 - Breaking changes in config files:
