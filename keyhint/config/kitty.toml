@@ -1,5 +1,4 @@
 id = "kitty"
-title = "Kitty Terminal"
 source = "https://sw.kovidgoyal.net/kitty/overview/"
 
 [match]

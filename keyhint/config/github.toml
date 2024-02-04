@@ -1,6 +1,6 @@
-id = "www-github"
-title = "GitHub"
+id = "github.com"
 source = "https://help.github.com/en/github/getting-started-with-github/keyboard-shortcuts"
+hidden = true
 
 [match]
 regex_process = ".*"

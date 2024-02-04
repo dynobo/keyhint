@@ -1,5 +1,4 @@
-id = "code"
-title = "VS Code"
+id = "vscode"
 source = "https://code.visualstudio.com/shortcuts/keyboard-shortcuts-linux.pdf"
 
 [match]

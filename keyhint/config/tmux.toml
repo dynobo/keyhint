@@ -1,5 +1,4 @@
 id = "tmux"
-title = "Tmux"
 source = "https://github.com/gnunn1/tilix/blob/master/data/resources/ui/shortcuts.ui"
 
 [match]

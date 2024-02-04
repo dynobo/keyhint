@@ -1,5 +1,4 @@
 id = "vim"
-title = "Vim"
 source = ""
 
 [match]
@@ -28,12 +27,15 @@ d = "Delete / whole line"
 c = "Change (delete + insert)"
 y = "Yank / whole line"
 p = "Paste"
+"Shift + i" = "Insert at beginning of line"
 d5j = "Delete 5 lines downwards"
 "df\"" = "Delete in line until \""
 "dt\"" = "Delete in line until before \""
 "d/foo" = "Delete from cursor util foo"
 "> / <" = "Add / remove indentation"
 "=" = "Format code"
+"Ctrl + v & Up / Down" = "Visual block mode"
+"Shift + i & # & Esc" = "Comment selected visual block"
 
 [section.Registers]
 "`\"+y`" = "yank to system clipboard"

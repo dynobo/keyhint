@@ -1,5 +1,4 @@
 id = "foot-terminal"
-title = "Foot Terminal"
 source = "https://codeberg.org/dnkl/foot#user-content-shortcuts"
 
 [match]

@@ -1,5 +1,4 @@
 id = "pop-shell"
-title = "Pop Shell"
 source = "https://support.system76.com/articles/pop-keyboard-shortcuts/"
 
 [match]

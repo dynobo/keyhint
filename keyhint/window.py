@@ -330,11 +330,12 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         for k in keys:
             key = keyhint.utils.replace_keys(k.strip())
             label = Gtk.Label()
-            if key in ["+", "/"]:
+            if key in ["+", "/", "&"]:
                 label.set_css_classes(["dim-label"])
             else:
                 key = key.replace("\\/", "/")
                 key = key.replace("\\+", "+")
+                key = key.replace("\\&", "&")
                 label.set_css_classes(["keycap"])
             label.set_markup(f"{GLib.markup_escape_text(key)}")
             box.append(label)
