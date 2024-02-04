@@ -41,7 +41,7 @@ def load_default_sheets() -> list[dict]:
         List[dict]: List of application keyhints and meta info.
     """
     sheets = [_load_toml(f) for f in Path(CONFIG_PATH).glob("*.toml")]
-    sheets = sorted(sheets, key=lambda k: k["title"])
+    sheets = sorted(sheets, key=lambda k: k["id"])
     return sheets  # noqa: RET504
 
 
@@ -54,7 +54,7 @@ def load_user_sheets() -> list[dict]:
     if config_path := get_users_config_path():
         files = (config_path / "keyhint").glob("*.toml")
         sheets = [_load_toml(f) for f in files]
-        sheets = sorted(sheets, key=lambda k: k["title"])
+        sheets = sorted(sheets, key=lambda k: k["id"])
     else:
         sheets = []
     return sheets
@@ -74,7 +74,7 @@ def _expand_includes(sheets: list[dict]) -> list[dict]:
                     raise ValueError(message)
                 included_sheet = included_sheets[0]
                 included_sheet["section"] = {
-                    f"{included_sheet['title']} - {k}": v
+                    f"{included_sheet['id']} - {k}": v
                     for k, v in included_sheet["section"].items()
                 }
                 s["section"].update(included_sheets[0]["section"])

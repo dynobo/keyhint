@@ -1,5 +1,4 @@
 id = "gnome-terminal"
-title = "Gnome Terminal"
 source = "https://help.gnome.org/users/gnome-terminal/stable/adv-keyboard-shortcuts.html.en"
 
 [match]
