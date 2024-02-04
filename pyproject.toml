@@ -178,9 +178,6 @@ search = 'version = "{current_version}"'
 [[tool.tbump.file]]
 src = "keyhint/__init__.py"
 
-[[tool.tbump.file]]
-src = "keyhint/resources/window.ui"
-
 [[tool.tbump.before_commit]]
 name = "check changelog"
 cmd = "grep -q {new_version} CHANGELOG.md"
