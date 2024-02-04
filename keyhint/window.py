@@ -80,7 +80,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         if self.cli_args.get("orientation", "vertical") == "horizontal":
             self.sheet_container_box.set_orientation(1)
 
-        if self.cli_args.get("no-fullscreen", False):
+        if not self.cli_args.get("no-fullscreen", False):
             self.fullscreen()
 
         # Make sure the window is focused
@@ -131,6 +131,10 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         evk = Gtk.EventControllerKey()
         evk.connect("key-pressed", self.on_search_entry_key_pressed)
         self.search_entry.add_controller(evk)
+
+        # Reusing the same evk leads to critical assertion error
+        evk = Gtk.EventControllerKey()
+        evk.connect("key-pressed", self.on_search_entry_key_pressed)
         self.search_entry_fullscreen.add_controller(evk)
 
     @Gtk.Template.Callback()

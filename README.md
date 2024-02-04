@@ -15,8 +15,15 @@ window. (GTK 4.6+ required!)_**
 ## Prerequisites
 
 - Python 3.11+
-- GTK 4.6+ (since Ubuntu 22.04)
-- `libcairo2-dev libgirepository1.0-dev` (Package name on Ubuntu/Debian)
+- GTK 4.6+ (shipped since Ubuntu 22.04) + dev packages:
+  ```sh
+  sudo apt-get install \
+     libgirepository1.0-dev \
+     libcairo2-dev \
+     python3-gi \
+     gobject-introspection \
+     libgtk-4-dev
+  ```
 
 ## Installation
 

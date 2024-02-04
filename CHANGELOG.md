@@ -1,9 +1,15 @@
 # Changelog
 
-## v0.4.0 (Upcoming)
+## v0.4.0 (2024-02-04)
 
-- Breaking: Switch from yaml to toml format for shortcuts
-- Add filtering
+- Breaking changes in config files:
+  - Switch from yaml to toml format for shortcuts (you can use
+    [`yq`](https://mikefarah.gitbook.io/yq/) to convert yaml to toml)
+  - The key `hints` is renamed to `section`
+- Dropping binary builds! Please install via `pipx install keyhint` instead.
+- Add filter for shortcuts or section.
+- Add possibility to hide whole cheatsheets via `hidden = true` in config files.
+- Add fullscreen mode as default (toggle via `F11`)
 
 ## v0.3.0 (2023-02-12)
 
