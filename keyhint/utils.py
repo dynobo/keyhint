@@ -172,7 +172,12 @@ def get_active_window_info_wayland() -> tuple[str, str]:
     )
     stdout = _get_cmd_result(cmd_windows_list)
     windows = json.loads(stdout)
-    focused_window = next(filter(lambda x: x["focus"], windows))
+
+    focused_windows = list(filter(lambda x: x["focus"], windows))
+    if not focused_windows:
+        return "", ""
+
+    focused_window = focused_windows[0]
     wm_class = focused_window["wm_class"]
 
     cmd_windows_get_title = (
