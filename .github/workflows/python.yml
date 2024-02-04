@@ -37,13 +37,20 @@ jobs:
     needs: test
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    permissions:
+      # Used to authenticate to PyPI via OIDC.
+      # Used to sign the release's artifacts with sigstore-python.
+      id-token: write
+      # Used to attach signing artifacts to the published release.
+      contents: write
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install hatch
         run: pipx install hatch
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -57,6 +64,7 @@ jobs:
              gobject-introspection \
              libgtk-4-dev
 
+
       - name: Build Python package
         run: hatch build
 
@@ -65,9 +73,3 @@ jobs:
         with:
           verbose: true
           print-hash: true
-
-      - name: Sign published artifacts
-        uses: sigstore/gh-action-sigstore-python@v2.1.0
-        with:
-          inputs: ./dist/*.tar.gz ./dist/*.whl
-          release-signing-artifacts: true
