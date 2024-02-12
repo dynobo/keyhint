@@ -406,7 +406,12 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         return column_view
 
     def populate_sheet_container(self) -> None:
-        self.sheet_container_box.remove_all()
+        if hasattr(self.sheet_container_box, "remove_all") and False:
+            # Only available in GTK 4.12+
+            self.sheet_container_box.remove_all()
+        else:
+            while child := self.sheet_container_box.get_first_child():
+                self.sheet_container_box.remove(child)
 
         sheet_id = self.sheet_drop_down.get_selected_item().get_string()
         sheet = self.get_sheet_by_id(sheet_id)
