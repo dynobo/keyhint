@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.3 (2024-02-13)
+
+- Fix background color in GTK 4.6.
+
 ## v0.4.2 (2024-02-13)
 
 - Fix missing method in GTK 4.6.
