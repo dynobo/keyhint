@@ -24,6 +24,7 @@
   filter: unset;
 }
 
-.bindings-section {
+.bindings-section,
+.bindings-section .view {
   background-color: transparent;
 }
