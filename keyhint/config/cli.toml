@@ -1,0 +1,38 @@
+id = "cli"
+source = ""
+
+[match]
+regex_process = "a^"
+regex_title = "a^"
+
+[section]
+
+[section."Shell History"]
+"Ctrl + r" = "Reverse cmd search / find next"
+"`history | grep <term>`" = "Search for \"<term>\""
+"`history 10`" = "Print last 10 cmds"
+"!3" = "Execute cmd 3 from history"
+
+[section."Data Wrangling"]
+"`awk '{print $1}'`" = "Column base manipulations"
+"`sed -E 's/.*(d+)/\\1/'`" = "Line base manipulations"
+"`paste -sd,`" = "Concatenate lines"
+"`tail -n10`" = "Last lines"
+"`head -n10`" = "First lines"
+"`uniq -c`" = "Count unique lines"
+"`sort -nk1,1" = "Sort by column 1"
+
+[section.Tools]
+bc = "Calculator"
+"gtop / htop" = "System Monitors"
+xplr = "File manager"
+moc = "Music Player in Console"
+nvtop = "NVidia Card usage"
+fd = "Find alternative"
+hyperfine = "Benchmarking"
+tl = "TooLong log file viewer"
+
+[section.Navigating]
+pwd = "Print working dir"
+cd = "Change to home dir"
+"`cd -`" = "Change to previous dir"

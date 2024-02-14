@@ -1,5 +1,6 @@
 id = "tilix"
 source = "https://github.com/gnunn1/tilix/blob/master/data/resources/ui/shortcuts.ui"
+include = ["cli"]
 
 [match]
 regex_process = "tilix"
@@ -27,14 +28,3 @@ F12 = "View session sidebar"
 "Shift + Ctrl + G / H" = "Find next / previous"
 "Shift + Ctrl + Up Down" = "Scroll up / down"
 "Shift + PageUp PageDown" = "Page up / down"
-
-[section."Navigate cmds"]
-pwd = "Print working dir"
-cd = "Change to home dir"
-"`cd -`" = "Change to previous dir"
-
-[section."History cmds"]
-"`history | grep <term>`" = "Search for \"<term>\""
-"`history 10`" = "Print last 10 cmds"
-"!3" = "Execute cmd 3 from history"
-"Ctrl + r" = "Reverse cmd search / find next"

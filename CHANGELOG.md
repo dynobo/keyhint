@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.4 (2024-02-14)
+
+- Move generic CLI commands into separate cheatsheet and include it in terminal apps.
+
 ## v0.4.3 (2024-02-13)
 
 - Fix background color in GTK 4.6.
