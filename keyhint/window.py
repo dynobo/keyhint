@@ -430,9 +430,11 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         sections = sheet["section"]
         if not self.cli_args.get("no-section-sort", False):
             # Sort sections by number of bindings to make the layout more dense
-            sections = sorted(sections.items(), key=lambda x: len(x[1]), reverse=True)
+            sections = dict(
+                sorted(sections.items(), key=lambda x: len(x[1]), reverse=True)
+            )
 
-        for section, bindings in sections:
+        for section, bindings in sections.items():
             ls = Gio.ListStore()
             for shortcut, label in bindings.items():
                 ls.append(BindingsRow(shortcut=shortcut, label=label, section=section))
