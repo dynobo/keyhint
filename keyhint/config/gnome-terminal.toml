@@ -1,27 +1,15 @@
 id = "gnome-terminal"
 source = "https://help.gnome.org/users/gnome-terminal/stable/adv-keyboard-shortcuts.html.en"
+include = ["cli"]
 
 [match]
 regex_process = "gnome-terminal"
 regex_title = ".*"
 
 [section]
-[section.Navigating]
-pwd = "Print working dir"
-cd = "Change to home dir"
-"`cd -`" = "Change to previous dir"
 
-[section.History]
-"`history | grep <term>`" = "Search for \"<term>\""
-"`history 10`" = "Print last 10 cmds"
-"!3" = "Execute cmd 3 from history"
-"Ctrl + r" = "Reverse cmd search / find next"
-
-[section.Tools]
-"`awk '{print $1}'`" = "Column base manipulations"
-"`sed -E 's/.*(d+)/\\1/'`" = "Line base manipulations"
-"`paste -sd,`" = "Concatenate lines"
-bc = "Calculator"
-"gtop / htop" = "System Monitors"
-ranger = "File manager"
-moc = "Music Player in Console"
+[section.Tabs]
+"Shift + Ctrl + T" = "New Tab"
+"Shift + Ctrl + N" = "New Window"
+"Shift + Ctrl + W" = "Close Tab"
+"Shift + Ctrl + Q" = "Close Window"

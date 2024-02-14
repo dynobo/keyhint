@@ -1,5 +1,6 @@
 id = "tmux"
 source = "https://github.com/gnunn1/tilix/blob/master/data/resources/ui/shortcuts.ui"
+include = ["cli"]
 
 [match]
 regex_process = "foot"

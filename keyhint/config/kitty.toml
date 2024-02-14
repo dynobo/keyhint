@@ -1,5 +1,6 @@
 id = "kitty"
 source = "https://sw.kovidgoyal.net/kitty/overview/"
+include = ["cli"]
 
 [match]
 regex_process = "kitty"
