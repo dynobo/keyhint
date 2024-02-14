@@ -7,6 +7,7 @@ import re
 import subprocess
 import tomllib
 import traceback
+from copy import deepcopy
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -63,21 +64,17 @@ def load_user_sheets() -> list[dict]:
 def _expand_includes(sheets: list[dict]) -> list[dict]:
     new_sheets = []
     for s in sheets:
-        if includes := s.get("include", []):
-            for include in includes:
-                included_sheets = [c for c in sheets if c["id"] == include]
-                if not included_sheets:
-                    message = (
-                        f"Cheatsheet ID '{included_sheets}' "
-                        f"included by '{s['id']}' not found!"
-                    )
-                    raise ValueError(message)
-                included_sheet = included_sheets[0]
-                included_sheet["section"] = {
-                    f"{included_sheet['id']} - {k}": v
-                    for k, v in included_sheet["section"].items()
-                }
-                s["section"].update(included_sheets[0]["section"])
+        for include in s.get("include", []):
+            included_sheets = [c for c in sheets if c["id"] == include]
+            if not included_sheets:
+                message = f"Cheatsheet '{include}' included by '{s['id']}' not found!"
+                raise ValueError(message)
+            included_sheet = deepcopy(included_sheets[0])
+            included_sheet["section"] = {
+                f"[{included_sheet['id']}] {k}": v
+                for k, v in included_sheet["section"].items()
+            }
+            s["section"].update(included_sheet["section"])
         new_sheets.append(s)
     return new_sheets
 
