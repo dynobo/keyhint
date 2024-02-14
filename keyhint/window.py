@@ -2,10 +2,16 @@
 
 Does the rendering of the cheatsheets as well interface actions.
 
-Sheet
-Section
-Binding
-Shortcut + Label
+Naming Hierarchy:
+1. Keyhint works with multiple cheatsheets, in short "Sheets".
+2. A single "Sheet" corresponds to one application and is rendered as one page in UI.
+   The sheet to render can be selected in the dropdown field. Each sheet has a
+   "Sheet ID" which must be unique.
+3. A "Sheet" consists of multiple "Sections", which group together shortcuts or commands
+   into a blocks. Each section has a section title.
+4. A "Section" consists of multiple "Bindings"
+5. A "Binding" consists of a "Shortcut", which contains the key combination or command,
+   and a "Label" which describes the combination/command.
 """
 
 import logging
