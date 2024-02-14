@@ -85,6 +85,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
         # Make sure the window is focused
         self.present()
+        self.focus_search_entry()
 
     def init_actions(self) -> None:
         """Add actions used by main menu."""
@@ -161,6 +162,16 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             self.header_bar_fullscreen.set_visible(True)
         else:
             self.header_bar_fullscreen.set_visible(False)
+        self.focus_search_entry()
+
+    def focus_search_entry(self) -> None:
+        """Focus search entry depending on state."""
+        if self.is_fullscreen():
+            self.search_entry_fullscreen.grab_focus()
+            self.search_entry_fullscreen.set_position(-1)
+        else:
+            self.search_entry.grab_focus()
+            self.search_entry.set_position(-1)
 
     def on_key_pressed(
         self,
