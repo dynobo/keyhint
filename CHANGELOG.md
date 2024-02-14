@@ -4,6 +4,7 @@
 
 - Fix duplicate IDs in included sections.
 - Fix error if launched with `--no-section-sort`
+- Focus search field on start.
 - Move generic CLI commands into separate cheatsheet and include it in terminal apps.
 
 ## v0.4.3 (2024-02-13)
