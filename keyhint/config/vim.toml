@@ -6,50 +6,78 @@ regex_process = "(foot|kitty|gnome-terminal)"
 regex_title = "^(n)?vim( .*)?$"
 
 [section]
-[section.Navigating]
-"f / F + {c}" = "Jump to next / previous char"
-"t / T + {c}" = "Move until next / previous char"
-"; / ," = "Go to next / previous occurance"
-"{ / }" = "Paragraph down / up"
-"Ctrl + D / U\"" = "Half page down / up"
-"gg / G" = "Jump to top/bottom of file"
-gd = "Jump to definition"
-gf = "Jump to file in import"
+
+[section."Verbs (Operators)"]
+"y / Y" = "Yank (copy) / until end"
+"p / ]p" = "Paste / and adjust indent"
+"d / D" = "Delete / until end"
+"c / C" = "Change / until end"
+"v / V" = "Visually select / whole line"
+"> / <" = "Add / remove indentation"
+
+[section.Modifiers]
+i = "Inner"
+a = "Around"
+"{int}" = "x times"
+"t / T + {c}" = "Toward next / previous char"
+"f / F + {c}" = "Find next / previous char"
+"/" = "Search"
+
+[section."Nouns (Motions)"]
+"Ctrl + d / u" = "Half page down / up"
+"H / M / L" = "Top / middle / bottom of screen"
+"0 / ^ / $" = "Line start / first non-blank / end"
+"* / #" = "Next / previous token under cursor"
+"b / B" = "Beginning of word / token"
+"w / W" = "Next word / token"
+"e / E" = "End of word / token"
+"} / {" = "Next paragraph / previous paragraph"
 "%" = "Jump to matching bracket"
+"{mod} + p" = "Paragraph"
+"{mod} + s" = "Sentence"
+"{mod} + b" = "Block"
+"{mod} + t" = "XML Tag"
+"{mod} + \"" = "Quoted string"
+"{mod} + ( / )" = "Paired brackets"
 
 [section.Search]
 "\\/ / ?" = "Search forward / backwards"
-"n / N" = "Jump to next / previous match"
+"n / N" = "Next / previous occurance"
 "* / #" = "Search next / previous word under cursor"
 
+[section.Navigating]
+gd = "Go to definition"
+gf = "Go to file in import"
+"gg / G" = "Go to top/bottom of file"
+5G = "Go to line 5"
+"+" = "Go to first char of next line"
+"ma / `a" = "Mark a / jump to a"
+
 [section.Editing]
-d = "Delete / whole line"
-c = "Change (delete + insert)"
-y = "Yank / whole line"
-p = "Paste"
-"Shift + i" = "Insert at beginning of line"
+"i / I" = "Insert before cursor / line"
+"a / A" = "Append after cursor / line"
+"o / O" = "Open new line below / above"
+"r / R" = "Replace char / and insert"
+"s / S" = "Substitute char / line"
+J = "Join lines"
+"x / X" = "Exterminate char under / before cursor"
+"u / Ctrl + r" = "Undo / redo"
+
+[section."Useful commands"]
 d5j = "Delete 5 lines downwards"
 "df\"" = "Delete in line until \""
 "dt\"" = "Delete in line until before \""
-"d/foo" = "Delete from cursor util foo"
-"> / <" = "Add / remove indentation"
-"=" = "Format code"
-"Ctrl + v & Up / Down" = "Visual block mode"
-"Shift + i & # & Esc" = "Comment selected visual block"
+ea = "Append to end of word"
+"d/foo" = "Delete from cursor until foo"
+ciw = "Change inner word"
+"gu / gU" = "Lowercase / uppercase"
+"Ctrl + v & j / k" = "Visual block select"
+"I & # & Esc" = "Comment selected visual block"
+"\"ayi\"" = "Yank inner \" to register a"
+"vi\"\"ap" = "Replace inner \" from register a"
 
 [section.Registers]
+"`\"ay`" = "yank to regesiter a"
+"`\"ap`" = "paste from register a"
 "`\"+y`" = "yank to system clipboard"
 "`\"+p`" = "paste from system clipboard"
-
-[section.Syntax]
-cc = "Double modify whole line"
-D = "Capitalize for stronger/alt"
-"{op} + a / i + {obj}" = "around / inner"
-ciw = "Change inner word"
-daw = "Delete a word"
-
-[section."surround.vim"]
-"ysiw)" = "Surround word under cursor with bracket"
-"yss)" = "Surround whole line with bracket"
-"cs)]" = "Change nearest brackets to squared brackets"
-"ds)" = "Delete surrounding brackets"
