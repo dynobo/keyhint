@@ -63,3 +63,12 @@ F10 = "Step over"
 [section."File/Tab Management"]
 "Ctrl + Tab" = "Switch between tabs"
 "Ctrl + P" = "Quick open file"
+
+[section."Extension = NeoVim"]
+"ma / mA" = "Multicursor after cursor / line"
+"mi / mI" = "Multicursor before cursor / line"
+"K" = "Show hover, repeat to focus hover"
+"gd" = "Goto definition"
+"gf" = "Goto declaration"
+"gH" = "Reference Search"
+"Ctrl + n / p" = "Next / previous list item"
