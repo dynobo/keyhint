@@ -62,25 +62,25 @@
       <object class="GtkBox" id="container">
         <property name="orientation">1</property>
         <child>
-          <object class="AdwHeaderBar" id="header_bar_fullscreen">
+          <object class="AdwHeaderBar" id="header_bar_fs">
             <property name="visible">False</property>
             <child type="start">
-              <object class="GtkDropDown" id="sheet_drop_down_fullscreen">
+              <object class="GtkDropDown" id="sheet_drop_down_fs">
                 <property name="can-focus">True</property>
                 <property name="model">
                   <object class="GtkStringList">
                     <items />
                   </object>
                 </property>
-                <signal name="notify::selected-item" handler="on_sheet_drop_down_fullscreen_changed"
+                <signal name="notify::selected-item" handler="on_sheet_drop_down_fs_changed"
                   swapped="no" />
               </object>
             </child>
             <child type="title">
-              <object class="GtkSearchEntry" id="search_entry_fullscreen">
+              <object class="GtkSearchEntry" id="search_entry_fs">
                 <property name="placeholder-text" translatable="true">Ctrl+F to filter...</property>
                 <property name="width-request">400</property>
-                <signal name="search-changed" handler="on_search_entry_fullscreen_changed" />
+                <signal name="search-changed" handler="on_search_entry_fs_changed" />
               </object>
             </child>
             <child type="end">
@@ -92,7 +92,7 @@
               </object>
             </child>
             <child type="end">
-              <object class="GtkToggleButton" id="fullscreen_button_fullscreen">
+              <object class="GtkToggleButton" id="fullscreen_button_fs">
                 <property name="icon-name">view-fullscreen-symbolic</property>
                 <property name="tooltip-text">Toggle fullscreen (F11)</property>
               </object>
