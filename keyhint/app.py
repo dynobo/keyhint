@@ -61,14 +61,6 @@ class Application(Adw.Application):
             "SHEET-ID",
         )
         self.add_main_option(
-            "no-fullscreen",
-            ord("f"),
-            GLib.OptionFlags.NONE,
-            GLib.OptionArg.NONE,
-            "Launch window in normal window state instead of fullscreen mode",
-            None,
-        )
-        self.add_main_option(
             "no-section-sort",
             ord("s"),
             GLib.OptionFlags.NONE,

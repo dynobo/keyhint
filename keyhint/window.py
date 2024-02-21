@@ -62,6 +62,9 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     sheet_drop_down_fullscreen: Gtk.DropDown = Gtk.Template.Child()
     search_entry_fullscreen: Gtk.SearchEntry = Gtk.Template.Child()
 
+    fullscreen_button = Gtk.Template.Child()
+    fullscreen_button_fullscreen = Gtk.Template.Child()
+
     max_shortcut_width = 0
 
     def __init__(self, cli_args: dict) -> None:
@@ -70,6 +73,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         logger.debug("Loaded %s cheatsheets.", len(self.sheets))
 
         self.cli_args = cli_args
+        self.config = keyhint.config.load()
 
         self.load_css()
         self.set_icon_name("keyhint")
@@ -82,12 +86,15 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.sheet_container_box.set_filter_func(self.filter_sections)
 
         self.connect("notify::fullscreened", self.on_fullscreen_state_event)
+        self.fullscreen_button.connect("clicked", lambda _: self.toggle_fullscreen())
+        self.fullscreen_button_fullscreen.connect(
+            "clicked", lambda _: self.toggle_fullscreen()
+        )
 
-        if self.cli_args.get("orientation", "vertical") == "horizontal":
+        if self.config["main"]["orientation"] == "horizontal":
             self.sheet_container_box.set_orientation(1)
 
-        if not self.cli_args.get("no-fullscreen", False):
-            self.fullscreen()
+        self.toggle_fullscreen(self.config["main"].getboolean("fullscreen", False))
 
         # Make sure the window is focused
         self.present()
@@ -156,6 +163,24 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.set_active_sheet(selected_item.get_string())
         self.populate_sheet_container()
 
+    def toggle_fullscreen(self, is_fullscreen: bool | None = None) -> None:
+        """Set the fullscreen state."""
+        if is_fullscreen is self.is_fullscreen():
+            return
+
+        if is_fullscreen is None:
+            is_fullscreen = not self.is_fullscreen()
+
+        self.fullscreen_button.set_active(is_fullscreen)
+        self.fullscreen_button_fullscreen.set_active(is_fullscreen)
+
+        if is_fullscreen:
+            self.fullscreen()
+        else:
+            self.unfullscreen()
+
+        self.config.set_persistent("main", "fullscreen", is_fullscreen)
+
     @Gtk.Template.Callback()
     def on_search_entry_changed(self, _: Gtk.SearchEntry) -> None:
         """Execute on change of the sheet selection dropdown."""
@@ -194,11 +219,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
                 else:
                     self.close()
             case Gdk.KEY_F11:
-                # Toggle fullscreen
-                if self.is_fullscreen():
-                    self.unfullscreen()
-                else:
-                    self.fullscreen()
+                self.toggle_fullscreen()
             case Gdk.KEY_f:
                 if modifier == Gdk.ModifierType.CONTROL_MASK:
                     # Focus search entry

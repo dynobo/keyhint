@@ -32,6 +32,7 @@ def _load_toml(file_path: str | os.PathLike) -> dict:
     except Exception as exc:
         print(exc)  # noqa: T201
         result = {}
+
     return result
 
 
@@ -53,7 +54,7 @@ def load_user_sheets() -> list[dict]:
         List[dict]: List of application keyhints and meta info.
     """
     if config_path := get_users_config_path():
-        files = (config_path / "keyhint").glob("*.toml")
+        files = config_path.glob("*.toml")
         sheets = [_load_toml(f) for f in files]
         sheets = sorted(sheets, key=lambda k: k["id"])
     else:
@@ -238,16 +239,16 @@ def is_using_wayland() -> bool:
     return "WAYLAND_DISPLAY" in os.environ
 
 
-def get_users_config_path() -> Path | None:
+def get_users_config_path() -> Path:
     """Retrieve path for config files.
 
     Returns:
         Path -- Root of config folder
     """
     if xdg_conf := os.getenv("XDG_CONFIG_HOME", None):
-        return Path(xdg_conf)
+        return Path(xdg_conf) / "keyhint"
 
-    return Path.home() / ".config"
+    return Path.home() / ".config" / "keyhint"
 
 
 def detect_active_window() -> tuple[str, str]:
