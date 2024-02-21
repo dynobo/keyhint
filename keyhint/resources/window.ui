@@ -50,6 +50,12 @@
             <property name="menu-model">window_menu</property>
           </object>
         </child>
+        <child type="end">
+          <object class="GtkToggleButton" id="fullscreen_button">
+            <property name="icon-name">view-fullscreen-symbolic</property>
+            <property name="tooltip-text">Toggle fullscreen (F11)</property>
+          </object>
+        </child>
       </object>
     </property>
     <child>
@@ -83,6 +89,12 @@
                 <property name="tooltip-text" translatable="true">Main Menu</property>
                 <property name="primary">true</property>
                 <property name="menu-model">window_menu</property>
+              </object>
+            </child>
+            <child type="end">
+              <object class="GtkToggleButton" id="fullscreen_button_fullscreen">
+                <property name="icon-name">view-fullscreen-symbolic</property>
+                <property name="tooltip-text">Toggle fullscreen (F11)</property>
               </object>
             </child>
           </object>
