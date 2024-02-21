@@ -1,0 +1,31 @@
+id = "forge"
+source = "https://github.com/forge-ext/forge"
+
+[match]
+regex_process = ""
+regex_title = ""
+
+[section]
+
+[section."Move window"]
+"Super + Shift + hjkl" = "Move window"
+"Super + Ctrl + hjkl" = "Swap window"
+"Super + Enter" = "Swap with last active"
+"Super + g" = "Toggle vertical/horizontal"
+"Super + c" = "Toggle floating"
+
+[section.Navigation]
+"Super + Direction" = "Move focus"
+"Super + Ctrl + UpDown" = "Navigate between workspaces"
+
+[section."Manipulate window"]
+"Super + q" = "Quit"
+"Super + Ctrl + yuio" = "Increase size left / bottom / top / right /"
+"Super + Ctrl + Shift + yuio" = "Decrease size left / bottom / top / right /"
+
+[section."Manage workspaces"]
+
+[section.Miscellaneous]
+"Super + Tab" = "Switch apps"
+"Alt + F2" = "Run command"
+"Ctrl + Alt + Del" = "Logout"
