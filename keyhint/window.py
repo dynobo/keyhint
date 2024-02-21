@@ -58,12 +58,12 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     search_entry: Gtk.SearchEntry = Gtk.Template.Child()
     scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()
 
-    header_bar_fullscreen: Adw.HeaderBar = Gtk.Template.Child()
-    sheet_drop_down_fullscreen: Gtk.DropDown = Gtk.Template.Child()
-    search_entry_fullscreen: Gtk.SearchEntry = Gtk.Template.Child()
+    header_bar_fs: Adw.HeaderBar = Gtk.Template.Child()
+    sheet_drop_down_fs: Gtk.DropDown = Gtk.Template.Child()
+    search_entry_fs: Gtk.SearchEntry = Gtk.Template.Child()
 
     fullscreen_button = Gtk.Template.Child()
-    fullscreen_button_fullscreen = Gtk.Template.Child()
+    fullscreen_button_fs = Gtk.Template.Child()
 
     max_shortcut_width = 0
 
@@ -87,9 +87,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
         self.connect("notify::fullscreened", self.on_fullscreen_state_event)
         self.fullscreen_button.connect("clicked", lambda _: self.toggle_fullscreen())
-        self.fullscreen_button_fullscreen.connect(
-            "clicked", lambda _: self.toggle_fullscreen()
-        )
+        self.fullscreen_button_fs.connect("clicked", lambda _: self.toggle_fullscreen())
 
         if self.config["main"]["orientation"] == "horizontal":
             self.sheet_container_box.set_orientation(1)
@@ -120,10 +118,10 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             model.append(sheet_id)
 
         # Use the same model for the fullscreen dropdown and bind changes
-        self.sheet_drop_down_fullscreen.set_model(model)
+        self.sheet_drop_down_fs.set_model(model)
         self.sheet_drop_down.bind_property(
             "selected",
-            self.sheet_drop_down_fullscreen,
+            self.sheet_drop_down_fs,
             "selected",
             GObject.BindingFlags.BIDIRECTIONAL,
         )
@@ -136,7 +134,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def init_search_entry(self) -> None:
         """Let search entry capture key events."""
         # Bind changes between search entries in header bar and for fullscreen
-        self.search_entry_fullscreen.bind_property(
+        self.search_entry_fs.bind_property(
             "text",
             self.search_entry,
             "text",
@@ -149,7 +147,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         # Reusing the same evk leads to critical assertion error
         evk = Gtk.EventControllerKey()
         evk.connect("key-pressed", self.on_search_entry_key_pressed)
-        self.search_entry_fullscreen.add_controller(evk)
+        self.search_entry_fs.add_controller(evk)
 
     @Gtk.Template.Callback()
     def on_sheet_drop_down_changed(
@@ -172,7 +170,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             is_fullscreen = not self.is_fullscreen()
 
         self.fullscreen_button.set_active(is_fullscreen)
-        self.fullscreen_button_fullscreen.set_active(is_fullscreen)
+        self.fullscreen_button_fs.set_active(is_fullscreen)
 
         if is_fullscreen:
             self.fullscreen()
@@ -190,16 +188,16 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def on_fullscreen_state_event(self, _: Gtk.Widget, __: GObject.Parameter) -> None:
         """Hide header bar in title and show it in window instead, and vice versa."""
         if self.is_fullscreen():
-            self.header_bar_fullscreen.set_visible(True)
+            self.header_bar_fs.set_visible(True)
         else:
-            self.header_bar_fullscreen.set_visible(False)
+            self.header_bar_fs.set_visible(False)
         self.focus_search_entry()
 
     def focus_search_entry(self) -> None:
         """Focus search entry depending on state."""
         if self.is_fullscreen():
-            self.search_entry_fullscreen.grab_focus()
-            self.search_entry_fullscreen.set_position(-1)
+            self.search_entry_fs.grab_focus()
+            self.search_entry_fs.set_position(-1)
         else:
             self.search_entry.grab_focus()
             self.search_entry.set_position(-1)
@@ -224,7 +222,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
                 if modifier == Gdk.ModifierType.CONTROL_MASK:
                     # Focus search entry
                     if self.is_fullscreen():
-                        self.search_entry_fullscreen.grab_focus()
+                        self.search_entry_fs.grab_focus()
                     else:
                         self.search_entry.grab_focus()
             case Gdk.KEY_s:
