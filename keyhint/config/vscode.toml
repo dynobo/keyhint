@@ -23,6 +23,9 @@ regex_title = ".*"
 "Ctrl + Shift + M" = "Toggle problems"
 "Ctrl + Shift + Y" = "Toggle debug console"
 
+[section.View]
+"Ctrl + K + Z" = "Zen mode"
+
 [section."Basic Editing"]
 "Ctrl + L" = "Select current line"
 "Ctrl + Backspace" = "Delete last word"
