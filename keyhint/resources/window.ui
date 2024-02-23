@@ -4,19 +4,87 @@
   <!-- interface-name window.ui -->
   <requires lib="gtk" version="4.0" />
   <requires lib="libadwaita" version="1.4" />
-  <menu id="window_menu">
-    <section>
-      <item>
-        <attribute name="label" translatable="true">Developer Documentation</attribute>
-        <attribute name="action">win.open_uri</attribute>
-        <attribute name="target">https://developer.gnome.org/documentation/index.html</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="true">About App</attribute>
-        <attribute name="action">win.about</attribute>
-      </item>
-    </section>
-  </menu>
+  <object class="GtkPopover" id="popover_menu">
+    <property name="name">popover_menu</property>
+    <property name="width-request">250</property>
+    <property name="child">
+      <object class="GtkBox" id="popover_menu_box">
+        <property name="name">popover_menu_box</property>
+        <property name="orientation">1</property>
+        <child>
+          <object class="GtkLabel">
+            <property name="label">Orientation:</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox" id="orientation_toggle_box">
+            <property name="orientation">0</property>
+            <property name="homogeneous">true</property>
+            <property name="vexpand">false</property>
+            <property name="halign">3</property>
+            <property name="margin-top">3</property>
+            <property name="margin-bottom">6</property>
+            <property name="spacing">6</property>
+            <child>
+              <object class="GtkToggleButton" id="orientation_vertical">
+                <property name="tooltip_text" translatable="yes">Smooth shapes</property>
+                <property name="vexpand">true</property>
+                <property name="active">true</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">Vertical</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkToggleButton" id="orientation_horizontal">
+                <property name="tooltip_text" translatable="yes">Rough shapes</property>
+                <property name="vexpand">true</property>
+                <property name="group">orientation_vertical</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">Horizontal</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkSpinButton" id="amount_stp">
+            <property name="visible">True</property>
+            <property name="sensitive">False</property>
+            <property name="can-focus">True</property>
+            <property name="hexpand">True</property>
+            <property name="width-chars">12</property>
+            <property name="text" translatable="yes">0.000000</property>
+            <property name="digits">8</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="has-frame">0</property>
+            <property name="label" translatable="true">Debug Info</property>
+            <property name="action-name">win.debug</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="has-frame">0</property>
+            <property name="label" translatable="true">About Keyhint</property>
+            <property name="action-name">win.about</property>
+          </object>
+        </child>
+      </object>
+    </property>
+  </object>
   <template class="main_window" parent="GtkApplicationWindow">
     <property name="height-request">300</property>
     <property name="width-request">800</property>
@@ -46,8 +114,7 @@
           <object class="GtkMenuButton">
             <property name="icon-name">open-menu-symbolic</property>
             <property name="tooltip-text" translatable="true">Main Menu</property>
-            <property name="primary">true</property>
-            <property name="menu-model">window_menu</property>
+            <property name="popover">popover_menu</property>
           </object>
         </child>
         <child type="end">
@@ -87,8 +154,7 @@
               <object class="GtkMenuButton">
                 <property name="icon-name">open-menu-symbolic</property>
                 <property name="tooltip-text" translatable="true">Main Menu</property>
-                <property name="primary">true</property>
-                <property name="menu-model">window_menu</property>
+                <property name="popover">popover_menu</property>
               </object>
             </child>
             <child type="end">

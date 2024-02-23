@@ -89,9 +89,8 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.fullscreen_button.connect("clicked", lambda _: self.toggle_fullscreen())
         self.fullscreen_button_fs.connect("clicked", lambda _: self.toggle_fullscreen())
 
-        if self.config["main"]["orientation"] == "horizontal":
-            self.sheet_container_box.set_orientation(1)
-
+        # Apply configuration
+        self.toggle_orientation(self.config["main"].get("orientation", "horizontal"))
         self.toggle_fullscreen(self.config["main"].getboolean("fullscreen", False))
 
         # Make sure the window is focused
@@ -160,6 +159,21 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
         self.set_active_sheet(selected_item.get_string())
         self.populate_sheet_container()
+
+    def toggle_orientation(self, orientation: str | None = None) -> None:
+        """Set the orientation of the sheet container."""
+        if orientation is None:
+            orientation = self.sheet_container_box.get_orientation().value_nick
+
+        # The used GTK orientation is the opposite of the config value, which follows
+        # the naming from user perspective!
+        gtk_orientation = (
+            Gtk.Orientation.VERTICAL
+            if orientation == "horizontal"
+            else Gtk.Orientation.HORIZONTAL
+        )
+        self.sheet_container_box.set_orientation(gtk_orientation)
+        self.config.set_persistent("main", "orientation", orientation)
 
     def toggle_fullscreen(self, is_fullscreen: bool | None = None) -> None:
         """Set the fullscreen state."""

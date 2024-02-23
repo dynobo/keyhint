@@ -24,6 +24,11 @@
   filter: unset;
 }
 
+#popover_menu_box > list > row {
+  border-radius: 10px;
+}
+
+.transparent,
 .bindings-section,
 .bindings-section .view {
   background-color: transparent;
