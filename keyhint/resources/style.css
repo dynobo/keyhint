@@ -24,8 +24,12 @@
   filter: unset;
 }
 
-#popover_menu_box > list > row {
+.popover_menu_box > list > row {
   border-radius: 10px;
+}
+
+.popover_menu_box .menu_entry {
+  font-weight: normal;
 }
 
 .transparent,

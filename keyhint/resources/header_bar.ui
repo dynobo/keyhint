@@ -1,0 +1,219 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.16.0 -->
+<interface>
+  <!-- interface-name headerbar.ui -->
+  <requires lib="gtk" version="4.0" />
+  <requires lib="libadwaita" version="1.4" />
+  <object class="GtkPopover" id="popover_menu">
+    <property name="name">popover_menu</property>
+    <property name="width-request">250</property>
+    <property name="child">
+      <object class="GtkBox">
+        <property name="name">popover_menu_box</property>
+        <property name="orientation">1</property>
+        <style>
+          <class name="popover_menu_box" />
+        </style>
+        <child>
+          <object class="GtkLabel">
+            <property name="label">Section Sorting</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">0</property>
+            <property name="homogeneous">true</property>
+            <property name="halign">3</property>
+            <property name="margin-top">4</property>
+            <property name="margin-bottom">12</property>
+            <property name="spacing">6</property>
+            <child>
+              <object class="GtkToggleButton" id="sort_by_size_button">
+                <property name="tooltip_text" translatable="yes">Smooth shapes</property>
+                <property name="active">true</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">By Size</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkToggleButton" id="sort_by_title_button">
+                <property name="tooltip_text" translatable="yes">Rough shapes</property>
+                <property name="group">sort_by_size_button</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">By Title</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="label">Scroll Direction</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">0</property>
+            <property name="homogeneous">true</property>
+            <property name="halign">3</property>
+            <property name="margin-top">4</property>
+            <property name="margin-bottom">12</property>
+            <property name="spacing">6</property>
+            <child>
+              <object class="GtkToggleButton" id="scroll_vertical_button">
+                <property name="tooltip_text" translatable="yes">Smooth shapes</property>
+                <property name="active">true</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">Vertical</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkToggleButton" id="scroll_horizontal_button">
+                <property name="tooltip_text" translatable="yes">Rough shapes</property>
+                <property name="group">scroll_vertical_button</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">Horizontal</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="label">Zoom</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkSpinButton" id="zoom_spin_button">
+            <property name="margin-top">4</property>
+            <property name="margin-bottom">12</property>
+            <property name="halign">3</property>
+            <property name="value">100</property>
+            <property name="climb-rate">1</property>
+            <property name="digits">0</property>
+            <property name="adjustment">
+              <object class="GtkAdjustment">
+                <property name="lower">50</property>
+                <property name="upper">200</property>
+                <property name="step-increment">10</property>
+                <property name="value">100</property>
+              </object>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="label">Fallback Cheatsheet</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkEntry" id="fallback_sheet_entry">
+            <property name="halign">3</property>
+            <property name="margin-top">4</property>
+            <property name="margin-bottom">12</property>
+            <property name="placeholder-text">Type cheatsheet id...</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="margin-top">4</property>
+            <property name="margin-bottom">6</property>
+            <property name="can_focus">False</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="has-frame">0</property>
+            <property name="action-name">win.about</property>
+            <style>
+              <class name="menu_entry" />
+            </style>
+            <child>
+              <object class="GtkLabel">
+                <property name="label" translatable="yes">Open Cheatsheet Folder...</property>
+                <property name="xalign">0</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="has-frame">0</property>
+            <property name="action-name">win.about</property>
+            <style>
+              <class name="menu_entry" />
+            </style>
+            <child>
+              <object class="GtkLabel">
+                <property name="label" translatable="yes">Debug Info</property>
+                <property name="xalign">0</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="has-frame">0</property>
+            <property name="action-name">win.about</property>
+            <style>
+              <class name="menu_entry" />
+            </style>
+            <child>
+              <object class="GtkLabel">
+                <property name="label" translatable="yes">About Keyhint</property>
+                <property name="xalign">0</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+  </object>
+
+  <template class="header_bar" parent="GtkBox">
+    <child>
+      <object class="AdwHeaderBar" id="adwheaderbar">
+        <property name="hexpand">true</property>
+        <child type="start">
+          <object class="GtkDropDown" id="sheet_drop_down">
+            <property name="can-focus">True</property>
+            <property name="model">
+              <object class="GtkStringList">
+                <items />
+              </object>
+            </property>
+          </object>
+        </child>
+        <child type="title">
+          <object class="GtkSearchEntry" id="search_entry">
+            <property name="placeholder-text" translatable="true">Ctrl+F to filter...</property>
+            <property name="width-request">400</property>
+          </object>
+        </child>
+        <child type="end">
+          <object class="GtkMenuButton">
+            <property name="icon-name">open-menu-symbolic</property>
+            <property name="tooltip-text" translatable="true">Main Menu</property>
+            <property name="popover">popover_menu</property>
+          </object>
+        </child>
+        <child type="end">
+          <object class="GtkToggleButton" id="fullscreen_button">
+            <property name="icon-name">view-fullscreen-symbolic</property>
+            <property name="tooltip-text">Toggle fullscreen (F11)</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

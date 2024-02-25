@@ -20,7 +20,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk
+from gi.repository import Adw, Gdk, Gio, GObject, Gtk
 
 import keyhint
 
@@ -41,29 +41,45 @@ class BindingsRow(GObject.Object):
         self.filter_text = f"{shortcut} {label} {section}"
 
 
+@Gtk.Template(filename=f"{RESOURCE_PATH}/header_bar.ui")
+class HeaderBar(Gtk.Box):
+    __gtype_name__ = "header_bar"
+
+    sheet_drop_down: Gtk.DropDown = Gtk.Template.Child()
+    search_entry: Gtk.SearchEntry = Gtk.Template.Child()
+    fullscreen_button = Gtk.Template.Child()
+    adwheaderbar: Adw.HeaderBar = Gtk.Template.Child()
+    sort_by_size_button = Gtk.Template.Child()
+    sort_by_title_button = Gtk.Template.Child()
+    scroll_vertical_button = Gtk.Template.Child()
+    scroll_horizontal_button = Gtk.Template.Child()
+    zoom_spin_button = Gtk.Template.Child()
+    fallback_sheet_entry: Gtk.Entry = Gtk.Template.Child()
+
+    def __init__(self, visible: bool = True, decoration: str | None = None) -> None:
+        super().__init__()
+        self.set_visible(visible)
+        if decoration:
+            self.adwheaderbar.set_decoration_layout(decoration)
+
+
 @Gtk.Template(filename=f"{RESOURCE_PATH}/window.ui")
 class KeyhintWindow(Gtk.ApplicationWindow):
     """Handler for main ApplicationWindow."""
 
     __gtype_name__ = "main_window"
 
-    sheets: list[dict] = keyhint.utils.load_sheets()
+    sheets: list[dict] = keyhint.sheets.load_sheets()
     dialog_is_open: bool = False
     wm_class: str = ""
     window_title: str = ""
     sheet_id: str = ""
+    ignore_search_changed: bool = False
+    search_text: str = ""
 
-    sheet_drop_down: Gtk.DropDown = Gtk.Template.Child()
-    sheet_container_box: Gtk.FlowBox = Gtk.Template.Child()
-    search_entry: Gtk.SearchEntry = Gtk.Template.Child()
     scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()
-
-    header_bar_fs: Adw.HeaderBar = Gtk.Template.Child()
-    sheet_drop_down_fs: Gtk.DropDown = Gtk.Template.Child()
-    search_entry_fs: Gtk.SearchEntry = Gtk.Template.Child()
-
-    fullscreen_button = Gtk.Template.Child()
-    fullscreen_button_fs = Gtk.Template.Child()
+    container: Gtk.Box = Gtk.Template.Child()
+    sheet_container_box: Gtk.FlowBox = Gtk.Template.Child()
 
     max_shortcut_width = 0
 
@@ -78,24 +94,58 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.load_css()
         self.set_icon_name("keyhint")
 
+        # Add normal header bar
+        self.headerbar = HeaderBar()
+        self.set_titlebar(self.headerbar)
+
+        # Add second header bar which is only visible in fullscreen mode
+        self.headerbar_fs = HeaderBar(decoration=":minimize,close", visible=False)
+        self.container.prepend(self.headerbar_fs)
+
+        # Set up the controls
+        self.init_signals()
         self.init_actions()
+        self.init_binds()
         self.init_sheet_drop_down()
         self.init_search_entry()
         self.init_event_controller_key()
 
-        self.sheet_container_box.set_filter_func(self.filter_sections)
-
-        self.connect("notify::fullscreened", self.on_fullscreen_state_event)
-        self.fullscreen_button.connect("clicked", lambda _: self.toggle_fullscreen())
-        self.fullscreen_button_fs.connect("clicked", lambda _: self.toggle_fullscreen())
-
-        # Apply configuration
+        # Apply loaded configuration
         self.toggle_orientation(self.config["main"].get("orientation", "horizontal"))
         self.toggle_fullscreen(self.config["main"].getboolean("fullscreen", False))
 
         # Make sure the window is focused
         self.present()
         self.focus_search_entry()
+
+    def init_signals(self) -> None:
+        """Connect signals to methods."""
+        # Fullscreen button
+        self.headerbar.fullscreen_button.connect(
+            "clicked", lambda _: self.toggle_fullscreen()
+        )
+        self.headerbar_fs.fullscreen_button.connect(
+            "clicked", lambda _: self.toggle_fullscreen()
+        )
+
+        # Search entry
+        self.search_changed_handler = self.headerbar.search_entry.connect(
+            "search-changed", self.on_search_entry_changed
+        )
+        self.search_fs_changed_handler = self.headerbar_fs.search_entry.connect(
+            "search-changed", self.on_search_entry_changed
+        )
+
+        # Sheet drop down
+        self.headerbar.sheet_drop_down.connect(
+            "notify::selected-item", self.on_sheet_drop_down_changed
+        )
+
+        # Sheets filter
+        self.sheet_container_box.set_filter_func(self.filter_sections)
+
+        # Window state
+        self.connect("notify::fullscreened", self.on_fullscreen_state_changed)
 
     def init_actions(self) -> None:
         """Add actions used by main menu."""
@@ -112,58 +162,65 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def init_sheet_drop_down(self) -> None:
         """Populate dropdown and select appropriate sheet."""
         # Populate the model with sheet ids
-        model = self.sheet_drop_down.get_model()
+        model = self.headerbar.sheet_drop_down.get_model()
         for sheet_id in sorted([s["id"] for s in self.sheets]):
             model.append(sheet_id)
 
         # Use the same model for the fullscreen dropdown and bind changes
-        self.sheet_drop_down_fs.set_model(model)
-        self.sheet_drop_down.bind_property(
-            "selected",
-            self.sheet_drop_down_fs,
-            "selected",
-            GObject.BindingFlags.BIDIRECTIONAL,
-        )
+        self.headerbar_fs.sheet_drop_down.set_model(model)
 
         # Select entry with appropriate sheet id
-        drop_down_strings = [s.get_string() for s in self.sheet_drop_down.get_model()]
+        drop_down_strings = [
+            s.get_string() for s in self.headerbar.sheet_drop_down.get_model()
+        ]
         select_idx = drop_down_strings.index(self.get_appropriate_sheet_id())
-        self.sheet_drop_down.set_selected(select_idx)
+        self.headerbar.sheet_drop_down.set_selected(select_idx)
 
     def init_search_entry(self) -> None:
         """Let search entry capture key events."""
         # Bind changes between search entries in header bar and for fullscreen
-        self.search_entry_fs.bind_property(
-            "text",
-            self.search_entry,
-            "text",
-            GObject.BindingFlags.BIDIRECTIONAL,
-        )
         evk = Gtk.EventControllerKey()
         evk.connect("key-pressed", self.on_search_entry_key_pressed)
-        self.search_entry.add_controller(evk)
+        self.headerbar.search_entry.add_controller(evk)
 
         # Reusing the same evk leads to critical assertion error
         evk = Gtk.EventControllerKey()
         evk.connect("key-pressed", self.on_search_entry_key_pressed)
-        self.search_entry_fs.add_controller(evk)
+        self.headerbar_fs.search_entry.add_controller(evk)
 
-    @Gtk.Template.Callback()
+    def init_binds(self) -> None:
+        """Bind properties of controls between both header bars."""
+        widgets = [
+            ("sort_by_size_button", "active"),
+            ("sort_by_title_button", "active"),
+            ("scroll_vertical_button", "active"),
+            ("scroll_horizontal_button", "active"),
+            ("zoom_spin_button", "value"),
+            ("fallback_sheet_entry", "text"),
+            ("sheet_drop_down", "selected"),
+        ]
+        for widget, prop in widgets:
+            getattr(self.headerbar, widget).bind_property(
+                prop,
+                getattr(self.headerbar_fs, widget),
+                prop,
+                GObject.BindingFlags.BIDIRECTIONAL,
+            )
+
     def on_sheet_drop_down_changed(
         self, drop_down: Gtk.DropDown, _: GObject.Parameter
     ) -> None:
         """Execute on change of the sheet selection dropdown."""
-        selected_item = drop_down.get_selected_item()
-        if not selected_item:
+        if not (selected_item := drop_down.get_selected_item()):
             return
 
-        self.set_active_sheet(selected_item.get_string())
+        self.sheet_id = selected_item.get_string()
         self.populate_sheet_container()
 
     def toggle_orientation(self, orientation: str | None = None) -> None:
         """Set the orientation of the sheet container."""
-        if orientation is None:
-            orientation = self.sheet_container_box.get_orientation().value_nick
+        if not orientation:
+            orientation = str(self.sheet_container_box.get_orientation().value_nick)
 
         # The used GTK orientation is the opposite of the config value, which follows
         # the naming from user perspective!
@@ -175,46 +232,66 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.sheet_container_box.set_orientation(gtk_orientation)
         self.config.set_persistent("main", "orientation", orientation)
 
-    def toggle_fullscreen(self, is_fullscreen: bool | None = None) -> None:
+    def toggle_fullscreen(self, to_fullscreen: bool | None = None) -> None:
         """Set the fullscreen state."""
-        if is_fullscreen is self.is_fullscreen():
+        if to_fullscreen is self.is_fullscreen():
             return
 
-        if is_fullscreen is None:
-            is_fullscreen = not self.is_fullscreen()
+        if to_fullscreen is None:
+            to_fullscreen = not self.is_fullscreen()
 
-        self.fullscreen_button.set_active(is_fullscreen)
-        self.fullscreen_button_fs.set_active(is_fullscreen)
+        self.headerbar.fullscreen_button.set_active(to_fullscreen)
+        self.headerbar_fs.fullscreen_button.set_active(to_fullscreen)
 
-        if is_fullscreen:
+        self.ignore_search_changed = True
+        if to_fullscreen:
+            self.headerbar_fs.search_entry.set_text(self.search_text)
             self.fullscreen()
         else:
+            self.headerbar.search_entry.set_text(self.search_text)
             self.unfullscreen()
 
-        self.config.set_persistent("main", "fullscreen", is_fullscreen)
+        self.config.set_persistent("main", "fullscreen", to_fullscreen)
 
-    @Gtk.Template.Callback()
-    def on_search_entry_changed(self, _: Gtk.SearchEntry) -> None:
-        """Execute on change of the sheet selection dropdown."""
-        self.list_view_filter.changed(Gtk.FilterChange.DIFFERENT)
-        self.sheet_container_box.invalidate_filter()
-
-    def on_fullscreen_state_event(self, _: Gtk.Widget, __: GObject.Parameter) -> None:
+    def on_fullscreen_state_changed(self, _: Gtk.Widget, __: GObject.Parameter) -> None:
         """Hide header bar in title and show it in window instead, and vice versa."""
         if self.is_fullscreen():
-            self.header_bar_fs.set_visible(True)
+            self.headerbar_fs.set_visible(True)
         else:
-            self.header_bar_fs.set_visible(False)
+            self.headerbar_fs.set_visible(False)
         self.focus_search_entry()
 
     def focus_search_entry(self) -> None:
         """Focus search entry depending on state."""
         if self.is_fullscreen():
-            self.search_entry_fs.grab_focus()
-            self.search_entry_fs.set_position(-1)
+            self.headerbar_fs.search_entry.grab_focus()
+            self.headerbar_fs.search_entry.set_position(-1)
         else:
-            self.search_entry.grab_focus()
-            self.search_entry.set_position(-1)
+            self.headerbar.search_entry.grab_focus()
+            self.headerbar.search_entry.set_position(-1)
+
+    def on_search_entry_changed(self, search_entry: Gtk.SearchEntry) -> None:
+        """Execute on change of the sheet selection dropdown."""
+        if self.ignore_search_changed:
+            self.ignore_search_changed = False
+            return
+
+        if search_entry.get_text() == self.search_text:
+            return
+
+        self.search_text = search_entry.get_text()
+        self.list_view_filter.changed(Gtk.FilterChange.DIFFERENT)
+        self.sheet_container_box.invalidate_filter()
+
+    def on_search_entry_key_pressed(
+        self,
+        evk: Gtk.EventControllerKey,
+        keycode,  # noqa: ANN001
+        keyval,  # noqa: ANN001
+        modifier,  # noqa: ANN001
+    ) -> None:
+        if keycode == Gdk.KEY_Escape:
+            self.close()
 
     def on_key_pressed(
         self,
@@ -256,16 +333,6 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             case Gdk.KEY_Page_Down:
                 self.scroll(to_start=False, by_page=True)
 
-    def on_search_entry_key_pressed(
-        self,
-        evk: Gtk.EventControllerKey,
-        keycode,  # noqa: ANN001
-        keyval,  # noqa: ANN001
-        modifier,  # noqa: ANN001
-    ) -> None:
-        if keycode == Gdk.KEY_Escape:
-            self.close()
-
     def on_about_action(self, _: Gio.SimpleAction, __: None) -> None:
         """Execute on click "about" in application menu."""
         self.dialog_is_open = True
@@ -286,38 +353,33 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def filter_sections(self, child: Gtk.Widget) -> bool:
         """Filter binding sections based on the search entry text."""
         # If no text, show all sections
-        search_text = self.search_entry.get_text()
-        if not search_text:
+        if not self.search_text:
             return True
 
         # If text, show only sections with 1 or more visible bindings
         column_view = child.get_child()
         selection = column_view.get_model()
         filter_model = selection.get_model()
-        count_items = filter_model.get_n_items()
-        return count_items > 0
+        return filter_model.get_n_items() > 0
 
     def scroll(self, to_start: bool, by_page: bool) -> None:
-        default_distance = 25
-        vadj = self.scrolled_window.get_vadjustment()
-        hadj = self.scrolled_window.get_hadjustment()
-        h_distance = hadj.get_page_size() if by_page else default_distance
-        v_distance = vadj.get_page_size() if by_page else default_distance
-
-        if to_start:
-            h_distance *= -1
-            v_distance *= -1
-
         if self.sheet_container_box.get_orientation() == 1:
-            hadj.set_value(hadj.get_value() + h_distance)
+            adj = self.scrolled_window.get_hadjustment()
         else:
-            vadj.set_value(vadj.get_value() + v_distance)
+            adj = self.scrolled_window.get_vadjustment()
+
+        default_distance = 25
+        distance = adj.get_page_size() if by_page else default_distance
+        if to_start:
+            distance *= -1
+
+        adj.set_value(adj.get_value() + distance)
 
     def get_sheet_by_id(self, sheet_id: str) -> dict[str, Any]:
         return next(sheet for sheet in self.sheets if sheet["id"] == sheet_id)
 
     def get_sheet_id_by_active_window(self) -> str | None:
-        self.wm_class, self.window_title = keyhint.utils.detect_active_window()
+        self.wm_class, self.window_title = keyhint.context.detect_active_window()
 
         matching_sheets = [
             h
@@ -375,54 +437,28 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             self.get_display(), provider, Gtk.STYLE_PROVIDER_PRIORITY_USER
         )
 
-    @staticmethod
-    def create_shortcut(text: str) -> Gtk.Box:
-        box = Gtk.Box(
-            orientation=Gtk.Orientation.HORIZONTAL, spacing=6, halign=Gtk.Align.END
-        )
-        keys = [text.replace("`", "")] if text.startswith("`") else text.split()
-        for k in keys:
-            key = keyhint.utils.replace_keys(k.strip())
-            label = Gtk.Label()
-            if key in ["+", "/", "&"]:
-                label.set_css_classes(["dim-label"])
-            else:
-                key = key.replace("\\/", "/")
-                key = key.replace("\\+", "+")
-                key = key.replace("\\&", "&")
-                label.set_css_classes(["keycap"])
-            label.set_markup(f"{GLib.markup_escape_text(key)}")
-            box.append(label)
-        return box
-
-    @staticmethod
-    def create_section_title(text: str) -> Gtk.Label:
-        label = Gtk.Label(xalign=0.0)
-        label.set_markup(f"<b>{text}</b>")
-        return label
-
     def bind_shortcuts_callback(
-        self, factory: Gtk.SignalListItemFactory, item: Gtk.Widget
+        self, _: Gtk.SignalListItemFactory, item: Gtk.Widget
     ) -> None:
-        shortcut = self.create_shortcut(item.get_item().shortcut)
+        shortcut = keyhint.utils.create_shortcut(item.get_item().shortcut)
         self.max_shortcut_width = max(
             self.max_shortcut_width, shortcut.get_preferred_size().natural_size.width
         )
         item.set_child(shortcut)
 
     def bind_labels_callback(
-        self, factory: Gtk.SignalListItemFactory, item: Gtk.Widget
+        self, _: Gtk.SignalListItemFactory, item: Gtk.Widget
     ) -> None:
         label = item.get_item().label
         if item.get_item().shortcut:
             child = Gtk.Label(label=label, xalign=0.0)
         else:
-            child = self.create_section_title(label)
+            child = keyhint.utils.create_section_title(label)
         item.set_child(child)
 
     def list_view_match_func(self, bindings_row: BindingsRow) -> bool:
-        if search_text := self.search_entry.get_text():
-            return search_text.lower() in bindings_row.filter_text.lower()
+        if self.search_text:
+            return self.search_text.lower() in bindings_row.filter_text.lower()
         return True
 
     def create_list_item_factory(self, callback: Callable) -> Gtk.SignalListItemFactory:
@@ -456,6 +492,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         return column_view
 
     def populate_sheet_container(self) -> None:
+        # TODO: Simplify method
         if hasattr(self.sheet_container_box, "remove_all") and False:
             # Only available in GTK 4.12+
             self.sheet_container_box.remove_all()
@@ -463,7 +500,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             while child := self.sheet_container_box.get_first_child():
                 self.sheet_container_box.remove(child)
 
-        sheet_id = self.sheet_drop_down.get_selected_item().get_string()
+        sheet_id = self.headerbar.sheet_drop_down.get_selected_item().get_string()
         sheet = self.get_sheet_by_id(sheet_id)
 
         shortcut_column_factory = self.create_list_item_factory(
@@ -509,13 +546,6 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             section_child.set_child(column_view)
 
             self.sheet_container_box.append(section_child)
-
-    def set_active_sheet(self, sheet_id: str) -> None:
-        # TODO: Do I need sheet_id and active_sheet?
-        if sheet_id == self.sheet_id:
-            return
-        self.sheet_id = sheet_id
-        self.active_sheet = self.get_sheet_by_id(self.sheet_id)
 
     def get_debug_info(self) -> str:
         text = "Active Window:\n"
