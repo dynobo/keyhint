@@ -1,8 +1,12 @@
+import os
 from configparser import ConfigParser
+from pathlib import Path
 
-from keyhint.utils import get_users_config_path
-
-CONFIG_FILE = get_users_config_path() / "keyhint.ini"
+if xdg_conf := os.getenv("XDG_CONFIG_HOME", None):
+    CONFIG_PATH = Path(xdg_conf) / "keyhint"
+else:
+    CONFIG_PATH = Path.home() / ".config" / "keyhint"
+CONFIG_FILE = CONFIG_PATH / "keyhint.ini"
 
 
 class WritingConfigParser(ConfigParser):
