@@ -18,11 +18,11 @@ from gi.repository import Adw, Gio, GLib, Gtk  # noqa: E402
 from keyhint.window import KeyhintWindow  # noqa: E402
 
 logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+    format="%(asctime)s - %(levelname)-7s - %(module)s.py:%(lineno)d - %(message)s",
     datefmt="%H:%M:%S",
     level="WARNING",
 )
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("keyhint")
 
 
 class Application(Adw.Application):
@@ -53,30 +53,6 @@ class Application(Adw.Application):
             "SHEET-ID",
         )
         self.add_main_option(
-            "default-cheatsheet",
-            ord("d"),
-            GLib.OptionFlags.NONE,
-            GLib.OptionArg.STRING,
-            "Cheatsheet to show in case no cheatsheet is found for active application",
-            "SHEET-ID",
-        )
-        self.add_main_option(
-            "no-section-sort",
-            ord("s"),
-            GLib.OptionFlags.NONE,
-            GLib.OptionArg.NONE,
-            "Do not sort sections by size, keep order from config toml file",
-            None,
-        )
-        self.add_main_option(
-            "orientation",
-            ord("o"),
-            GLib.OptionFlags.NONE,
-            GLib.OptionArg.STRING,
-            "Orientation and scroll direction. Default: 'vertical'",
-            "horizontal|vertical",
-        )
-        self.add_main_option(
             "verbose",
             ord("v"),
             GLib.OptionFlags.NONE,
@@ -96,7 +72,7 @@ class Application(Adw.Application):
         self.options = cli.get_options_dict().end().unpack()
 
         if "verbose" in self.options:
-            logging.getLogger().setLevel("DEBUG")
+            logger.setLevel("DEBUG")
             logger.debug("CLI Options: %s", self.options)
 
         self.activate()

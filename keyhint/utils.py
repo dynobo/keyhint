@@ -1,10 +1,11 @@
 """Various utility functions."""
 
 import logging
+from pathlib import Path
 
-from gi.repository import GLib, Gtk
+from gi.repository import Gdk, GLib, Gtk
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("keyhint")
 
 
 def replace_keys(text: str) -> str:
@@ -33,7 +34,7 @@ def replace_keys(text: str) -> str:
 
 
 def style_key(text: str) -> tuple[str, list[str]]:
-    if text in ["+", "/", "&"]:
+    if text in ["+", "/", "&", "or"]:
         css_classes = ["dim-label"]
     else:
         text = text.replace("\\/", "/")
@@ -58,7 +59,39 @@ def create_shortcut(text: str) -> Gtk.Box:
     return box
 
 
-def create_section_title(text: str) -> Gtk.Label:
-    label = Gtk.Label(xalign=0.0)
-    label.set_markup(f"<b>{text}</b>")
-    return label
+def create_column_view_column(
+    title: str,
+    factory: Gtk.SignalListItemFactory,
+    fixed_width: float | None = None,
+) -> Gtk.ColumnViewColumn:
+    column = Gtk.ColumnViewColumn(title=title, factory=factory)
+    if fixed_width:
+        column.set_fixed_width(int(fixed_width))
+    return column
+
+
+def create_column_view(
+    selection: Gtk.SelectionModel,
+    shortcut_column: Gtk.ColumnViewColumn,
+    label_column: Gtk.ColumnViewColumn,
+) -> Gtk.ColumnView:
+    column_view = Gtk.ColumnView()
+    column_view.get_style_context().add_class("bindings-section")
+    column_view.set_hexpand(True)
+    column_view.set_model(selection)
+    column_view.append_column(shortcut_column)
+    column_view.append_column(label_column)
+    return column_view
+
+
+def create_css_provider(
+    display: Gdk.Display, css: str | None = None
+) -> Gtk.CssProvider:
+    """Load custom global CSS."""
+    provider = Gtk.CssProvider()
+    Gtk.StyleContext().add_provider_for_display(
+        display, provider, Gtk.STYLE_PROVIDER_PRIORITY_USER
+    )
+    if css and Path(css).exists():
+        provider.load_from_path(css)
+    return provider

@@ -35,49 +35,31 @@ Linux. (GTK 4.6+ required!)_**
 - Configure a **global hotkey** (e.g. `Ctrl + F1`) **via your system settings** to
   launch `keyhint`.
 - If KeyHint is launched via hotkey, it detects the current active application and shows
-  the appropriate hints.
+  the appropriate hints. (This feature won't work reliably when KeyHint ist started via
+  Menu or Launcher.)
 
 ## CLI Options
 
 ```
 Application Options:
   -c, --cheatsheet=SHEET-ID                 Show cheatsheet with this ID on startup
-  -d, --default-cheatsheet=SHEET-ID         Cheatsheet to show in case no cheatsheet is found for active application
-  -f, --no-fullscreen                       Launch window in normal window state instead of fullscreen mode
-  -s, --no-section-sort                     Do not sort sections by size, keep order from config toml file
-  -o, --orientation=horizontal|vertical     Orientation and scroll direction. Default: 'vertical'
   -v, --verbose                             Verbose log output for debugging
 ```
 
-## Configuration
+## Cheatsheet Configuration
 
-- The **config directory** is `~/.config/keyhint/`.
-- To **customize existing** cheatsheets, copy
-  [the corresponding .toml-file](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config)
-  into the config directory. Make your changes in a text editor. As long as you don't
-  change the `id` it will overwrite the defaults.
-- To **create new** cheatsheets, I suggest you also start with
-  [one of the existing .toml-file](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config):
-  - Place it in the config directory and give it a good file name.
-  - Change the value `id` to something unique.
-  - Adjust `regex_process` and `regex_title` so it will be selected based on the active
-    window. (See [Tips](#tips))
-  - Add the `shortcuts` & `label` to a `section`.
-  - If you think your cheatsheet might be useful for others, please consider opening a
-    pull request or an issue.
-- You can always **reset a configuration** to the shipped version by deleting the
-  `.toml` files from the config folder.
-- You can **include shortcuts from other cheatsheets** add
-  `include = ["<Cheatsheet ID>"]`
-- You can **hide a cheatsheet** by add `hidden = true` in the top block (same level as
-  `id` and `title`).
+The content which KeyHint displays is configured using [`toml`](https://toml.io/en/)
+configuration files.
 
-## Tips
+KeyHint reads those files from two locations:
 
-**Cheatsheet selection:**
+1. The [built-in directory](https://github.com/dynobo/keyhint/tree/main/keyhint/config)
+1. The user directory, usually located in `~/.config/keyhint`
+
+### How Keyhint selects the cheatsheet to show
 
 - The cheatsheet to be displayed on startup are selected by comparing the value of
-  `regex_process` with the wm_class of the active window and the value of `regex_title`
+  `regex_wmclass` with the wm_class of the active window and the value of `regex_title`
   with the title of the active window.
 - The potential cheatsheets are processed alphabetically by filename, the first file
   that matches both wm_class and title are getting displayed.
@@ -85,30 +67,96 @@ Application Options:
 - Check "Debug Info" in the application menu to get insights about the active window and
   the selected cheatsheet file.
 
-**Available cheatsheets:**
+### Customize or add cheatsheets
 
-- Check the
-  [included toml-files](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config)
-  to see which applications are available by default.
-- Feel free submit additional `toml-files` for further applications.
+- To **change built-in** cheatsheets, copy
+  [the corresponding .toml-file](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config)
+  into the config directory. Make your changes in a text editor. As long as you don't
+  change the `id` it will overwrite the defaults.
+- To **create new** cheatsheets, I suggest you start with
+  [one of the existing .toml-file](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config):
+  - Place it in the config directory and give it a good file name.
+  - Change the value `id` to something unique.
+  - Adjust `regex_wmclass` and `regex_title` so it will be selected based on the active
+    window. (See [Tips](#tips))
+  - Add the `shortcuts` & `label` to a `section`.
+  - If you think your cheatsheet might be useful for others, please consider opening a
+    pull request or an issue!
+- You can always **reset cheatsheets** to the shipped version by deleting the
+  corresponding `.toml` files from the config folder.
+- You can **include shortcuts from other cheatsheets** by adding
+  `include = ["<Cheatsheet ID>"]`
 
-**Differentiate cheatsheets per website:**
+### Examples
 
-- For showing different browser-cheatsheets depending on the current website, you might
-  want to use a browser extension like
-  "[Add URL To Window Title](https://addons.mozilla.org/en-US/firefox/addon/add-url-to-window-title/)"
-  and then configure the sections in `<cheatsheet>.toml` to look for the URL in the
-  window title.
+#### Hide existing cheatsheets
 
-**KeyHint's shortcuts:**
+To hide a cheatsheet, e.g. the
+[built-in](https://github.com/dynobo/keyhint/blob/main/keyhint/config/tilix.toml) one
+with the ID `tilix`, create a new file `~/.config/keyhint/tilix.toml` with the content:
 
-- `Ctrl+F`: Start filtering
-- `Ctrl+S`: Focus sheet selection dropdown (press `Enter` to open it)
-- `Esc`: Exit KeyHint
-- `→`, `↓`, `l` or `k`: scroll forward
-- `←`, `↑`, `h` or `j`: scroll backward
-- `PageDown`: scroll page forward
-- `PageUP`: scroll page backward
+```toml
+id = "tilix"
+hidden = true
+```
+
+#### Extend existing cheatsheets
+
+To add keybindings to an existing cheatsheet, e.g. the
+[built-in](https://github.com/dynobo/keyhint/blob/main/keyhint/config/firefox.toml) one
+with the ID `firefox`, create a new file `~/.config/keyhint/firefox.toml` which only
+contains the ID and the additional bindings:
+
+```toml
+id = "firefox"
+
+[section]
+[section."My Personal Favorites"]  # New section
+"Ctrl + Shift + Tab" = "Show all Tabs"
+# ...
+```
+
+#### Add new cheatsheet which never gets auto-selected
+
+To add a new cheatsheet, which never gets automatically selected and displayed by
+KeyHint, but remains accessible through KeyHint's cheatsheet dropdown, create a file
+`~/.config/keyhint/my-app.toml`:
+
+```toml
+id = "my-app"
+url = "url-to-my-apps-keybindings"
+
+[match]
+regex_wmclass = "a^"  # Patter which never matches
+regex_title = "a^"
+
+[section]
+[section.General]
+"Ctrl + C" = "Copy"
+# ...
+
+```
+
+#### Different cheatsheets for different Websites
+
+For showing different browser-cheatsheets depending on the current website, you might
+want to use a browser extension like
+"[Add URL To Window Title](https://addons.mozilla.org/en-US/firefox/addon/add-url-to-window-title/)"
+and configure the `[match]` section to look for the url in the title. E.g.
+`~/.config/keyhint/github.toml`
+
+```toml
+id = "github.com"
+
+[match]
+regex_wmclass = "Firefox"
+regex_title = ".*github\\.com.*"  # URL added by browser extensions to window title
+
+[section]
+[section.Repositories]
+gc = "Goto code tab"
+# ...
+```
 
 ## Contribute
 
@@ -120,11 +168,10 @@ the
 ## Design Principles
 
 - **Don't run as service**<br>It shouldn't consume resources in the background, even if
-  this leads to slower start-up time.
+  this leads to slightly slower start-up time.
 - **No network connection**<br>Everything should run locally without any network
   communication.
 - **Dependencies**<br>The fewer dependencies, the better.
-- **Multi-Monitors**<br>Supports setups with two or more displays
 
 ## Certification
 
