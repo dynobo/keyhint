@@ -4,9 +4,9 @@ import tomllib
 from copy import deepcopy
 from pathlib import Path
 
-import keyhint
+from keyhint import config
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("keyhint")
 
 
 def _load_toml(file_path: str | os.PathLike) -> dict:
@@ -24,7 +24,7 @@ def _load_toml(file_path: str | os.PathLike) -> dict:
         with Path(file_path).open("rb") as fh:
             result = tomllib.load(fh)
     except Exception as exc:
-        print(exc)  # noqa: T201
+        logger.warning("Could not loading toml file %s: %s", file_path, exc)
         result = {}
 
     return result
@@ -38,7 +38,7 @@ def load_default_sheets() -> list[dict]:
     """
     default_sheet_path = Path(__file__).parent / "config"
     sheets = [_load_toml(f) for f in default_sheet_path.glob("*.toml")]
-    logger.info("Loaded %s default cheatsheets.", len(sheets))
+    logger.debug("Found %s default sheets.", len(sheets))
     return sorted(sheets, key=lambda k: k["id"])
 
 
@@ -48,9 +48,9 @@ def load_user_sheets() -> list[dict]:
     Returns:
         List[dict]: List of application keyhints and meta info.
     """
-    files = keyhint.config.CONFIG_PATH.glob("*.toml")
+    files = config.CONFIG_PATH.glob("*.toml")
     sheets = [_load_toml(f) for f in files]
-    logger.info("Loaded %s user cheatsheets.", len(sheets))
+    logger.debug("Found %s user sheets in %s/.", len(sheets), config.CONFIG_PATH)
     return sorted(sheets, key=lambda k: k["id"])
 
 
@@ -60,7 +60,7 @@ def _expand_includes(sheets: list[dict]) -> list[dict]:
         for include in s.get("include", []):
             included_sheets = [c for c in sheets if c["id"] == include]
             if not included_sheets:
-                message = f"Cheatsheet '{include}' included by '{s['id']}' not found!"
+                message = f"Sheet '{include}' included by '{s['id']}' not found!"
                 raise ValueError(message)
             included_sheet = deepcopy(included_sheets[0])
             included_sheet["section"] = {
@@ -82,6 +82,20 @@ def _remove_hidden(sheets: list[dict]) -> list[dict]:
     return [s for s in sheets if not s.get("hidden", False)]
 
 
+def _update_or_append(sheets: list[dict], new_sheet: dict) -> list[dict]:
+    for sheet in sheets:
+        if sheet["id"] == new_sheet["id"]:
+            # Update existing default sheet by user sheet
+            user_sheet_sections = new_sheet.pop("section")
+            sheet.update(new_sheet)
+            sheet["section"].update(user_sheet_sections)
+            break
+    else:
+        # If default sheet didn't exist, append as new
+        sheets.append(new_sheet)
+    return sheets
+
+
 def load_sheets() -> list[dict]:
     """Load unified default keyhints and keyhints from user config.
 
@@ -95,23 +109,13 @@ def load_sheets() -> list[dict]:
     user_sheets = load_user_sheets()
 
     for user_sheet in user_sheets:
-        existed = False
-        for sheet in sheets:
-            # Update default sheet by user sheet (if existing)
-            if sheet["id"] == user_sheet["id"]:
-                user_sheet_sections = user_sheet.pop("section")
-                sheet.update(user_sheet)
-                sheet["section"].update(user_sheet_sections)
-                existed = True
-                break
-        # If it didn't exist, append as new
-        if not existed:
-            sheets.append(user_sheet)
+        sheets = _update_or_append(sheets, user_sheet)
 
     sheets = _expand_includes(sheets)
     sheets = _remove_hidden(sheets)
     sheets = _remove_empty_sections(sheets)
-    return sheets  # noqa: RET504
+    logger.debug("Loaded %s sheets.", len(sheets))
+    return sheets
 
 
 if __name__ == "__main__":

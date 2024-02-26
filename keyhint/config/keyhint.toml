@@ -1,0 +1,20 @@
+id = "keyhint"
+source = "https://github.com/dynobo/keyhint/README.md"
+
+[match]
+regex_process = "keyhint"
+regex_title = ".*"
+
+[section]
+[section.General]
+F11 = "Toggle Fullscreen"
+"Ctrl + f" = "Focus search field"
+"Ctrl + Backspace / u" = "Clear search field"
+"Ctrl + s & Enter" = "Focus & open sheet selection dropdown"
+Esc = "Exit"
+
+[section.Scroll]
+"Down or Ctrl + j" = "Forward"
+"Up or Ctrl + k" = "Backward"
+PageDown = "Page forward"
+PageUp = "Page backward"

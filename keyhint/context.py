@@ -7,7 +7,7 @@ import re
 import subprocess
 import traceback
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("keyhint")
 
 
 def get_active_window_info_wayland() -> tuple[str, str]:
@@ -130,9 +130,9 @@ def detect_active_window() -> tuple[str, str]:
             "incl. the traceback above on https://github.com/dynobo/keyhint/issues."
         )
 
-    logger.debug(
-        "Detected wm_class: '%s'. Detected window_title: '%s'", wm_class, window_title
-    )
+    logger.debug("Detected wm_class: '%s'.", wm_class)
+    logger.debug("Detected window_title: '%s'.", window_title)
+
     if "" in [wm_class, window_title]:
         logger.error(
             "Couldn't detect active window! Please report this error "

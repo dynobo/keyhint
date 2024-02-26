@@ -42,10 +42,6 @@ Linux. (GTK 4.6+ required!)_**
 ```
 Application Options:
   -c, --cheatsheet=SHEET-ID                 Show cheatsheet with this ID on startup
-  -d, --default-cheatsheet=SHEET-ID         Cheatsheet to show in case no cheatsheet is found for active application
-  -f, --no-fullscreen                       Launch window in normal window state instead of fullscreen mode
-  -s, --no-section-sort                     Do not sort sections by size, keep order from config toml file
-  -o, --orientation=horizontal|vertical     Orientation and scroll direction. Default: 'vertical'
   -v, --verbose                             Verbose log output for debugging
 ```
 
@@ -99,16 +95,6 @@ Application Options:
   "[Add URL To Window Title](https://addons.mozilla.org/en-US/firefox/addon/add-url-to-window-title/)"
   and then configure the sections in `<cheatsheet>.toml` to look for the URL in the
   window title.
-
-**KeyHint's shortcuts:**
-
-- `Ctrl+F`: Start filtering
-- `Ctrl+S`: Focus sheet selection dropdown (press `Enter` to open it)
-- `Esc`: Exit KeyHint
-- `→`, `↓`, `l` or `k`: scroll forward
-- `←`, `↑`, `h` or `j`: scroll backward
-- `PageDown`: scroll page forward
-- `PageUP`: scroll page backward
 
 ## Contribute
 

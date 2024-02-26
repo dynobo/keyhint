@@ -41,3 +41,7 @@ s-tui = "Stress test and monitor"
 pwd = "Print working dir"
 cd = "Change to home dir"
 "`cd -`" = "Change to previous dir"
+
+[section.Debuggin]
+"journalctl --since \"1m ago\"" = "System logs since time"
+"journalctl -k" = "System logs since boot"

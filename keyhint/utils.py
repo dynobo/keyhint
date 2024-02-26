@@ -4,7 +4,7 @@ import logging
 
 from gi.repository import GLib, Gtk
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("keyhint")
 
 
 def replace_keys(text: str) -> str:
@@ -33,7 +33,7 @@ def replace_keys(text: str) -> str:
 
 
 def style_key(text: str) -> tuple[str, list[str]]:
-    if text in ["+", "/", "&"]:
+    if text in ["+", "/", "&", "or"]:
         css_classes = ["dim-label"]
     else:
         text = text.replace("\\/", "/")
@@ -56,9 +56,3 @@ def create_shortcut(text: str) -> Gtk.Box:
         label.set_markup(f"{GLib.markup_escape_text(key)}")
         box.append(label)
     return box
-
-
-def create_section_title(text: str) -> Gtk.Label:
-    label = Gtk.Label(xalign=0.0)
-    label.set_markup(f"<b>{text}</b>")
-    return label

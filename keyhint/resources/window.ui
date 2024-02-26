@@ -25,6 +25,9 @@
                 <property name="can-focus">false</property>
                 <property name="can-target">false</property>
                 <property name="max-children-per-line">999</property>
+                <style>
+                  <class name="sheet_container_box" />
+                </style>
               </object>
             </child>
           </object>
