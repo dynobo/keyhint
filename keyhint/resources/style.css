@@ -10,7 +10,6 @@
   padding-bottom: 3px;
   padding-left: 6px;
   padding-right: 6px;
-
   background-color: @bg_color;
   border: 1px solid;
   border-radius: 5px;
@@ -26,6 +25,11 @@
 
 .popover_menu_box > list > row {
   border-radius: 10px;
+}
+
+.popover_menu_box .setting_label {
+  font-size: 85%;
+  opacity: 0.8;
 }
 
 .popover_menu_box .menu_entry {

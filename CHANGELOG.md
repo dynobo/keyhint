@@ -1,11 +1,17 @@
 # Changelog
 
-## v0.4.4 (2024-02-14)
+## v0.5.0 (upcoming)
 
+- Breaking changes:
+  - Renamed the attribute `regex_process` in `toml`-files to `regex_wmclass`.
+  - Renamed the attribute `source` in `toml`-files to `url`.
+  - Removed cli-args which are now covered by settings menu.
 - Fix duplicate IDs in included sections.
-- Fix error if launched with `--no-section-sort`
+- Add settings menu to ui.
 - Focus search field on start.
-- Move generic CLI commands into separate cheatsheet and include it in terminal apps.
+- Cheatsheets:
+  - Moved some CLI commands into separate cheatsheet and include it in terminal apps.
+  - Added sheet for Keyhint itself.
 
 ## v0.4.3 (2024-02-13)
 

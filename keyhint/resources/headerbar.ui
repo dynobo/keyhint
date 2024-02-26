@@ -16,7 +16,10 @@
         </style>
         <child>
           <object class="GtkLabel">
-            <property name="label">Section Sorting</property>
+            <property name="label">Section Order</property>
+            <style>
+              <class name="setting_label" />
+            </style>
           </object>
         </child>
         <child>
@@ -29,8 +32,10 @@
             <property name="spacing">6</property>
             <child>
               <object class="GtkToggleButton" id="sort_by_size_button">
-                <property name="tooltip_text" translatable="yes">Smooth shapes</property>
+                <property name="tooltip_text" translatable="yes">Sort sections by height</property>
                 <property name="active">true</property>
+                <property name="action-name">win.sort_by</property>
+                <property name="action-target">'size'</property>
                 <child>
                   <object class="GtkLabel">
                     <property name="label">By Size</property>
@@ -39,12 +44,27 @@
               </object>
             </child>
             <child>
-              <object class="GtkToggleButton" id="sort_by_title_button">
-                <property name="tooltip_text" translatable="yes">Rough shapes</property>
+              <object class="GtkToggleButton">
+                <property name="tooltip_text" translatable="yes">Sort sections alphabetically</property>
                 <property name="group">sort_by_size_button</property>
+                <property name="action-name">win.sort_by</property>
+                <property name="action-target">'title'</property>
                 <child>
                   <object class="GtkLabel">
                     <property name="label">By Title</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkToggleButton">
+                <property name="tooltip_text" translatable="yes">Use section order from config files</property>
+                <property name="group">sort_by_size_button</property>
+                <property name="action-name">win.sort_by</property>
+                <property name="action-target">'native'</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label">Native</property>
                   </object>
                 </child>
               </object>
@@ -53,7 +73,10 @@
         </child>
         <child>
           <object class="GtkLabel">
-            <property name="label">Scroll Direction</property>
+            <property name="label">Scroll Orientation</property>
+            <style>
+              <class name="setting_label" />
+            </style>
           </object>
         </child>
         <child>
@@ -66,7 +89,9 @@
             <property name="spacing">6</property>
             <child>
               <object class="GtkToggleButton" id="scroll_vertical_button">
-                <property name="tooltip_text" translatable="yes">Smooth shapes</property>
+                <property name="tooltip_text" translatable="yes">Scroll left ↔ right</property>
+                <property name="action-name">win.orientation</property>
+                <property name="action-target">'vertical'</property>
                 <property name="active">true</property>
                 <child>
                   <object class="GtkLabel">
@@ -76,8 +101,10 @@
               </object>
             </child>
             <child>
-              <object class="GtkToggleButton" id="scroll_horizontal_button">
-                <property name="tooltip_text" translatable="yes">Rough shapes</property>
+              <object class="GtkToggleButton">
+                <property name="tooltip_text" translatable="yes">Scroll up ↔ down</property>
+                <property name="action-name">win.orientation</property>
+                <property name="action-target">'horizontal'</property>
                 <property name="group">scroll_vertical_button</property>
                 <child>
                   <object class="GtkLabel">
@@ -90,11 +117,15 @@
         </child>
         <child>
           <object class="GtkLabel">
-            <property name="label">Zoom</property>
+            <property name="label">Zoom %</property>
+            <style>
+              <class name="setting_label" />
+            </style>
           </object>
         </child>
         <child>
           <object class="GtkSpinButton" id="zoom_spin_button">
+            <property name="tooltip_text" translatable="yes">Adjust font size</property>
             <property name="margin-top">4</property>
             <property name="margin-bottom">12</property>
             <property name="halign">3</property>
@@ -103,8 +134,8 @@
             <property name="digits">0</property>
             <property name="adjustment">
               <object class="GtkAdjustment">
-                <property name="lower">50</property>
-                <property name="upper">200</property>
+                <property name="lower">70</property>
+                <property name="upper">150</property>
                 <property name="step-increment">10</property>
                 <property name="value">100</property>
               </object>
@@ -114,6 +145,9 @@
         <child>
           <object class="GtkLabel">
             <property name="label">Fallback Cheatsheet</property>
+            <style>
+              <class name="setting_label" />
+            </style>
           </object>
         </child>
         <child>
@@ -122,6 +156,7 @@
             <property name="margin-top">4</property>
             <property name="margin-bottom">12</property>
             <property name="placeholder-text">Type cheatsheet id...</property>
+            <property name="tooltip_text" translatable="yes">Used if no matching cheatsheet is found</property>
           </object>
         </child>
         <child>
@@ -134,7 +169,7 @@
         <child>
           <object class="GtkButton">
             <property name="has-frame">0</property>
-            <property name="action-name">win.about</property>
+            <property name="action-name">win.open_folder</property>
             <style>
               <class name="menu_entry" />
             </style>
@@ -149,13 +184,13 @@
         <child>
           <object class="GtkButton">
             <property name="has-frame">0</property>
-            <property name="action-name">win.about</property>
+            <property name="action-name">win.debug_info</property>
             <style>
               <class name="menu_entry" />
             </style>
             <child>
               <object class="GtkLabel">
-                <property name="label" translatable="yes">Debug Info</property>
+                <property name="label" translatable="yes">Show Debug Info</property>
                 <property name="xalign">0</property>
               </object>
             </child>
@@ -180,13 +215,14 @@
     </property>
   </object>
 
-  <template class="header_bar" parent="GtkBox">
+  <template class="headerbar_box" parent="GtkBox">
     <child>
-      <object class="AdwHeaderBar" id="adwheaderbar">
+      <object class="AdwHeaderBar" id="headerbar">
         <property name="hexpand">true</property>
         <child type="start">
           <object class="GtkDropDown" id="sheet_drop_down">
             <property name="can-focus">True</property>
+            <property name="tooltip_text" translatable="yes">Switch cheatsheet</property>
             <property name="model">
               <object class="GtkStringList">
                 <items />
@@ -211,6 +247,7 @@
           <object class="GtkToggleButton" id="fullscreen_button">
             <property name="icon-name">view-fullscreen-symbolic</property>
             <property name="tooltip-text">Toggle fullscreen (F11)</property>
+            <property name="action-name">win.fullscreen</property>
           </object>
         </child>
       </object>
