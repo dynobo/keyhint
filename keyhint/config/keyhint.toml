@@ -1,8 +1,8 @@
 id = "keyhint"
-source = "https://github.com/dynobo/keyhint/README.md"
+url = "https://github.com/dynobo/keyhint/README.md"
 
 [match]
-regex_process = "keyhint"
+regex_wmclass = "keyhint"
 regex_title = ".*"
 
 [section]

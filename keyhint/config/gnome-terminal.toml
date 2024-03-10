@@ -1,9 +1,9 @@
 id = "gnome-terminal"
-source = "https://help.gnome.org/users/gnome-terminal/stable/adv-keyboard-shortcuts.html.en"
+url = "https://help.gnome.org/users/gnome-terminal/stable/adv-keyboard-shortcuts.html.en"
 include = ["cli"]
 
 [match]
-regex_process = "gnome-terminal"
+regex_wmclass = "gnome-terminal"
 regex_title = ".*"
 
 [section]

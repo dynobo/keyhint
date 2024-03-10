@@ -1,13 +1,13 @@
 id = "github.com"
-source = "https://help.github.com/en/github/getting-started-with-github/keyboard-shortcuts"
+url = "https://help.github.com/en/github/getting-started-with-github/keyboard-shortcuts"
 hidden = true
 
 [match]
-regex_process = ".*"
+regex_wmclass = ".*"
 regex_title = ".*github\\.com.*"
 
 [section]
-[section."Side Wide"]
+[section."Site Wide"]
 "S / \\/" = "Focus search bar"
 gn = "Goto notifications"
 esc = "Close hovercard, if open"

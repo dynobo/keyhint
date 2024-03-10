@@ -1,8 +1,8 @@
 id = "vim"
-source = ""
+url = ""
 
 [match]
-regex_process = "(foot|kitty|gnome-terminal)"
+regex_wmclass = "(foot|kitty|gnome-terminal)"
 regex_title = "^(n)?vim( .*)?$"
 
 [section]

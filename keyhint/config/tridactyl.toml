@@ -1,9 +1,9 @@
 id = "tridactyl"
-source = "https://github.com/tridactyl/tridactyl"
+url = "https://github.com/tridactyl/tridactyl"
 hidden = true
 
 [match]
-regex_process = "$^"
+regex_wmclass = "$^"
 regex_title = "$^"
 
 [section]

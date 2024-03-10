@@ -1,9 +1,9 @@
 id = "foot-terminal"
-source = "https://codeberg.org/dnkl/foot#user-content-shortcuts"
+url = "https://codeberg.org/dnkl/foot#user-content-shortcuts"
 include = ["cli"]
 
 [match]
-regex_process = "foot"
+regex_wmclass = "foot"
 regex_title = ".*"
 
 [section]

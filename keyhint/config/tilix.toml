@@ -1,9 +1,9 @@
 id = "tilix"
-source = "https://github.com/gnunn1/tilix/blob/master/data/resources/ui/shortcuts.ui"
+url = "https://github.com/gnunn1/tilix/blob/master/data/resources/ui/shortcuts.ui"
 include = ["cli"]
 
 [match]
-regex_process = "tilix"
+regex_wmclass = "tilix"
 regex_title = ".*"
 
 [section]
