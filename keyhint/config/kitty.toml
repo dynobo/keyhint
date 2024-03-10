@@ -1,9 +1,9 @@
 id = "kitty"
-source = "https://sw.kovidgoyal.net/kitty/overview/"
+url = "https://sw.kovidgoyal.net/kitty/overview/"
 include = ["cli"]
 
 [match]
-regex_process = "kitty"
+regex_wmclass = "kitty"
 regex_title = ".*"
 
 [section]

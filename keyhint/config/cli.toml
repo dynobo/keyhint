@@ -1,8 +1,8 @@
 id = "cli"
-source = ""
+url = ""
 
 [match]
-regex_process = "a^"
+regex_wmclass = "a^"
 regex_title = "a^"
 
 [section]

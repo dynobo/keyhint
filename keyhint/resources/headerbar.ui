@@ -1,5 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!-- Created with Cambalache 0.16.0 -->
 <interface>
   <!-- interface-name headerbar.ui -->
   <requires lib="gtk" version="4.0" />
@@ -32,7 +31,7 @@
             <property name="spacing">6</property>
             <child>
               <object class="GtkToggleButton" id="sort_by_size_button">
-                <property name="tooltip_text" translatable="yes">Sort sections by height</property>
+                <property name="tooltip-text" translatable="yes">Sort sections by height</property>
                 <property name="active">true</property>
                 <property name="action-name">win.sort_by</property>
                 <property name="action-target">'size'</property>
@@ -45,7 +44,7 @@
             </child>
             <child>
               <object class="GtkToggleButton">
-                <property name="tooltip_text" translatable="yes">Sort sections alphabetically</property>
+                <property name="tooltip-text" translatable="yes">Sort sections alphabetically</property>
                 <property name="group">sort_by_size_button</property>
                 <property name="action-name">win.sort_by</property>
                 <property name="action-target">'title'</property>
@@ -58,7 +57,7 @@
             </child>
             <child>
               <object class="GtkToggleButton">
-                <property name="tooltip_text" translatable="yes">Use section order from config files</property>
+                <property name="tooltip-text" translatable="yes">Use section order from config files</property>
                 <property name="group">sort_by_size_button</property>
                 <property name="action-name">win.sort_by</property>
                 <property name="action-target">'native'</property>
@@ -89,7 +88,7 @@
             <property name="spacing">6</property>
             <child>
               <object class="GtkToggleButton" id="scroll_vertical_button">
-                <property name="tooltip_text" translatable="yes">Scroll left ↔ right</property>
+                <property name="tooltip-text" translatable="yes">Scroll left ↔ right</property>
                 <property name="action-name">win.orientation</property>
                 <property name="action-target">'vertical'</property>
                 <property name="active">true</property>
@@ -102,7 +101,7 @@
             </child>
             <child>
               <object class="GtkToggleButton">
-                <property name="tooltip_text" translatable="yes">Scroll up ↔ down</property>
+                <property name="tooltip-text" translatable="yes">Scroll up ↔ down</property>
                 <property name="action-name">win.orientation</property>
                 <property name="action-target">'horizontal'</property>
                 <property name="group">scroll_vertical_button</property>
@@ -125,7 +124,7 @@
         </child>
         <child>
           <object class="GtkSpinButton" id="zoom_spin_button">
-            <property name="tooltip_text" translatable="yes">Adjust font size</property>
+            <property name="tooltip-text" translatable="yes">Adjust font size</property>
             <property name="margin-top">4</property>
             <property name="margin-bottom">12</property>
             <property name="halign">3</property>
@@ -152,11 +151,12 @@
         </child>
         <child>
           <object class="GtkEntry" id="fallback_sheet_entry">
+            <property name="text">keyhint</property>
             <property name="halign">3</property>
             <property name="margin-top">4</property>
             <property name="margin-bottom">12</property>
             <property name="placeholder-text">Type cheatsheet id...</property>
-            <property name="tooltip_text" translatable="yes">Used if no matching cheatsheet is found</property>
+            <property name="tooltip-text" translatable="yes">Used if no matching cheatsheet is found</property>
           </object>
         </child>
         <child>
@@ -220,9 +220,9 @@
       <object class="AdwHeaderBar" id="headerbar">
         <property name="hexpand">true</property>
         <child type="start">
-          <object class="GtkDropDown" id="sheet_drop_down">
+          <object class="GtkDropDown" id="sheet_dropdown">
             <property name="can-focus">True</property>
-            <property name="tooltip_text" translatable="yes">Switch cheatsheet</property>
+            <property name="tooltip-text" translatable="yes">Switch cheatsheet</property>
             <property name="model">
               <object class="GtkStringList">
                 <items />

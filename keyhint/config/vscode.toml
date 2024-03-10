@@ -1,8 +1,8 @@
 id = "vscode"
-source = "https://code.visualstudio.com/shortcuts/keyboard-shortcuts-linux.pdf"
+url = "https://code.visualstudio.com/shortcuts/keyboard-shortcuts-linux.pdf"
 
 [match]
-regex_process = "code"
+regex_wmclass = "code"
 regex_title = ".*"
 
 [section]

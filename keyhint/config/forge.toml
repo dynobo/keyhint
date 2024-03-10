@@ -1,9 +1,10 @@
 id = "forge"
-source = "https://github.com/forge-ext/forge"
+url = "https://github.com/forge-ext/forge"
+hidden = true
 
 [match]
-regex_process = ""
-regex_title = ""
+regex_wmclass = "^$"
+regex_title = "^$"
 
 [section]
 

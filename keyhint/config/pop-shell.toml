@@ -1,8 +1,8 @@
 id = "pop-shell"
-source = "https://support.system76.com/articles/pop-keyboard-shortcuts/"
+url = "https://support.system76.com/articles/pop-keyboard-shortcuts/"
 
 [match]
-regex_process = "pop-shell"
+regex_wmclass = "pop-shell"
 regex_title = ".*"
 
 [section]
