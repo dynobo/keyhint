@@ -36,6 +36,7 @@ eza = "ls clone with coloring"
 duf = "Basic disk usage"
 ncdu = "Recursive disk usage analyzer"
 s-tui = "Stress test and monitor"
+btm = "System resources dashboard"
 
 [section.Navigating]
 pwd = "Print working dir"

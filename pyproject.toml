@@ -48,6 +48,7 @@ dependencies = [
   "pip-audit",
   "mypy",
   "mdformat",
+  "pygobject-stubs",
 ]
 
 [tool.hatch.envs.default.scripts]
@@ -73,6 +74,8 @@ version = "tbump {args:current-version}"
 target-version = "py311"
 line-length = 88
 exclude = [".venv"]
+
+[tool.ruff.lint]
 select = [
   "F",    # Pyflakes
   "E",    # pycodestyle
@@ -116,17 +119,18 @@ ignore = [
   "ISC001", # Rule conflicts with ruff's formaatter
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.per-file-ignores]
 "tests/**/*" = ["PLR2004", "PLR0913", "S101", "TID252", "ANN", "D"]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["keyhint"]
 
-[tool.ruff.flake8-tidy-imports]
-ban-relative-imports = "all"
 
 [tool.mypy]
 files = ["keyhint/**/*.py", "tests/**/*.py"]

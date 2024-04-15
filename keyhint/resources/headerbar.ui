@@ -215,41 +215,37 @@
     </property>
   </object>
 
-  <template class="headerbar_box" parent="GtkBox">
-    <child>
-      <object class="AdwHeaderBar" id="headerbar">
-        <property name="hexpand">true</property>
-        <child type="start">
-          <object class="GtkDropDown" id="sheet_dropdown">
-            <property name="can-focus">True</property>
-            <property name="tooltip-text" translatable="yes">Switch cheatsheet</property>
-            <property name="model">
-              <object class="GtkStringList">
-                <items />
-              </object>
-            </property>
+  <template class="headerbar" parent="GtkHeaderBar">
+    <property name="hexpand">true</property>
+    <child type="start">
+      <object class="GtkDropDown" id="sheet_dropdown">
+        <property name="can-focus">True</property>
+        <property name="tooltip-text" translatable="yes">Switch cheatsheet</property>
+        <property name="model">
+          <object class="GtkStringList">
+            <items />
           </object>
-        </child>
-        <child type="title">
-          <object class="GtkSearchEntry" id="search_entry">
-            <property name="placeholder-text" translatable="true">Ctrl+F to filter...</property>
-            <property name="width-request">400</property>
-          </object>
-        </child>
-        <child type="end">
-          <object class="GtkMenuButton">
-            <property name="icon-name">open-menu-symbolic</property>
-            <property name="tooltip-text" translatable="true">Main Menu</property>
-            <property name="popover">popover_menu</property>
-          </object>
-        </child>
-        <child type="end">
-          <object class="GtkToggleButton" id="fullscreen_button">
-            <property name="icon-name">view-fullscreen-symbolic</property>
-            <property name="tooltip-text">Toggle fullscreen (F11)</property>
-            <property name="action-name">win.fullscreen</property>
-          </object>
-        </child>
+        </property>
+      </object>
+    </child>
+    <child type="title">
+      <object class="GtkSearchEntry" id="search_entry">
+        <property name="placeholder-text" translatable="true">Ctrl+F to filter...</property>
+        <property name="width-request">400</property>
+      </object>
+    </child>
+    <child type="end">
+      <object class="GtkMenuButton">
+        <property name="icon-name">open-menu-symbolic</property>
+        <property name="tooltip-text" translatable="true">Main Menu</property>
+        <property name="popover">popover_menu</property>
+      </object>
+    </child>
+    <child type="end">
+      <object class="GtkToggleButton" id="fullscreen_button">
+        <property name="icon-name">view-fullscreen-symbolic</property>
+        <property name="tooltip-text">Toggle fullscreen (F11)</property>
+        <property name="action-name">win.fullscreen</property>
       </object>
     </child>
   </template>
