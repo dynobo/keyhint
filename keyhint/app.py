@@ -5,15 +5,13 @@ Main entry point that get's executed on start.
 
 import logging
 import sys
-from collections.abc import Mapping
-from typing import Any
 
 import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
-from gi.repository import Adw, Gio, GLib, Gtk  # noqa: E402
+from gi.repository import Adw, Gio, GLib  # noqa: E402
 
 from keyhint.window import KeyhintWindow  # noqa: E402
 
@@ -36,10 +34,12 @@ class Application(Adw.Application):
 
     def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Initialize application with command line options."""
-        super().__init__(
-            *args,
+        kwargs.update(
             application_id="eu.dynobo.keyhint",
             flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE,
+        )
+        super().__init__(
+            *args,
             **kwargs,
         )
         self.options: dict = {}
@@ -67,7 +67,7 @@ class Application(Adw.Application):
         window.set_application(self)
         window.present()
 
-    def do_command_line(self, cli: Gtk, **__: Mapping[Any, Any]) -> int:
+    def do_command_line(self, cli: Gio.ApplicationCommandLine) -> int:
         """Store command line options in class attribute for later usage."""
         self.options = cli.get_options_dict().end().unpack()
 
