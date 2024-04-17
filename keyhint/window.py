@@ -39,7 +39,7 @@ def check_state(func: TActionCallback) -> TActionCallback:
     """Decorator to only execute the function if the action state changed."""
 
     def wrapper(cls: Gtk.Widget, action: Gio.SimpleAction, state: GLib.Variant) -> None:
-        if action.get_state() == state:
+        if action.get_state_type() and action.get_state() == state:
             return None
 
         if state:
@@ -69,8 +69,9 @@ class HeaderBarBox(Gtk.HeaderBar):
     sheet_dropdown = cast(Gtk.DropDown, Gtk.Template.Child())
     search_entry = cast(Gtk.SearchEntry, Gtk.Template.Child())
     fullscreen_button = cast(Gtk.ToggleButton, Gtk.Template.Child())
-    zoom_spin_button = cast(Gtk.SpinButton, Gtk.Template.Child())
+    zoom_scale = cast(Gtk.Scale, Gtk.Template.Child())
     fallback_sheet_entry = cast(Gtk.Entry, Gtk.Template.Child())
+    fallback_sheet_button = cast(Gtk.Button, Gtk.Template.Child())
 
     def __init__(
         self, for_fullscreen: bool = False, decoration: str | None = None
@@ -169,7 +170,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         # Create
         action = Gio.SimpleAction.new_stateful(
             name="sort_by",
-            state=GLib.Variant("s", "size"),
+            state=GLib.Variant("s", ""),
             parameter_type=GLib.VariantType.new("s"),
         )
         action.connect("activate", self.on_change_sort)
@@ -188,20 +189,27 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         # Create
         action = Gio.SimpleAction.new_stateful(
             name="zoom",
-            state=GLib.Variant("i", 100),
+            state=GLib.Variant("i", 0),
             parameter_type=GLib.VariantType.new("i"),
         )
         action.connect("change-state", self.on_change_zoom)
         self.add_action(action)
 
-        # Connect
+        # Connect & add marks
         for headerbar in [self.headerbar, self.headerbar_fs]:
-            headerbar.zoom_spin_button.connect(
+            headerbar.zoom_scale.connect(
                 "value-changed",
                 lambda btn: self.change_action_state(
-                    "zoom", GLib.Variant("i", btn.get_value_as_int())
+                    "zoom", GLib.Variant("i", btn.get_value())
                 ),
             )
+            slider_range = headerbar.zoom_scale.get_adjustment()
+            for i in range(
+                int(slider_range.get_lower()), int(slider_range.get_upper()) + 1, 25
+            ):
+                headerbar.zoom_scale.add_mark(
+                    i, Gtk.PositionType.BOTTOM, f"<small>{i}</small>"
+                )
 
         # Init state
         self.change_action_state(
@@ -235,7 +243,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         # Create
         action = Gio.SimpleAction.new_stateful(
             name="orientation",
-            state=GLib.Variant("s", "vertical"),
+            state=GLib.Variant("s", ""),
             parameter_type=GLib.VariantType.new("s"),
         )
         action.connect("activate", self.on_change_orientation)
@@ -255,18 +263,19 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         # Create
         action = Gio.SimpleAction.new_stateful(
             name="fallback_sheet",
-            state=GLib.Variant("s", "keyhint"),
+            state=GLib.Variant("s", ""),
             parameter_type=GLib.VariantType.new("s"),
         )
-        action.connect("change-state", self.on_change_fallback_sheet)
+        action.connect("change-state", self.on_set_fallback_sheet)
         self.add_action(action)
 
         # Connect
         for headerbar in [self.headerbar, self.headerbar_fs]:
-            headerbar.fallback_sheet_entry.connect(
-                "changed",
-                lambda entry: self.change_action_state(
-                    "fallback_sheet", GLib.Variant("s", entry.get_text())
+            headerbar.fallback_sheet_button.connect(
+                "clicked",
+                lambda *args: self.change_action_state(
+                    "fallback_sheet",
+                    GLib.Variant("s", self.get_current_sheet_id() or "keyhint"),
                 ),
             )
 
@@ -282,7 +291,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         # Create
         action = Gio.SimpleAction.new_stateful(
             name="sheet",
-            state=GLib.Variant("s", "keyhint"),
+            state=GLib.Variant("s", ""),
             parameter_type=GLib.VariantType.new("s"),
         )
         action.connect("change-state", self.on_change_sheet)
@@ -351,21 +360,14 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.headerbar_fs.sheet_dropdown.set_model(model)
 
     @check_state
-    def on_change_fallback_sheet(
+    def on_set_fallback_sheet(
         self, action: Gio.SimpleAction, state: GLib.Variant
     ) -> None:
         """Set the default sheet to use."""
         sheet_id = state.get_string()
-        if sheet_id not in [s["id"] for s in self.sheets]:
-            sheet_id = "keyhint"
-            css_class = "error"
-        else:
-            css_class = ""
-            self.config.set_persistent("main", "fallback_cheatsheet", sheet_id)
-        self.headerbar.fallback_sheet_entry.set_text(sheet_id)
-        self.headerbar_fs.fallback_sheet_entry.set_text(sheet_id)
-        self.headerbar.fallback_sheet_entry.set_css_classes([css_class])
-        self.headerbar_fs.fallback_sheet_entry.set_css_classes([css_class])
+        self.config.set_persistent("main", "fallback_cheatsheet", sheet_id)
+        for headerbar in [self.headerbar, self.headerbar_fs]:
+            headerbar.fallback_sheet_entry.set_text(sheet_id)
 
     @check_state
     def on_change_sheet(self, action: Gio.SimpleAction, state: GLib.Variant) -> None:
@@ -398,8 +400,8 @@ class KeyhintWindow(Gtk.ApplicationWindow):
                     font-size: {value}%;
                 }}
                 """
-        self.headerbar.zoom_spin_button.set_value(value)
-        self.headerbar_fs.zoom_spin_button.set_value(value)
+        self.headerbar.zoom_scale.set_value(value)
+        self.headerbar_fs.zoom_scale.set_value(value)
         if hasattr(self.zoom_css_provider, "load_from_string"):
             # GTK 4.12+
             self.zoom_css_provider.load_from_string(css)
@@ -773,10 +775,13 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         section_child.set_child(column_view)
         return section_child
 
-    def get_debug_info_text(self) -> str:
+    def get_current_sheet_id(self) -> str:
         action = self.lookup_action("sheet")
         state = action.get_state() if action else None
-        sheet_id = state.get_string() if state else None
+        return state.get_string() if state else ""
+
+    def get_debug_info_text(self) -> str:
+        sheet_id = self.get_current_sheet_id()
         sheet = (
             sheets.get_sheet_by_id(sheets=self.sheets, sheet_id=sheet_id)
             if sheet_id

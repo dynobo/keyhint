@@ -27,8 +27,10 @@
             <property name="homogeneous">true</property>
             <property name="halign">3</property>
             <property name="margin-top">4</property>
-            <property name="margin-bottom">12</property>
-            <property name="spacing">6</property>
+            <property name="margin-bottom">14</property>
+            <style>
+              <class name="linked" />
+            </style>
             <child>
               <object class="GtkToggleButton" id="sort_by_size_button">
                 <property name="tooltip-text" translatable="yes">Sort sections by height</property>
@@ -84,8 +86,10 @@
             <property name="homogeneous">true</property>
             <property name="halign">3</property>
             <property name="margin-top">4</property>
-            <property name="margin-bottom">12</property>
-            <property name="spacing">6</property>
+            <property name="margin-bottom">14</property>
+            <style>
+              <class name="linked" />
+            </style>
             <child>
               <object class="GtkToggleButton" id="scroll_vertical_button">
                 <property name="tooltip-text" translatable="yes">Scroll left ↔ right</property>
@@ -123,20 +127,17 @@
           </object>
         </child>
         <child>
-          <object class="GtkSpinButton" id="zoom_spin_button">
+          <object class="GtkScale" id="zoom_scale">
             <property name="tooltip-text" translatable="yes">Adjust font size</property>
-            <property name="margin-top">4</property>
-            <property name="margin-bottom">12</property>
-            <property name="halign">3</property>
-            <property name="value">100</property>
-            <property name="climb-rate">1</property>
+            <property name="margin-top">0</property>
+            <property name="margin-bottom">14</property>
             <property name="digits">0</property>
+            <property name="round-digits">0</property>
             <property name="adjustment">
               <object class="GtkAdjustment">
-                <property name="lower">70</property>
-                <property name="upper">150</property>
-                <property name="step-increment">10</property>
                 <property name="value">100</property>
+                <property name="lower">75</property>
+                <property name="upper">150</property>
               </object>
             </property>
           </object>
@@ -150,13 +151,27 @@
           </object>
         </child>
         <child>
-          <object class="GtkEntry" id="fallback_sheet_entry">
-            <property name="text">keyhint</property>
+          <object class="GtkBox">
+            <property name="orientation">0</property>
             <property name="halign">3</property>
             <property name="margin-top">4</property>
             <property name="margin-bottom">12</property>
-            <property name="placeholder-text">Type cheatsheet id...</property>
-            <property name="tooltip-text" translatable="yes">Used if no matching cheatsheet is found</property>
+            <style>
+              <class name="linked" />
+            </style>
+            <child>
+              <object class="GtkEntry" id="fallback_sheet_entry">
+                <property name="text">keyhint</property>
+                <property name="sensitive">false</property>
+                <property name="tooltip-text" translatable="yes">Shown if no matching cheatsheet is found</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="fallback_sheet_button">
+                <property name="icon-name">view-pin-symbolic</property>
+                <property name="tooltip-text" translatable="true">Set to current cheatsheet</property>
+              </object>
+            </child>
           </object>
         </child>
         <child>

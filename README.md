@@ -1,7 +1,7 @@
 # KeyHint
 
 **_Utility to display keyboard shortcuts or other hints based on the active window on
-Linux. (GTK 4.6+ required!)_**
+Linux._**
 
 <p align="center"><br>
 <img alt="Tests passing" src="https://github.com/dynobo/keyhint/workflows/Test/badge.svg">
@@ -24,6 +24,12 @@ Linux. (GTK 4.6+ required!)_**
      gobject-introspection \
      libgtk-4-dev
   ```
+- Wayland & Gnome: The
+  [Gnome Extension "Window-Calls"](https://extensions.gnome.org/extension/4724/window-calls/)
+  is required to auto-select the cheatsheet based on the current active application.
+- Wayland & KDE: Not yet implemented.
+  [Create an issue](https://github.com/dynobo/keyhint/issues/new) if you like to have
+  this support for this setup.
 
 ## Installation
 
