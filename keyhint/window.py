@@ -73,9 +73,7 @@ class HeaderBarBox(Gtk.HeaderBar):
     fallback_sheet_entry = cast(Gtk.Entry, Gtk.Template.Child())
     fallback_sheet_button = cast(Gtk.Button, Gtk.Template.Child())
 
-    def __init__(
-        self, for_fullscreen: bool = False, decoration: str | None = None
-    ) -> None:
+    def __init__(self, for_fullscreen: bool = False) -> None:
         super().__init__()
         if for_fullscreen:
             self.set_decoration_layout(":minimize,close")
@@ -99,6 +97,9 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     shortcut_column_factory = Gtk.SignalListItemFactory()
     label_column_factory = Gtk.SignalListItemFactory()
 
+    headerbar = HeaderBarBox()
+    headerbar_fs = HeaderBarBox(for_fullscreen=True)
+
     max_shortcut_width = 0
 
     def __init__(self, cli_args: dict) -> None:
@@ -119,30 +120,18 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.zoom_css_provider = utils.create_css_provider(display=self.get_display())
         self.set_icon_name("keyhint")
 
-        # Add normal header bar
-        self.headerbar = HeaderBarBox()
+        self.headerbars = [self.headerbar, self.headerbar_fs]
         self.set_titlebar(self.headerbar)
-
-        # Add second header bar which is only visible in fullscreen mode
-        self.headerbar_fs = HeaderBarBox(for_fullscreen=True)
         self.container.prepend(self.headerbar_fs)
 
-        # Search filters
-        self.list_view_filter = Gtk.CustomFilter.new(
-            match_func=self.list_view_match_func
-        )
-        self.sheet_container_box.set_filter_func(self.filter_sections_func)
+        self.bindings_filter = Gtk.CustomFilter.new(match_func=self.bindings_match_func)
+        self.sheet_container_box.set_filter_func(filter_func=self.sections_filter_func)
+        self.sheet_container_box.set_sort_func(sort_func=self.sections_sort_func)
 
-        # Sort
-        self.sheet_container_box.set_sort_func(self.sort_sections_func)
-
-        # Column factories
         self.shortcut_column_factory.connect("bind", self.bind_shortcuts_callback)
         self.label_column_factory.connect("bind", self.bind_labels_callback)
 
-        self.init_populate_sheet_dropdown()
-
-        # Set up the controls
+        self.init_sheet_dropdown()
         self.init_action_sheet()
         self.init_action_fullscreen()
         self.init_action_sort_by()
@@ -150,17 +139,15 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.init_action_orientation()
         self.init_action_fallback_sheet()
         self.init_actions_for_menu_entries()
+        self.init_actions_for_toasts()
+        self.init_search_entry()
+        self.init_key_event_controllers()
 
-        self.init_connect_search_entry()
-        self.init_add_key_event_controllers()
-
-        # Make sure the window is focused
-        self.present()
         self.focus_search_entry()
 
-    def init_connect_search_entry(self) -> None:
+    def init_search_entry(self) -> None:
         """Connect signals to methods."""
-        for headerbar in [self.headerbar, self.headerbar_fs]:
+        for headerbar in self.headerbars:
             # Search entry
             self.search_changed_handler = headerbar.search_entry.connect(
                 "search-changed", self.on_search_entry_changed
@@ -196,7 +183,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.add_action(action)
 
         # Connect & add marks
-        for headerbar in [self.headerbar, self.headerbar_fs]:
+        for headerbar in self.headerbars:
             headerbar.zoom_scale.connect(
                 "value-changed",
                 lambda btn: self.change_action_state(
@@ -270,7 +257,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.add_action(action)
 
         # Connect
-        for headerbar in [self.headerbar, self.headerbar_fs]:
+        for headerbar in self.headerbars:
             headerbar.fallback_sheet_button.connect(
                 "clicked",
                 lambda *args: self.change_action_state(
@@ -298,7 +285,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.add_action(action)
 
         # Connect
-        for headerbar in [self.headerbar, self.headerbar_fs]:
+        for headerbar in self.headerbars:
             headerbar.sheet_dropdown.connect(
                 "notify::selected-item",
                 lambda btn, param: self.change_action_state(
@@ -325,12 +312,12 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         action.connect("activate", self.on_open_folder_action)
         self.add_action(action)
 
-        # TODO: Not part of menu!!
+    def init_actions_for_toasts(self) -> None:
         action = Gio.SimpleAction.new("create_new_sheet", None)
         action.connect("activate", self.on_create_new_sheet)
         self.add_action(action)
 
-    def init_add_key_event_controllers(self) -> None:
+    def init_key_event_controllers(self) -> None:
         """Register key press handler."""
         evk = Gtk.EventControllerKey()
         evk.connect("key-pressed", self.on_key_pressed)
@@ -345,7 +332,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         evk.connect("key-pressed", self.on_search_entry_key_pressed)
         self.headerbar_fs.search_entry.add_controller(evk)
 
-    def init_populate_sheet_dropdown(self) -> None:
+    def init_sheet_dropdown(self) -> None:
         """Populate dropdown and select appropriate sheet."""
         # Populate the model with sheet ids
         model = self.headerbar.sheet_dropdown.get_model()
@@ -366,7 +353,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         """Set the default sheet to use."""
         sheet_id = state.get_string()
         self.config.set_persistent("main", "fallback_cheatsheet", sheet_id)
-        for headerbar in [self.headerbar, self.headerbar_fs]:
+        for headerbar in self.headerbars:
             headerbar.fallback_sheet_entry.set_text(sheet_id)
 
     @check_state
@@ -406,7 +393,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             # GTK 4.12+
             self.zoom_css_provider.load_from_string(css)
         else:
-            # ON_HOLD: Remove once GTK 4.12+ is required
+            # ONHOLD: Remove once GTK 4.12+ is required
             self.zoom_css_provider.load_from_data(css, len(css))
 
         self.config.set_persistent("main", "zoom", str(int(value)))
@@ -503,7 +490,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             return
 
         self.search_text = search_entry.get_text()
-        self.list_view_filter.changed(Gtk.FilterChange.DIFFERENT)
+        self.bindings_filter.changed(Gtk.FilterChange.DIFFERENT)
         self.sheet_container_box.invalidate_filter()
 
     def on_search_entry_key_pressed(
@@ -610,7 +597,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def on_open_folder_action(self, _: Gio.SimpleAction, __: None) -> None:
         subprocess.Popen(["xdg-open", str(config.CONFIG_PATH.resolve())])  # noqa: S603, S607
 
-    def filter_sections_func(self, child: Gtk.FlowBoxChild) -> bool:
+    def sections_filter_func(self, child: Gtk.FlowBoxChild) -> bool:
         """Filter binding sections based on the search entry text."""
         # If no text, show all sections
         if not self.search_text:
@@ -631,7 +618,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
         return filter_model.get_n_items() > 0
 
-    def sort_sections_func(
+    def sections_sort_func(
         self, child_a: Gtk.FlowBoxChild, child_b: Gtk.FlowBoxChild
     ) -> bool:
         sort_by = self.config["main"].get("sort_by", "size")
@@ -724,16 +711,17 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             child.set_markup(f"<b>{row.label}</b>")
         item.set_child(child)
 
-    def list_view_match_func(self, bindings_row: BindingsRow) -> bool:
+    def bindings_match_func(self, bindings_row: BindingsRow) -> bool:
         if self.search_text:
             return self.search_text.lower() in bindings_row.filter_text.lower()
         return True
 
     def show_sheet(self, sheet_id: str) -> None:
-        if hasattr(self.sheet_container_box, "remove_all") and False:
+        if hasattr(self.sheet_container_box, "remove_all"):
             # Only available in GTK 4.12+
             self.sheet_container_box.remove_all()
         else:
+            # ONHOLD: Remove once GTK 4.12+ is required
             while child := self.sheet_container_box.get_first_child():
                 self.sheet_container_box.remove(child)
 
@@ -756,7 +744,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             ls.append(BindingsRow(shortcut=shortcut, label=label, section=section))
 
         filter_list = Gtk.FilterListModel(model=ls)
-        filter_list.set_filter(self.list_view_filter)
+        filter_list.set_filter(self.bindings_filter)
 
         selection = Gtk.NoSelection.new(filter_list)
 
