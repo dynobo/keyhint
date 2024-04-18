@@ -777,20 +777,23 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             if sheet_id
             else {}
         )
-        return (
-            "\n"
-            "<big>Last Active Application</big>\n\n"
-            f"<span foreground='#FF2E88'>title:</span> {self.window_title}\n"
-            f"<span foreground='#FF2E88'>wmclass:</span> {self.wm_class}\n"
-            "\n\n"
-            "<big>Selected Cheatsheet</big>\n\n"
-            f"<span foreground='#FF2E88'>ID:</span> {sheet_id}\n"
-            "<span foreground='#FF2E88'>regex_wmclass:</span> "
-            f"{sheet.get('match',{}).get('regex_wmclass', 'n/a')}\n"
-            "<span foreground='#FF2E88'>regex_title:</span> "
-            f"{sheet.get('match', {}).get('regex_title', 'n/a')}\n"
-            "<span foreground='#FF2E88'>source:</span> "
-            f"<a href='{sheet.get('url', '')}'>"
-            f"<span foreground='#00A6FF'>{sheet.get('url', 'n/a')}</span>"
-            "</a>\n"
+        regex_wm_class = sheet.get("match", {}).get("regex_wmclass", "n/a")
+        regex_title = sheet.get("match", {}).get("regex_title", "n/a")
+        link = sheet.get("url", "")
+        link_text = f"<span foreground='#00A6FF'>{link or 'n/a'}</span>"
+
+        return textwrap.dedent(
+            f"""
+            <big>Last Active Application</big>
+
+            <span foreground='#FF2E88'>title:</span> {self.window_title}
+            <span foreground='#FF2E88'>wmclass:</span> {self.wm_class}
+
+            <big>Selected Cheatsheet</big>
+
+            <span foreground='#FF2E88'>ID:</span> {sheet_id}
+            <span foreground='#FF2E88'>regex_wmclass:</span> {regex_wm_class}
+            <span foreground='#FF2E88'>regex_title:</span> {regex_title}
+            <span foreground='#FF2E88'>source:</span> <a href='{link}'>{link_text}</a>
+            """
         )
