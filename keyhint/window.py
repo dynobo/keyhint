@@ -23,7 +23,7 @@ from typing import TypeVar, cast
 
 from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk, Pango
 
-from keyhint import __version__, config, context, sheets, utils
+from keyhint import __version__, binding, config, context, css, sheets
 
 logger = logging.getLogger("keyhint")
 
@@ -114,10 +114,10 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.skip_search_changed: bool = False
         self.search_text: str = ""
 
-        self.css_provider = utils.create_css_provider(
+        self.css_provider = css.create_provider(
             display=self.get_display(), css=f"{RESOURCE_PATH}/style.css"
         )
-        self.zoom_css_provider = utils.create_css_provider(display=self.get_display())
+        self.zoom_css_provider = css.create_provider(display=self.get_display())
         self.set_icon_name("keyhint")
 
         self.headerbars = [self.headerbar, self.headerbar_fs]
@@ -381,7 +381,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def on_change_zoom(self, action: Gio.SimpleAction, state: GLib.Variant) -> None:
         """Set the zoom level of the sheet container."""
         value = state.get_int32()
-        css = f"""
+        css_style = f"""
                 .sheet_container_box,
                 .sheet_container_box .bindings-section header label {{
                     font-size: {value}%;
@@ -391,10 +391,10 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.headerbar_fs.zoom_scale.set_value(value)
         if hasattr(self.zoom_css_provider, "load_from_string"):
             # GTK 4.12+
-            self.zoom_css_provider.load_from_string(css)
+            self.zoom_css_provider.load_from_string(css_style)
         else:
             # ONHOLD: Remove once GTK 4.12+ is required
-            self.zoom_css_provider.load_from_data(css, len(css))
+            self.zoom_css_provider.load_from_data(css_style, len(css_style))
 
         self.config.set_persistent("main", "zoom", str(int(value)))
 
@@ -496,9 +496,9 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def on_search_entry_key_pressed(
         self,
         evk: Gtk.EventControllerKey,
-        keycode,  # noqa: ANN001
-        keyval,  # noqa: ANN001
-        modifier,  # noqa: ANN001
+        keycode: int,
+        keyval: int,
+        modifier: Gdk.ModifierType,
     ) -> None:
         if keycode == Gdk.KEY_Escape:
             self.close()
@@ -506,9 +506,9 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def on_key_pressed(
         self,
         evk: Gtk.EventControllerKey,
-        keycode,  # noqa: ANN001
-        keyval,  # noqa: ANN001
-        modifier,  # noqa: ANN001
+        keycode: int,
+        keyval: int,
+        modifier: Gdk.ModifierType,
     ) -> None:
         ctrl_pressed = modifier == Gdk.ModifierType.CONTROL_MASK
         match keycode, ctrl_pressed:
@@ -690,7 +690,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         item: Gtk.ColumnViewCell,  # type: ignore  # Available since GTK 4.12
     ) -> None:
         row = cast(BindingsRow, item.get_item())
-        shortcut = utils.create_shortcut(row.shortcut)
+        shortcut = binding.create_shortcut(row.shortcut)
         self.max_shortcut_width = max(
             self.max_shortcut_width,
             shortcut.get_preferred_size().natural_size.width,  # type: ignore # False Positive
@@ -750,13 +750,15 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
         # TODO: Dynamic width based on content
         shortcut_column_width = self.config["main"].getint("zoom", 100) * 1.1 + 135
-        shortcut_column = utils.create_column_view_column(
+        shortcut_column = binding.create_column_view_column(
             "", self.shortcut_column_factory, shortcut_column_width
         )
-        label_column = utils.create_column_view_column(
+        label_column = binding.create_column_view_column(
             section, self.label_column_factory
         )
-        column_view = utils.create_column_view(selection, shortcut_column, label_column)
+        column_view = binding.create_column_view(
+            selection, shortcut_column, label_column
+        )
 
         section_child = Gtk.FlowBoxChild()
         section_child.set_vexpand(False)
