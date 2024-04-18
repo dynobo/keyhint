@@ -1,9 +1,8 @@
-"""Various utility functions."""
+"""Utility functions to format and view bindings (shortcut + label)."""
 
 import logging
-from pathlib import Path
 
-from gi.repository import Gdk, GLib, Gtk
+from gi.repository import GLib, Gtk
 
 logger = logging.getLogger("keyhint")
 
@@ -82,16 +81,3 @@ def create_column_view(
     column_view.append_column(shortcut_column)
     column_view.append_column(label_column)
     return column_view
-
-
-def create_css_provider(
-    display: Gdk.Display, css: str | None = None
-) -> Gtk.CssProvider:
-    """Load custom global CSS."""
-    provider = Gtk.CssProvider()
-    Gtk.StyleContext().add_provider_for_display(
-        display, provider, Gtk.STYLE_PROVIDER_PRIORITY_USER
-    )
-    if css and Path(css).exists():
-        provider.load_from_path(css)
-    return provider
