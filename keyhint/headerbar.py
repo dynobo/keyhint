@@ -29,6 +29,15 @@ class HeaderBarBox(Gtk.HeaderBar):
 
 
 class HeaderBars:
+    """Utility class for easier accessing the two header bars.
+
+    The 'normal' header bar is used as application title bar. It is shown in the normal
+    window mode, and automatically hidden in fullscreen mode (by design of GTK).
+
+    The 'fullscreen' header bar is added as a widget to the window content. Its
+    visibility needs to be toggled depending on window state.
+    """
+
     normal = HeaderBarBox()
     fullscreen = HeaderBarBox(for_fullscreen=True)
 

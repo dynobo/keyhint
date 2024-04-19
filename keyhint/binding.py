@@ -8,7 +8,7 @@ logger = logging.getLogger("keyhint")
 
 
 def replace_keys(text: str) -> str:
-    """Replace key names by corresponding unicode symbol.
+    """Replace certain key names by corresponding unicode symbol.
 
     Args:
         text (str): Text with key names.
@@ -33,7 +33,16 @@ def replace_keys(text: str) -> str:
 
 
 def style_key(text: str) -> tuple[str, list[str]]:
-    if text in ["+", "/", "&", "or"]:
+    """Style the key as keycap or as divider (between two keycaps).
+
+    Args:
+        text: A single partition of a shortcut.
+
+    Returns:
+        (Unescaped) key of the shortcut, css classes to use.
+    """
+    key_dividers = ["+", "/", "&", "or"]
+    if text in key_dividers:
         css_classes = ["dim-label"]
     else:
         text = text.replace("\\/", "/")

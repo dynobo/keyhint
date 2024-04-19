@@ -53,7 +53,7 @@ def check_state(func: TActionCallback) -> TActionCallback:
 
 @Gtk.Template(filename=f"{RESOURCE_PATH}/window.ui")
 class KeyhintWindow(Gtk.ApplicationWindow):
-    """Handler for main ApplicationWindow."""
+    """The main UI for Keyhint."""
 
     __gtype_name__ = "main_window"
 
@@ -70,7 +70,6 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     max_shortcut_width = 0
 
     def __init__(self, cli_args: dict) -> None:
-        """Initialize during window creation."""
         super().__init__()
 
         self.cli_args = cli_args
@@ -82,7 +81,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.search_text: str = ""
 
         self.css_provider = css.new_provider(
-            display=self.get_display(), css=f"{RESOURCE_PATH}/style.css"
+            display=self.get_display(), css_file=RESOURCE_PATH / "style.css"
         )
         self.zoom_css_provider = css.new_provider(display=self.get_display())
         self.set_icon_name("keyhint")
@@ -121,7 +120,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         action.connect("change-state", self.on_change_sort)
         self.add_action(action)
 
-        # Connect & add marks
+        # Connect to button happens via headerbar.ui
 
         self.change_action_state(
             "sort_by", GLib.Variant("s", self.config["main"].get("sort_by", "size"))
@@ -144,9 +143,9 @@ class KeyhintWindow(Gtk.ApplicationWindow):
                 ),
             )
             slider_range = bar.zoom_scale.get_adjustment()
-            for i in range(
-                int(slider_range.get_lower()), int(slider_range.get_upper()) + 1, 25
-            ):
+            lower_bound = int(slider_range.get_lower())
+            upper_bound = int(slider_range.get_upper())
+            for i in range(lower_bound, upper_bound + 1, 25):
                 bar.zoom_scale.add_mark(
                     i, Gtk.PositionType.BOTTOM, f"<small>{i}</small>"
                 )
@@ -238,14 +237,12 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         )
 
     def init_search_entry(self) -> None:
-        """Connect signals to methods."""
         for bar in self.headerbars:
             self.search_changed_handler = bar.search_entry.connect(
                 "search-changed", self.on_search_entry_changed
             )
 
     def init_actions_for_menu_entries(self) -> None:
-        """Add actions accessible in the UI."""
         action = Gio.SimpleAction.new("about", None)
         action.connect("activate", self.on_about_action)
         self.add_action(action)
@@ -259,12 +256,13 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.add_action(action)
 
     def init_actions_for_toasts(self) -> None:
+        """Register actions which can be triggered from toast notifications."""
         action = Gio.SimpleAction.new("create_new_sheet", None)
         action.connect("activate", self.on_create_new_sheet)
         self.add_action(action)
 
     def init_key_event_controllers(self) -> None:
-        """Register key press handler."""
+        """Register key press handlers."""
         evk = Gtk.EventControllerKey()
         evk.connect("key-pressed", self.on_key_pressed)
         self.add_controller(evk)
@@ -279,8 +277,8 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.headerbars.fullscreen.search_entry.add_controller(evk)
 
     def init_sheet_dropdown(self) -> None:
-        """Populate dropdown and select appropriate sheet."""
-        # Use the same model from normal dropdown for the fullscreen dropdown
+        """Populate sheet dropdown with available sheet IDs."""
+        # Use the model from normal dropdown also for the fullscreen dropdown
         model = self.headerbars.normal.sheet_dropdown.get_model()
         self.headerbars.fullscreen.sheet_dropdown.set_model(model)
 
@@ -295,7 +293,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def on_set_fallback_sheet(
         self, action: Gio.SimpleAction, state: GLib.Variant
     ) -> None:
-        """Set the default sheet to use."""
+        """Set the sheet to use in case no matching sheet is found."""
         sheet_id = state.get_string()
         self.config.set_persistent("main", "fallback_cheatsheet", sheet_id)
         for bar in self.headerbars:
@@ -303,6 +301,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
     @check_state
     def on_change_sheet(self, action: Gio.SimpleAction, state: GLib.Variant) -> None:
+        """Get selected sheet and render it in the UI."""
         dropdown_model = self.headerbars.normal.sheet_dropdown.get_model()
 
         # Satisfy type checker
@@ -323,7 +322,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
     @check_state
     def on_change_zoom(self, action: Gio.SimpleAction, state: GLib.Variant) -> None:
-        """Set the zoom level of the sheet container."""
+        """Set the zoom level of the sheet container via css."""
         value = state.get_int32()
 
         for bar in self.headerbars:
@@ -349,7 +348,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def on_change_orientation(
         self, action: Gio.SimpleAction, state: GLib.Variant
     ) -> None:
-        """Set the orientation of the sheet container."""
+        """Set the orientation or scroll direction of the sheet container."""
         # The used GTK orientation is the opposite of the config value, which follows
         # the naming from user perspective!
         value = state.get_string()
@@ -376,7 +375,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         if state is not None:
             to_fullscreen = bool(state)
         else:
-            # toggle
+            # If state is not provided, just toggle the action's state
             to_fullscreen = not bool(action.get_state())
         action.set_state(GLib.Variant("b", to_fullscreen))
 
@@ -394,6 +393,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.config.set_persistent("main", "fullscreen", to_fullscreen)
 
     def scroll(self, to_start: bool, by_page: bool) -> None:
+        """Scroll the sheet container by a certain distance."""
         if self.sheet_container_box.get_orientation() == 1:
             adj = self.scrolled_window.get_hadjustment()
         else:
@@ -407,7 +407,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         adj.set_value(adj.get_value() + distance)
 
     def focus_search_entry(self) -> None:
-        """Focus search entry depending on state."""
+        """Focus search entry of the active headerbar."""
         if self.is_fullscreen():
             self.headerbars.fullscreen.search_entry.grab_focus()
             self.headerbars.fullscreen.search_entry.set_position(-1)
@@ -416,6 +416,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             self.headerbars.normal.search_entry.set_position(-1)
 
     def show_create_new_sheet_toast(self) -> None:
+        """Display a toast notification to offer the creation of a new cheatsheet."""
         toast = Adw.Toast.new(f"No cheatsheet found for '{self.wm_class}'.")
         toast.set_button_label("Create new")
         toast.set_action_name("win.create_new_sheet")
@@ -423,7 +424,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.overlay.add_toast(toast)
 
     def on_fullscreen_state_changed(self, _: Gtk.Widget, __: GObject.Parameter) -> None:
-        """Hide header bar in title and show it in window instead, and vice versa."""
+        """Toggle fullscreen header bar according to current window state."""
         if self.is_fullscreen():
             self.headerbars.fullscreen.set_visible(True)
         else:
@@ -450,6 +451,10 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         keyval: int,
         modifier: Gdk.ModifierType,
     ) -> None:
+        """Handle key press events in the search entry field.
+
+        Note: The search itself is triggered by the 'change' event, not by 'key-pressed'
+        """
         if keycode == Gdk.KEY_Escape:
             self.close()
 
@@ -460,6 +465,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         keyval: int,
         modifier: Gdk.ModifierType,
     ) -> None:
+        """Handle key press events in the main window."""
         ctrl_pressed = modifier == Gdk.ModifierType.CONTROL_MASK
         match keycode, ctrl_pressed:
             case Gdk.KEY_Escape, _:
@@ -486,7 +492,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
                 self.scroll(to_start=False, by_page=True)
 
     def on_about_action(self, _: Gio.SimpleAction, __: None) -> None:
-        """Execute on click "about" in application menu."""
+        """Show modal 'About' dialog."""
         logo = Gtk.Image.new_from_file(f"{RESOURCE_PATH}/keyhint_icon.svg")
         Gtk.AboutDialog(
             program_name="KeyHint",
@@ -502,6 +508,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         ).show()
 
     def on_debug_action(self, _: Gio.SimpleAction, __: None) -> None:
+        """Show modal dialog with information useful for error reporting."""
         label = Gtk.Label()
         label.set_use_markup(True)
         label.set_wrap(True)
@@ -529,6 +536,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         dialog.show()
 
     def on_create_new_sheet(self, _: Gio.SimpleAction, __: None) -> None:
+        """Create a new text file with a template for a new cheatsheet."""
         title = self.wm_class.lower().replace(" ", "")
         pad = 26 - len(title)
         template = f"""\
@@ -546,16 +554,20 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             "Ctrl + v" = "Paste from clipboard"
         """
         template = textwrap.dedent(template)
+
         new_file = config.CONFIG_PATH / f"{title}.toml"
-        for idx in range(1, 100):
-            if new_file.exists():
-                new_file = new_file.with_name(f"{title}_{idx}.toml")
-            else:
-                break
+
+        # Make sure the file name is unique
+        idx = 1
+        while new_file.exists():
+            new_file = new_file.with_name(f"{title}_{idx}.toml")
+            idx += 1
+
         new_file.write_text(template)
         subprocess.Popen(["xdg-open", str(new_file.resolve())])  # noqa: S603, S607
 
     def on_open_folder_action(self, _: Gio.SimpleAction, __: None) -> None:
+        """Open config folder in default file manager."""
         subprocess.Popen(["xdg-open", str(config.CONFIG_PATH.resolve())])  # noqa: S603, S607
 
     def sections_filter_func(self, child: Gtk.FlowBoxChild) -> bool:
@@ -582,19 +594,24 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def sections_sort_func(
         self, child_a: Gtk.FlowBoxChild, child_b: Gtk.FlowBoxChild
     ) -> bool:
+        """Sort function for the sections of the cheatsheet."""
         sort_by = self.config["main"].get("sort_by", "size")
 
         if sort_by == "native":
+            # The names use the format 'section-{INDEX}', so just sort by that
             return child_a.get_name() > child_b.get_name()
 
         sub_child_a = child_a.get_child()
         sub_child_b = child_b.get_child()
+
+        # Satisfy type checker
         if not isinstance(sub_child_a, Gtk.ColumnView) or not isinstance(
             sub_child_b, Gtk.ColumnView
         ):
             raise TypeError("Child is not a ColumnView.")
 
         if sort_by == "size":
+            # Sorts by number of bindings in the section
             model_a = sub_child_a.get_model()
             model_b = sub_child_b.get_model()
             if not isinstance(model_a, Gtk.NoSelection) or not isinstance(
@@ -615,6 +632,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         raise ValueError(f"Invalid sort_by value: {sort_by}")
 
     def get_appropriate_sheet_id(self) -> str:
+        """Determine the sheet ID based on context or configuration."""
         sheet_id = None
 
         # If sheet-id was provided via cli option, use that one
@@ -668,7 +686,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         if row.shortcut:
             child = Gtk.Label(label=row.label, xalign=0.0)
         else:
-            # section title
+            # Section title
             child = Gtk.Label(xalign=0.0)
             child.set_markup(f"<b>{row.label}</b>")
         item.set_child(child)
@@ -679,6 +697,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         return True
 
     def show_sheet(self, sheet_id: str) -> None:
+        """Clear sheet container and populate it with the selected sheet."""
         if hasattr(self.sheet_container_box, "remove_all"):
             # Only available in GTK 4.12+
             self.sheet_container_box.remove_all()
@@ -687,12 +706,10 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             while child := self.sheet_container_box.get_first_child():
                 self.sheet_container_box.remove(child)
 
-        sheet = sheets.get_sheet_by_id(sheets=self.sheets, sheet_id=sheet_id)
-
         self.max_shortcut_width = 0
 
+        sheet = sheets.get_sheet_by_id(sheets=self.sheets, sheet_id=sheet_id)
         sections = sheet["section"]
-
         for index, (section, bindings) in enumerate(sections.items()):
             section_child = self.create_section(section, bindings)
             section_child.set_name(f"section-{index:03}")
@@ -733,6 +750,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         return state.get_string() if state else ""
 
     def get_debug_info_text(self) -> str:
+        """Compile information which is useful for error analysis."""
         sheet_id = self.get_current_sheet_id()
         sheet = (
             sheets.get_sheet_by_id(sheets=self.sheets, sheet_id=sheet_id)
