@@ -17,6 +17,7 @@ TODO: Create Flatpak
 """
 
 import logging
+import platform
 import subprocess
 import textwrap
 from collections.abc import Callable
@@ -501,7 +502,6 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         ).show()
 
     def on_debug_action(self, _: Gio.SimpleAction, __: None) -> None:
-        dialog = Gtk.Dialog(title="Debug Info", transient_for=self, modal=True)
         label = Gtk.Label()
         label.set_use_markup(True)
         label.set_wrap(True)
@@ -511,7 +511,21 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         label.set_margin_start(24)
         label.set_margin_end(24)
 
-        dialog.set_child(label)
+        def _on_copy_clicked(button: Gtk.Button) -> None:
+            if display := Gdk.Display.get_default():
+                clipboard = display.get_clipboard()
+                clipboard.set(f"### Debug Info:\n```{label.get_text()}```")
+                button.set_icon_name("checkmark")
+                button.set_tooltip_text("Copied!")
+
+        copy_button = Gtk.Button()
+        copy_button.set_icon_name("edit-copy")
+        copy_button.set_tooltip_text("Copy to clipboard")
+        copy_button.connect("clicked", _on_copy_clicked)
+
+        dialog = Gtk.Dialog(title="Debug Info", transient_for=self, modal=True)
+        dialog.get_content_area().append(label)
+        dialog.add_action_widget(copy_button, Gtk.ResponseType.NONE)
         dialog.show()
 
     def on_create_new_sheet(self, _: Gio.SimpleAction, __: None) -> None:
@@ -729,6 +743,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         regex_title = sheet.get("match", {}).get("regex_title", "n/a")
         link = sheet.get("url", "")
         link_text = f"<span foreground='#00A6FF'>{link or 'n/a'}</span>"
+        desktop_environment = context.get_desktop_environment()
 
         return textwrap.dedent(
             f"""
@@ -743,5 +758,14 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             <span foreground='#FF2E88'>regex_wmclass:</span> {regex_wm_class}
             <span foreground='#FF2E88'>regex_title:</span> {regex_title}
             <span foreground='#FF2E88'>source:</span> <a href='{link}'>{link_text}</a>
+
+            <big>System Information</big>
+
+            <span foreground='#FF2E88'>Platform:</span> {platform.platform()}
+            <span foreground='#FF2E88'>Desktop Environment:</span> {desktop_environment}
+            <span foreground='#FF2E88'>Wayland:</span> {context.is_using_wayland()}
+            <span foreground='#FF2E88'>Python:</span> {platform.python_version()}
+            <span foreground='#FF2E88'>Keyhint:</span> v{__version__}
+            <span foreground='#FF2E88'>Flatpak:</span> {context.is_flatpak_package()}\
             """
         )
