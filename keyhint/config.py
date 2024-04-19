@@ -16,6 +16,13 @@ class WritingConfigParser(ConfigParser):
     def set_persistent(
         self, section: str, option: str, value: str | bool | int
     ) -> None:
+        """Updates the config file on disk, in case the value has changed.
+
+        Args:
+            section: Config section in the toml file.
+            option: Setting name in the section.
+            value: Setting value to be updated.
+        """
         if self.get(section, option) == str(value):
             return
         self.set(section, option, str(value))
@@ -23,7 +30,7 @@ class WritingConfigParser(ConfigParser):
 
 
 def load() -> WritingConfigParser:
-    """Create the default settings file if it doesn't exist."""
+    """Load the settings file or create a default settings file if it doesn't exist."""
     config = WritingConfigParser(
         defaults={
             "fullscreen": "True",

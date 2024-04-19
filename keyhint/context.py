@@ -1,4 +1,4 @@
-"""Various utility functions."""
+"""Functions to provide info about the context in which keyhint was started."""
 
 import json
 import logging
@@ -9,6 +9,97 @@ import subprocess
 import traceback
 
 logger = logging.getLogger("keyhint")
+
+
+def is_using_wayland() -> bool:
+    """Check if we are running on Wayland DE.
+
+    Returns:
+        [bool] -- {True} if probably Wayland
+    """
+    return "WAYLAND_DISPLAY" in os.environ
+
+
+def get_gnome_version() -> str:
+    """Detect Gnome version of current session.
+
+    Returns:
+        Version string or '(n/a)'.
+    """
+    if not shutil.which("gnome-shell"):
+        return "(n/a)"
+
+    try:
+        output = subprocess.check_output(
+            ["gnome-shell", "--version"],  # noqa: S607
+            shell=False,  # noqa: S603
+            text=True,
+        )
+        if result := re.search(r"\s+([\d\.]+)", output.strip()):
+            gnome_version = result.groups()[0]
+    except Exception as e:
+        logger.warning("Exception when trying to get gnome version from cli %s", e)
+        return "(n/a)"
+    else:
+        return gnome_version
+
+
+def is_flatpak_package() -> bool:
+    """Check if the application is running inside a flatpak package."""
+    return os.getenv("FLATPAK_ID") is not None
+
+
+def get_kde_version() -> str:
+    """Detect KDE platform version of current session.
+
+    Returns:
+        Version string or '(n/a)'.
+    """
+    if not shutil.which("plasma-desktop"):
+        return "(n/a)"
+
+    try:
+        output = subprocess.check_output(
+            ["plasma-desktop", "--version"],  # noqa: S607
+            shell=False,  # noqa: S603
+            text=True,
+        )
+        if result := re.search(r"Platform:\s+([\d+\.]+)", output.strip()):
+            kde_version = result.groups()[0]
+    except Exception as e:
+        logger.warning("Exception when trying to get kde version from cli %s", e)
+        return "(n/a)"
+    else:
+        return kde_version
+
+
+def get_desktop_environment() -> str:
+    """Detect used desktop environment."""
+    kde_full_session = os.environ.get("KDE_FULL_SESSION", "").lower()
+    xdg_current_desktop = os.environ.get("XDG_CURRENT_DESKTOP", "").lower()
+    desktop_session = os.environ.get("DESKTOP_SESSION", "").lower()
+    gnome_desktop_session_id = os.environ.get("GNOME_DESKTOP_SESSION_ID", "")
+    hyprland_instance_signature = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE", "")
+
+    if gnome_desktop_session_id == "this-is-deprecated":
+        gnome_desktop_session_id = ""
+
+    de = "not detected"
+
+    if gnome_desktop_session_id or "gnome" in xdg_current_desktop:
+        de = f"Gnome v{get_gnome_version()}"
+    if kde_full_session or "kde-plasma" in desktop_session:
+        de = f"KDE v{get_kde_version()}"
+    if "sway" in xdg_current_desktop or "sway" in desktop_session:
+        de = "Sway"
+    if "unity" in xdg_current_desktop:
+        de = "Unity"
+    if hyprland_instance_signature:
+        de = "Hyprland"
+    if "awesome" in xdg_current_desktop:
+        de = "Awesome"
+
+    return de
 
 
 def get_active_window_info_wayland() -> tuple[str, str]:
@@ -92,96 +183,6 @@ def get_active_window_info_x() -> tuple[str, str]:
         wm_class = match.group("class")
 
     return wm_class, title
-
-
-def is_using_wayland() -> bool:
-    """Check if we are running on Wayland DE.
-
-    Returns:
-        [bool] -- {True} if probably Wayland
-    """
-    return "WAYLAND_DISPLAY" in os.environ
-
-
-def get_gnome_version() -> str:
-    """Detect Gnome version of current session.
-
-    Returns:
-        Version string or '(n/a)'.
-    """
-    if not shutil.which("gnome-shell"):
-        return "(n/a)"
-
-    try:
-        output = subprocess.check_output(
-            ["gnome-shell", "--version"],  # noqa: S607
-            shell=False,  # noqa: S603
-            text=True,
-        )
-        if result := re.search(r"\s+([\d\.]+)", output.strip()):
-            gnome_version = result.groups()[0]
-    except Exception as e:
-        logger.warning("Exception when trying to get gnome version from cli %s", e)
-        return "(n/a)"
-    else:
-        return gnome_version
-
-
-def is_flatpak_package() -> bool:
-    return os.getenv("FLATPAK_ID") is not None
-
-
-def get_kde_version() -> str:
-    """Detect KDE platform version of current session.
-
-    Returns:
-        Version string or '(n/a)'.
-    """
-    if not shutil.which("plasma-desktop"):
-        return "(n/a)"
-
-    try:
-        output = subprocess.check_output(
-            ["plasma-desktop", "--version"],  # noqa: S607
-            shell=False,  # noqa: S603
-            text=True,
-        )
-        if result := re.search(r"Platform:\s+([\d+\.]+)", output.strip()):
-            kde_version = result.groups()[0]
-    except Exception as e:
-        logger.warning("Exception when trying to get kde version from cli %s", e)
-        return "(n/a)"
-    else:
-        return kde_version
-
-
-def get_desktop_environment() -> str:
-    """Detect used desktop environment (Linux)."""
-    kde_full_session = os.environ.get("KDE_FULL_SESSION", "").lower()
-    xdg_current_desktop = os.environ.get("XDG_CURRENT_DESKTOP", "").lower()
-    desktop_session = os.environ.get("DESKTOP_SESSION", "").lower()
-    gnome_desktop_session_id = os.environ.get("GNOME_DESKTOP_SESSION_ID", "")
-    hyprland_instance_signature = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE", "")
-
-    if gnome_desktop_session_id == "this-is-deprecated":
-        gnome_desktop_session_id = ""
-
-    de = "not detected"
-
-    if gnome_desktop_session_id or "gnome" in xdg_current_desktop:
-        de = f"Gnome v{get_gnome_version()}"
-    if kde_full_session or "kde-plasma" in desktop_session:
-        de = f"KDE v{get_kde_version()}"
-    if "sway" in xdg_current_desktop or "sway" in desktop_session:
-        de = "Sway"
-    if "unity" in xdg_current_desktop:
-        de = "Unity"
-    if hyprland_instance_signature:
-        de = "Hyprland"
-    if "awesome" in xdg_current_desktop:
-        de = "Awesome"
-
-    return de
 
 
 def detect_active_window() -> tuple[str, str]:
