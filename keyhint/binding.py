@@ -2,7 +2,7 @@
 
 import logging
 
-from gi.repository import GLib, Gtk
+from gi.repository import GLib, GObject, Gtk
 
 logger = logging.getLogger("keyhint")
 
@@ -41,6 +41,18 @@ def style_key(text: str) -> tuple[str, list[str]]:
         text = text.replace("\\&", "&")
         css_classes = ["keycap"]
     return text, css_classes
+
+
+class Row(GObject.Object):
+    shortcut: str
+    label: str
+    filter_text: str
+
+    def __init__(self, shortcut: str, label: str, section: str) -> None:
+        super().__init__()
+        self.shortcut = shortcut
+        self.label = label
+        self.filter_text = f"{shortcut} {label} {section}"
 
 
 def create_shortcut(text: str) -> Gtk.Box:
