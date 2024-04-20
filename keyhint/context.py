@@ -6,6 +6,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import traceback
 
 logger = logging.getLogger("keyhint")
@@ -202,7 +203,7 @@ def detect_active_window() -> tuple[str, str]:
             wm_class, window_title = get_active_window_info_x()
     except Exception:
         traceback.print_stack()
-        logger.error(
+        logger.error(  # noqa: TRY400  # the stacktrace should be before message
             "Couldn't detect active application window.\n"
             "KeyHint supports Wayland and Xorg.\n"
             "For Wayland, the installation of the 'Window Calls' gnome extension is "
@@ -212,7 +213,7 @@ def detect_active_window() -> tuple[str, str]:
             "If you met the prerequisites but still see this, please create an issue "
             "incl. the traceback above on:\nhttps://github.com/dynobo/keyhint/issues"
         )
-        exit(1)
+        sys.exit(1)
 
     logger.debug("Detected wm_class: '%s'.", wm_class)
     logger.debug("Detected window_title: '%s'.", window_title)
