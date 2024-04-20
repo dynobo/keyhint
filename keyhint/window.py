@@ -521,8 +521,8 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         def _on_copy_clicked(button: Gtk.Button) -> None:
             if display := Gdk.Display.get_default():
                 clipboard = display.get_clipboard()
-                clipboard.set(f"### Debug Info:\n```{label.get_text()}```")
-                button.set_icon_name("checkmark")
+                clipboard.set(f"### Debug Info\n\n```\n{label.get_text().strip()}\n```")
+                button.set_icon_name("object-select-symbolic")
                 button.set_tooltip_text("Copied!")
 
         copy_button = Gtk.Button()
@@ -667,7 +667,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def bind_shortcuts_callback(
         self,
         _: Gtk.SignalListItemFactory,
-        item,  # type: ignore  # ONHOLD: Gtk.ColumnViewCell for GTK 4.12+
+        item,  # noqa: ANN001 # ONHOLD: Gtk.ColumnViewCell for GTK 4.12+
     ) -> None:
         row = cast(binding.Row, item.get_item())
         shortcut = binding.create_shortcut(row.shortcut)
@@ -680,7 +680,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def bind_labels_callback(
         self,
         _: Gtk.SignalListItemFactory,
-        item,  # type: ignore  # ONHOLD: Gtk.ColumnViewCell for GTK 4.12+
+        item,  # noqa: ANN001  # ONHOLD: Gtk.ColumnViewCell for GTK 4.12+
     ) -> None:
         row = cast(binding.Row, item.get_item())
         if row.shortcut:
