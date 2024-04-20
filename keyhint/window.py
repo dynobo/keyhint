@@ -667,7 +667,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def bind_shortcuts_callback(
         self,
         _: Gtk.SignalListItemFactory,
-        item: Gtk.ColumnViewCell,  # type: ignore  # Available since GTK 4.12
+        item,  # type: ignore  # ONHOLD: Gtk.ColumnViewCell for GTK 4.12+
     ) -> None:
         row = cast(binding.Row, item.get_item())
         shortcut = binding.create_shortcut(row.shortcut)
@@ -680,7 +680,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def bind_labels_callback(
         self,
         _: Gtk.SignalListItemFactory,
-        item: Gtk.ColumnViewCell,  # type: ignore  # Available since GTK 4.12
+        item,  # type: ignore  # ONHOLD: Gtk.ColumnViewCell for GTK 4.12+
     ) -> None:
         row = cast(binding.Row, item.get_item())
         if row.shortcut:
