@@ -28,7 +28,7 @@ class WritingConfigParser(ConfigParser):
         self.set(section, option, str(value))
         if not CONFIG_FILE.parent.exists():
             CONFIG_FILE.parent.mkdir(exist_ok=True, parents=True)
-            
+
         self.write(CONFIG_FILE.open("w"))
 
 
