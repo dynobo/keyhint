@@ -53,7 +53,7 @@ dependencies = [
 
 [tool.hatch.envs.default.scripts]
 style = [
-  "ruff {args:.}",
+  "ruff check {args:.}",
   "ruff format --check --diff {args:.}",
   "mdformat --check --end-of-line keep {args:.}",
 ]
@@ -61,7 +61,7 @@ typing = "mypy"
 test = ["pytest {args:tests}", "coverage lcov"]
 security = "pip-audit"
 fmt = [
-  "ruff --fix {args:.}",
+  "ruff check --fix {args:.}",
   "ruff format {args:.}",
   "mdformat --end-of-line keep {args:.}",
 ]
