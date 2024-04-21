@@ -58,6 +58,8 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     __gtype_name__ = "main_window"
 
     overlay = cast(Adw.ToastOverlay, Gtk.Template.Child())
+    banner_window_calls = cast(Adw.Banner, Gtk.Template.Child())
+    banner_xprop = cast(Adw.Banner, Gtk.Template.Child())
     scrolled_window = cast(Gtk.ScrolledWindow, Gtk.Template.Child())
     container = cast(Gtk.Box, Gtk.Template.Child())
     sheet_container_box = cast(Gtk.FlowBox, Gtk.Template.Child())
@@ -75,7 +77,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.cli_args = cli_args
         self.config = config.load()
         self.sheets = sheets.load_sheets()
-        self.wm_class, self.window_title = context.detect_active_window()
+        self.wm_class, self.window_title = self.init_last_active_window_info()
 
         self.skip_search_changed: bool = False
         self.search_text: str = ""
@@ -105,10 +107,47 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.init_action_fallback_sheet()
         self.init_actions_for_menu_entries()
         self.init_actions_for_toasts()
+        self.init_actions_for_banners()
         self.init_search_entry()
         self.init_key_event_controllers()
 
         self.focus_search_entry()
+
+    def init_last_active_window_info(self) -> tuple[str, str]:
+        """Get class and title of active window.
+
+        Identify the OS and display server and pick the method accordingly.
+
+        Returns:
+            Tuple[str, str]: wm_class, window title
+        """
+        wm_class = wm_title = ""
+
+        on_wayland = context.is_using_wayland()
+        desktop_environment = context.get_desktop_environment_and_version()[0].lower()
+
+        match (on_wayland, desktop_environment):
+            case True, "gnome":
+                if context.has_window_calls_extension():
+                    wm_class, wm_title = context.get_active_window_via_window_calls()
+                else:
+                    self.banner_window_calls.set_revealed(True)
+                    logger.error("Window Calls extension not found!")
+
+            case False, _:
+                if context.has_xprop():
+                    wm_class, wm_title = context.get_active_window_via_xprop()
+                else:
+                    self.banner_xprop.set_revealed(True)
+                    logger.error("xprop not found!")
+
+        logger.debug("Detected wm_class: '%s'.", wm_class)
+        logger.debug("Detected window_title: '%s'.", wm_title)
+
+        if "" in [wm_class, wm_title]:
+            logger.warning("Couldn't detect active window!")
+
+        return wm_class, wm_title
 
     def init_action_sort_by(self) -> None:
         action = Gio.SimpleAction.new_stateful(
@@ -256,9 +295,20 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.add_action(action)
 
     def init_actions_for_toasts(self) -> None:
-        """Register actions which can be triggered from toast notifications."""
+        """Register actions which are triggered from toast notifications."""
         action = Gio.SimpleAction.new("create_new_sheet", None)
         action.connect("activate", self.on_create_new_sheet)
+        self.add_action(action)
+
+    def init_actions_for_banners(self) -> None:
+        """Register actions which are triggered from banners."""
+        action = Gio.SimpleAction.new("visit_window_calls", None)
+        action.connect(
+            "activate",
+            lambda *args: Gio.AppInfo.launch_default_for_uri(
+                "https://extensions.gnome.org/extension/4724/window-calls/"
+            ),
+        )
         self.add_action(action)
 
     def init_key_event_controllers(self) -> None:
@@ -761,7 +811,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         regex_title = sheet.get("match", {}).get("regex_title", "n/a")
         link = sheet.get("url", "")
         link_text = f"<span foreground='#00A6FF'>{link or 'n/a'}</span>"
-        desktop_environment = context.get_desktop_environment()
+        desktop_environment = " ".join(context.get_desktop_environment_and_version())
 
         return textwrap.dedent(
             f"""

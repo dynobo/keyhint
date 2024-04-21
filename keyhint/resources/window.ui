@@ -14,6 +14,21 @@
           <object class="GtkBox" id="container">
             <property name="orientation">1</property>
             <child>
+              <object class="AdwBanner" id="banner_window_calls">
+                <property name="button-label" translatable="true">Gnome Extension Webpage</property>
+                <property name="title" translatable="true">The Gnome Extension 'Window Calls' is required on Wayland!</property>
+                <property name="revealed">False</property>
+                <property name="action-name">win.visit_window_calls</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwBanner" id="banner_xprop">
+                <property name="title" translatable="true">The tool 'xprop' is required on Xorg. Install the system package 'x11-utils' (Debian/Ubuntu) or 'xprop' (Arch/Fedora)!</property>
+                <property name="revealed">False</property>
+                <property name="action-name">win.visit_xprop</property>
+              </object>
+            </child>
+            <child>
               <object class="GtkScrolledWindow" id="scrolled_window">
                 <property name="propagate-natural-height">true</property>
                 <child>
