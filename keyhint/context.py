@@ -6,6 +6,9 @@ import os
 import re
 import shutil
 import subprocess
+import tempfile
+import textwrap
+from datetime import datetime
 
 logger = logging.getLogger("keyhint")
 
@@ -63,16 +66,16 @@ def get_kde_version() -> str:
     Returns:
         Version string or '(n/a)'.
     """
-    if not shutil.which("plasma-desktop"):
+    if not shutil.which("plasmashell"):
         return "(n/a)"
 
     try:
         output = subprocess.check_output(
-            ["plasma-desktop", "--version"],  # noqa: S607
+            ["plasmashell", "--version"],  # noqa: S607
             shell=False,  # noqa: S603
             text=True,
         )
-        if result := re.search(r"Platform:\s+([\d+\.]+)", output.strip()):
+        if result := re.search(r"([\d+\.]+)", output.strip()):
             kde_version = result.groups()[0]
     except Exception as e:
         logger.warning("Exception when trying to get kde version from cli %s", e)
@@ -124,7 +127,7 @@ def has_window_calls_extension() -> bool:
 
 
 def get_active_window_via_window_calls() -> tuple[str, str]:
-    """Retrieve active window class and active window title on Wayland.
+    """Retrieve active window class and active window title on Gnome + Wayland.
 
     Inspired by https://gist.github.com/rbreaves/257c3edfa301786e66e964d7ac036269
 
@@ -161,6 +164,74 @@ def get_active_window_via_window_calls() -> tuple[str, str]:
         f"{focused_window['id']}"
     )
     title = _get_cmd_result(cmd_windows_get_title)
+
+    return wm_class, title
+
+
+def get_active_window_via_kwin() -> tuple[str, str]:
+    """Retrieve active window class and active window title on KDE + Wayland.
+
+    Returns:
+        Tuple(str, str): window class, window title
+    """
+    kwin_script = textwrap.dedent("""
+        console.info("keyhint test");
+        client = workspace.activeClient;
+        title = client.caption;
+        wm_class = client.resourceClass;
+        console.info(`keyhint_out: wm_class=${wm_class}, window_title=${title}`);
+        """)
+
+    with tempfile.NamedTemporaryFile(suffix=".js", delete=False) as fh:
+        fh.write(kwin_script.encode())
+        cmd_load = (
+            "gdbus call --session --dest org.kde.KWin "
+            "--object-path /Scripting "
+            f"--method org.kde.kwin.Scripting.loadScript '{fh.name}'"
+        )
+        logger.debug("cmd_load: %s", cmd_load)
+        stdout = subprocess.check_output(cmd_load, shell=True).decode()  # noqa: S602
+
+    logger.debug("loadScript output: %s", stdout)
+    script_id = stdout.strip().strip("()").split(",")[0]
+
+    since = str(datetime.now())
+
+    cmd_run = (
+        "gdbus call --session --dest org.kde.KWin "
+        f"--object-path /{script_id} "
+        "--method org.kde.kwin.Script.run"
+    )
+    subprocess.check_output(cmd_run, shell=True)  # noqa: S602
+
+    cmd_unload = (
+        "gdbus call --session --dest org.kde.KWin "
+        "--object-path /Scripting "
+        f"--method org.kde.kwin.Scripting.unloadScript {script_id}"
+    )
+    subprocess.check_output(cmd_unload, shell=True)  # noqa: S602
+
+    # Unfortunately, we can read script output from stdout, because of a KDE bug:
+    # https://bugs.kde.org/show_bug.cgi?id=445058
+    # The output has to be read through journalctl instead. A timestamp for
+    # filtering speeds up the process.
+    log_lines = (
+        subprocess.check_output(
+            f'journalctl --user -o cat --since "{since}"',
+            shell=True,  # noqa: S602
+        )
+        .decode()
+        .split("\n")
+    )
+    logger.debug("Journal message: %s", log_lines)
+    result_line = [m for m in log_lines if "keyhint_out" in m][-1]
+    match = re.search(r"keyhint_out: wm_class=(.+), window_title=(.+)", result_line)
+    if match:
+        wm_class = match.group(1)
+        title = match.group(2)
+    else:
+        logger.warning("Could not extract window info from KWin log!")
+        wm_class = title = ""
 
     return wm_class, title
 

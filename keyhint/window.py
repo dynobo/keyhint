@@ -86,7 +86,6 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             display=self.get_display(), css_file=RESOURCE_PATH / "style.css"
         )
         self.zoom_css_provider = css.new_provider(display=self.get_display())
-        self.set_icon_name("keyhint")
 
         self.set_titlebar(self.headerbars.normal)
         self.container.prepend(self.headerbars.fullscreen)
@@ -133,7 +132,8 @@ class KeyhintWindow(Gtk.ApplicationWindow):
                 else:
                     self.banner_window_calls.set_revealed(True)
                     logger.error("Window Calls extension not found!")
-
+            case True, "kde":
+                wm_class, wm_title = context.get_active_window_via_kwin()
             case False, _:
                 if context.has_xprop():
                     wm_class, wm_title = context.get_active_window_via_xprop()
@@ -591,7 +591,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         pad = 26 - len(title)
         template = f"""\
             id = "{title}"{" " * pad } # Unique ID, used e.g. in cheatsheet dropdown
-            url = ""                       # (Optional) URL to keybinding docs
+            url = ""                          # (Optional) URL to keybinding docs
 
             [match]
             regex_wmclass = "{self.wm_class}"
@@ -834,6 +834,5 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             <span foreground='#FF2E88'>Wayland:</span> {context.is_using_wayland()}
             <span foreground='#FF2E88'>Python:</span> {platform.python_version()}
             <span foreground='#FF2E88'>Keyhint:</span> v{__version__}
-            <span foreground='#FF2E88'>Flatpak:</span> {context.is_flatpak_package()}\
-            """
+            <span foreground='#FF2E88'>Flatpak:</span> {context.is_flatpak_package()}"""
         )

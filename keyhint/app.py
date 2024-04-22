@@ -35,7 +35,7 @@ class Application(Adw.Application):
     def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Initialize application with command line options."""
         kwargs.update(
-            application_id="eu.dynobo.keyhint",
+            application_id="com.github.dynobo.keyhint",
             flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE,
         )
         super().__init__(

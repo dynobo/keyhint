@@ -168,7 +168,7 @@
             </child>
             <child>
               <object class="GtkButton" id="fallback_sheet_button">
-                <property name="icon-name">view-pin-symbolic</property>
+                <property name="icon-name">pin</property>
                 <property name="tooltip-text" translatable="true">Set to current cheatsheet</property>
               </object>
             </child>
