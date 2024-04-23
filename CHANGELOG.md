@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.5.0 (upcoming)
+## v0.5.0
 
 - Breaking changes:
   - Renamed the attribute `regex_process` in `toml`-files to `regex_wmclass`.
@@ -8,6 +8,7 @@
   - Removed cli-args which are now covered by settings menu.
 - Fix duplicate IDs in included sections.
 - Add settings menu to ui.
+- Add Support KDE + Wayland.
 - Focus search field on start.
 - Cheatsheets:
   - Moved some CLI commands into separate cheatsheet and include it in terminal apps.

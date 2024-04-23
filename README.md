@@ -15,7 +15,7 @@ Linux._**
 ## Prerequisites
 
 - Python 3.11+
-- GTK 4.6+ (shipped since Ubuntu 22.04) + dev packages:
+- GTK 4.6+ (shipped since Ubuntu 22.04) + related dev packages:
   ```sh
   sudo apt-get install \
      libgirepository1.0-dev \
@@ -27,9 +27,6 @@ Linux._**
 - Wayland & Gnome: The
   [Gnome Extension "Window-Calls"](https://extensions.gnome.org/extension/4724/window-calls/)
   is required to auto-select the cheatsheet based on the current active application.
-- Wayland & KDE: Not yet implemented.
-  [Create an issue](https://github.com/dynobo/keyhint/issues/new) if you like to have
-  this support for this setup.
 
 ## Installation
 
