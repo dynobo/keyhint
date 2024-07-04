@@ -14,18 +14,54 @@
           <object class="GtkBox" id="container">
             <property name="orientation">1</property>
             <child>
-              <object class="AdwBanner" id="banner_window_calls">
-                <property name="button-label" translatable="true">Gnome Extension Webpage</property>
-                <property name="title" translatable="true">The Gnome Extension 'Window Calls' is required on Wayland!</property>
-                <property name="revealed">False</property>
-                <property name="action-name">win.visit_window_calls</property>
+              <object class="GtkRevealer" id="banner_window_calls">
+                <style>
+                  <class name="banner" />
+                </style>
+                <child>
+                  <object class="GtkBox">
+                    <property name="halign">center</property>
+                    <property name="margin-bottom">10</property>
+                    <property name="margin-end">5</property>
+                    <property name="margin-start">5</property>
+                    <property name="margin-top">10</property>
+                    <property name="orientation">horizontal</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label">The Gnome Extension 'Window Calls' is required on Wayland!</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton">
+                        <property name="margin-start">15</property>
+                        <property name="label">Gnome Extension Webpage</property>
+                        <property name="action-name">win.visit_window_calls</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
               </object>
             </child>
             <child>
-              <object class="AdwBanner" id="banner_xprop">
-                <property name="title" translatable="true">The tool 'xprop' is required on Xorg. Install the system package 'x11-utils' (Debian/Ubuntu) or 'xprop' (Arch/Fedora)!</property>
-                <property name="revealed">False</property>
-                <property name="action-name">win.visit_xprop</property>
+              <object class="GtkRevealer" id="banner_xprop">
+                <style>
+                  <class name="banner" />
+                </style>
+                <child>
+                  <object class="GtkBox">
+                    <property name="margin-bottom">10</property>
+                    <property name="margin-end">5</property>
+                    <property name="margin-start">5</property>
+                    <property name="margin-top">10</property>
+                    <property name="orientation">horizontal</property>
+                    <property name="halign">center</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label">The tool 'xprop' is required on Xorg! Install the system package 'x11-utils' (Debian/Ubuntu) or 'xprop' (Arch/Fedora)!</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
               </object>
             </child>
             <child>

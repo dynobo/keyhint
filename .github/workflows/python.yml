@@ -72,3 +72,7 @@ jobs:
         with:
           verbose: true
           print-hash: true
+
+      - uses: ncipollo/release-action@v1
+        with:
+          body: See [CHANGELOG.md](https://github.com/dynobo/keyhint/blob/main/CHANGELOG.md] for details.

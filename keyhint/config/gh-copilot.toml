@@ -1,0 +1,22 @@
+id = "gh-copilot"
+url = "https://docs.github.com/en/copilot/configuring-github-copilot/configuring-github-copilot-in-your-environment"
+hidden = true
+
+[match]
+regex_wmclass = "^$"
+regex_title = "^$"
+
+[section]
+
+[section.Suggestions]
+"Tab" = "Accept all"
+"Ctrl + r Right" = "Accept next word"
+"Alt + ] / [ " = "Show next / previous"
+"Alt + \\" = "Trigger suggestion"
+"Ctrl + Enter" = "Open 10 suggestions"
+"Esc" = "Dismiss"
+
+[section.Chat]
+"Ctrl + i" = "Open inline chat"
+"@" = "Add 'participants'"
+"#" = "Add context"
