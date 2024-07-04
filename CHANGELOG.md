@@ -1,6 +1,11 @@
 # Changelog
 
-## v0.5.0
+## v0.5.1 (2024-07-04)
+
+- Fix support for older version of `libadwaita`.
+- Add cheatsheet for GH copilot
+
+## v0.5.0 (2024-04-23)
 
 - Breaking changes:
   - Renamed the attribute `regex_process` in `toml`-files to `regex_wmclass`.

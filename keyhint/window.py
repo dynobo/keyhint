@@ -58,8 +58,8 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     __gtype_name__ = "main_window"
 
     overlay = cast(Adw.ToastOverlay, Gtk.Template.Child())
-    banner_window_calls = cast(Adw.Banner, Gtk.Template.Child())
-    banner_xprop = cast(Adw.Banner, Gtk.Template.Child())
+    banner_window_calls = cast(Gtk.Revealer, Gtk.Template.Child())
+    banner_xprop = cast(Gtk.Revealer, Gtk.Template.Child())
     scrolled_window = cast(Gtk.ScrolledWindow, Gtk.Template.Child())
     container = cast(Gtk.Box, Gtk.Template.Child())
     sheet_container_box = cast(Gtk.FlowBox, Gtk.Template.Child())
@@ -130,7 +130,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
                 if context.has_window_calls_extension():
                     wm_class, wm_title = context.get_active_window_via_window_calls()
                 else:
-                    self.banner_window_calls.set_revealed(True)
+                    self.banner_window_calls.set_reveal_child(True)
                     logger.error("Window Calls extension not found!")
             case True, "kde":
                 wm_class, wm_title = context.get_active_window_via_kwin()
@@ -138,7 +138,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
                 if context.has_xprop():
                     wm_class, wm_title = context.get_active_window_via_xprop()
                 else:
-                    self.banner_xprop.set_revealed(True)
+                    self.banner_xprop.set_reveal_child(True)
                     logger.error("xprop not found!")
 
         logger.debug("Detected wm_class: '%s'.", wm_class)
