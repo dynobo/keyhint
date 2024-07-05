@@ -339,6 +339,15 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         for sheet_id in sorted([s["id"] for s in self.sheets]):
             model.append(sheet_id)
 
+    @property
+    def active_headerbar(self) -> headerbar.HeaderBarBox:
+        """Return the currently active headerbar depending on window state."""
+        return (
+            self.headerbars.fullscreen
+            if self.is_fullscreen()
+            else self.headerbars.normal
+        )
+
     @check_state
     def on_set_fallback_sheet(
         self, action: Gio.SimpleAction, state: GLib.Variant
@@ -458,12 +467,8 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
     def focus_search_entry(self) -> None:
         """Focus search entry of the active headerbar."""
-        if self.is_fullscreen():
-            self.headerbars.fullscreen.search_entry.grab_focus()
-            self.headerbars.fullscreen.search_entry.set_position(-1)
-        else:
-            self.headerbars.normal.search_entry.grab_focus()
-            self.headerbars.normal.search_entry.set_position(-1)
+        self.active_headerbar.search_entry.grab_focus()
+        self.active_headerbar.search_entry.set_position(-1)
 
     def show_create_new_sheet_toast(self) -> None:
         """Display a toast notification to offer the creation of a new cheatsheet."""
@@ -523,15 +528,9 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             case Gdk.KEY_F11, _:
                 self.activate_action("win.fullscreen")
             case Gdk.KEY_f, True:
-                if self.is_fullscreen():
-                    self.headerbars.fullscreen.search_entry.grab_focus()
-                else:
-                    self.headerbars.normal.search_entry.grab_focus()
+                self.active_headerbar.grab_focus()
             case Gdk.KEY_s, True:
-                if self.is_fullscreen():
-                    self.headerbars.fullscreen.sheet_dropdown.grab_focus()
-                else:
-                    self.headerbars.normal.sheet_dropdown.grab_focus()
+                self.active_headerbar.sheet_dropdown.grab_focus()
             case (Gdk.KEY_Up, _) | (Gdk.KEY_k, True):
                 self.scroll(to_start=True, by_page=False)
             case (Gdk.KEY_Down, _) | (Gdk.KEY_j, True):
