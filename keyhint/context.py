@@ -41,9 +41,9 @@ def get_gnome_version() -> str:
         return "(n/a)"
 
     try:
-        output = subprocess.check_output(
+        output = subprocess.check_output(  # noqa: S603
             ["gnome-shell", "--version"],  # noqa: S607
-            shell=False,  # noqa: S603
+            shell=False,
             text=True,
         )
         if result := re.search(r"\s+([\d\.]+)", output.strip()):
@@ -70,9 +70,9 @@ def get_kde_version() -> str:
         return "(n/a)"
 
     try:
-        output = subprocess.check_output(
+        output = subprocess.check_output(  # noqa: S603
             ["plasmashell", "--version"],  # noqa: S607
-            shell=False,  # noqa: S603
+            shell=False,
             text=True,
         )
         if result := re.search(r"([\d+\.]+)", output.strip()):
@@ -216,9 +216,9 @@ def get_active_window_via_kwin() -> tuple[str, str]:
     # The output has to be read through journalctl instead. A timestamp for
     # filtering speeds up the process.
     log_lines = (
-        subprocess.check_output(
+        subprocess.check_output(  # noqa: S602
             f'journalctl --user -o cat --since "{since}"',
-            shell=True,  # noqa: S602
+            shell=True,
         )
         .decode()
         .split("\n")
@@ -243,9 +243,9 @@ def get_active_window_via_xprop() -> tuple[str, str]:
         Tuple(str, str): window class, window title
     """
     # Query id of active window
-    stdout_bytes: bytes = subprocess.check_output(
+    stdout_bytes: bytes = subprocess.check_output(  # noqa: S602
         "xprop -root _NET_ACTIVE_WINDOW",  # noqa: S607
-        shell=True,  # noqa: S602
+        shell=True,
     )
     stdout = stdout_bytes.decode()
 
@@ -257,9 +257,9 @@ def get_active_window_via_xprop() -> tuple[str, str]:
     window_id: str = match.group(1)
 
     # Query app_title and app_process
-    stdout_bytes = subprocess.check_output(
+    stdout_bytes = subprocess.check_output(  # noqa: S602
         f"xprop -id {window_id} WM_NAME WM_CLASS",
-        shell=True,  # noqa: S602
+        shell=True,
     )
     stdout = stdout_bytes.decode()
 
