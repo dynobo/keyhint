@@ -1,0 +1,17 @@
+id = "vscode-neovim"
+url = ""
+hidden = true
+
+[match]
+regex_wmclass = "^$"
+regex_title = "^$"
+
+[section]
+[section.General]
+"ma / mA" = "Multicursor after cursor / line"
+"mi / mI" = "Multicursor before cursor / line"
+"K" = "Show hover, repeat to focus hover"
+"gd" = "Goto definition"
+"gf" = "Goto declaration"
+"gH" = "Reference Search"
+"Ctrl + n / p" = "Next / previous list item"
