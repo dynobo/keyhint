@@ -8,13 +8,15 @@ on:
 
 jobs:
   build:
-    name: Test Build
+    name: Coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install hatch
-        run: pipx install hatch
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
 
       - uses: actions/setup-python@v5
         with:
@@ -30,10 +32,13 @@ jobs:
              gobject-introspection \
              libgtk-3-dev
 
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
       - name: Run pytest
-        run: hatch run test
+        run: uv run pytest
 
       - name: Coveralls
-        run: hatch run coveralls
+        run: uv run coveralls
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
