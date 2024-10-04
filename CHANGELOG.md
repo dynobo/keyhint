@@ -1,9 +1,15 @@
 # Changelog
 
+## v0.5.2 (2024-10-04)
+
+- Add cheatsheet for Alacritty.
+- Changed `cli` cheatsheet to hidden by default.
+- Renamed browser- and vscode-extension cheatsheets.
+
 ## v0.5.1 (2024-07-04)
 
 - Fix support for older version of `libadwaita`.
-- Add cheatsheet for GH copilot
+- Add cheatsheet for GH copilot.
 
 ## v0.5.0 (2024-04-23)
 
