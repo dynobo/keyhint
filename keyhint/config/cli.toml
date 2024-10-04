@@ -1,9 +1,10 @@
 id = "cli"
 url = ""
+hidden = true
 
 [match]
-regex_wmclass = "a^"
-regex_title = "a^"
+regex_wmclass = "^$"
+regex_title = "^$"
 
 [section]
 
@@ -43,6 +44,6 @@ pwd = "Print working dir"
 cd = "Change to home dir"
 "`cd -`" = "Change to previous dir"
 
-[section.Debuggin]
+[section.Debugging]
 "journalctl --since \"1m ago\"" = "System logs since time"
 "journalctl -k" = "System logs since boot"
