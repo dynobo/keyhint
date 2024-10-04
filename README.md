@@ -30,7 +30,8 @@ Linux._**
 
 ## Installation
 
-- `pipx install keyhint` (recommended, requires [pipx](https://pipx.pypa.io/))
+- `uv tool install keyhint` (recommended, requires [uv](https://docs.astral.sh/uv/))
+- `pipx install keyhint` (requires [pipx](https://pipx.pypa.io/))
 - _or_ `pip install keyhint`
 
 ## Usage
