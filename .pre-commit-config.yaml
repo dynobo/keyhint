@@ -19,9 +19,45 @@ repos:
       - id: mixed-line-ending
   - repo: local
     hooks:
-      - id: check
-        name: run project checks
+      - id: ruff-check
+        name: ruff check --fix .
         stages: [commit]
         language: system
-        entry: hatch run pre-commit
+        entry: ruff check .
+        pass_filenames: false
+      - id: ruff-format .
+        name: ruff format
+        stages: [commit]
+        language: system
+        entry: ruff check .
+        pass_filenames: false
+      - id: md-format .
+        name: md format
+        stages: [commit]
+        language: system
+        entry: mdformat --end-of-line keep .
+        pass_filenames: false
+      - id: mypy
+        name: mypy
+        stages: [commit]
+        language: system
+        entry: mypy
+        pass_filenames: false
+      - id: pytest
+        name: pytest
+        stages: [commit]
+        language: system
+        entry: pytest
+        pass_filenames: false
+      - id: coverage
+        name: coverage
+        stages: [commit]
+        language: system
+        entry: coverage lcov
+        pass_filenames: false
+      - id: pip-audit
+        name: pip-audit
+        stages: [commit]
+        language: system
+        entry: pip-audit
         pass_filenames: false

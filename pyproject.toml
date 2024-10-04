@@ -32,11 +32,8 @@ Source = "https://github.com/dynobo/keyhint"
 [project.scripts]
 keyhint = "keyhint.app:main"
 
-[[tool.hatch.envs.all.matrix]]
-python = ["3.11"]
-
-[tool.hatch.envs.default]
-dependencies = [
+[tool.uv]
+dev-dependencies = [
   "coverage[toml]>=6.5",
   "pytest",
   "pytest-cov",
@@ -50,25 +47,6 @@ dependencies = [
   "mdformat",
   "pygobject-stubs",
 ]
-
-[tool.hatch.envs.default.scripts]
-style = [
-  "ruff check {args:.}",
-  "ruff format --check --diff {args:.}",
-  "mdformat --check --end-of-line keep {args:.}",
-]
-typing = "mypy"
-test = ["pytest {args:tests}", "coverage lcov"]
-security = "pip-audit"
-fmt = [
-  "ruff check --fix {args:.}",
-  "ruff format {args:.}",
-  "mdformat --end-of-line keep {args:.}",
-]
-# Main tasks:
-check = ["style", "typing", "test", "security"]
-pre-commit = ["fmt", "check"]
-version = "tbump {args:current-version}"
 
 [tool.ruff]
 target-version = "py311"
@@ -130,7 +108,6 @@ convention = "google"
 
 [tool.ruff.lint.isort]
 known-first-party = ["keyhint"]
-
 
 [tool.mypy]
 files = ["keyhint/**/*.py", "tests/**/*.py"]
