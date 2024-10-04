@@ -1,4 +1,4 @@
-id = "gh-copilot"
+id = "vscode-copilot"
 url = "https://docs.github.com/en/copilot/configuring-github-copilot/configuring-github-copilot-in-your-environment"
 hidden = true
 
