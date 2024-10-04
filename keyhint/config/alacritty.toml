@@ -1,0 +1,27 @@
+id = "alacritty"
+url = "https://github.com/alacritty/alacritty/blob/master/docs/features.md"
+include = ["cli"]
+
+[match]
+regex_wmclass = "alacritty"
+regex_title = ".*"
+
+[section]
+
+[section.Search]
+"Ctrl + Shift + F" = "Search forward"
+"Ctrl + Shift + B" = "Search backwards"
+"Ctrl + Shift + S" = "Paste from selection"
+"Enter / Shift + Enter" = "Next / previous match"
+"Esc" = "Leave search"
+
+[section."Vi Mode"]
+"Ctrl + Shift + Space" = "Launch Vi mode"
+"/" = "Search forward"
+"?" = "Search backwards"
+"Enter" = "Activate hint (e.g. open URL)"
+
+[section.Mouse]
+"`Double click`" = "Select word"
+"`Triple click`" = "Select line"
+"Ctrl + select" = "Select block"
