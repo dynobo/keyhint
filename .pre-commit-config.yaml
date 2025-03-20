@@ -3,12 +3,12 @@ fail_fast: true
 
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v2.4.0
+    rev: v4.0.0
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: check-ast
       - id: check-toml
@@ -21,43 +21,43 @@ repos:
     hooks:
       - id: ruff-check
         name: ruff check --fix .
-        stages: [commit]
+        stages: [pre-commit]
         language: system
         entry: ruff check .
         pass_filenames: false
       - id: ruff-format .
         name: ruff format
-        stages: [commit]
+        stages: [pre-commit]
         language: system
         entry: ruff check .
         pass_filenames: false
       - id: md-format .
         name: md format
-        stages: [commit]
+        stages: [pre-commit]
         language: system
         entry: mdformat --end-of-line keep .
         pass_filenames: false
       - id: mypy
         name: mypy
-        stages: [commit]
+        stages: [pre-commit]
         language: system
         entry: mypy
         pass_filenames: false
       - id: pytest
         name: pytest
-        stages: [commit]
+        stages: [pre-commit]
         language: system
         entry: pytest
         pass_filenames: false
       - id: coverage
         name: coverage
-        stages: [commit]
+        stages: [pre-commit]
         language: system
         entry: coverage lcov
         pass_filenames: false
       - id: pip-audit
         name: pip-audit
-        stages: [commit]
+        stages: [pre-commit]
         language: system
         entry: pip-audit
         pass_filenames: false
