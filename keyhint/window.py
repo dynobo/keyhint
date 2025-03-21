@@ -22,7 +22,7 @@ import subprocess
 import textwrap
 from collections.abc import Callable
 from pathlib import Path
-from typing import TypeVar, cast
+from typing import Literal, TypeVar, cast
 
 from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk, Pango
 
@@ -465,6 +465,21 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
         adj.set_value(adj.get_value() + distance)
 
+    def cycle_sheets(self, direction: Literal["next", "previous"]) -> None:
+        dropdown = self.headerbars.normal.sheet_dropdown
+        dropdown_model = dropdown.get_model()
+
+        # Satisfy type checker
+        if not dropdown_model:
+            raise TypeError("Sheet dropdown model is not a Gtk.StringList.")
+
+        relative_change = 1 if direction == "next" else -1
+
+        new_position = dropdown.get_selected() + relative_change
+        new_position = max(0, new_position)
+        new_position = min(new_position, dropdown_model.get_n_items())
+        dropdown.set_selected(position=new_position)
+
     def focus_search_entry(self) -> None:
         """Focus search entry of the active headerbar."""
         self.active_headerbar.search_entry.grab_focus()
@@ -513,7 +528,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         if keycode == Gdk.KEY_Escape:
             self.close()
 
-    def on_key_pressed(
+    def on_key_pressed(  # noqa: C901
         self,
         evk: Gtk.EventControllerKey,
         keycode: int,
@@ -525,20 +540,28 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         match keycode, ctrl_pressed:
             case Gdk.KEY_Escape, _:
                 self.close()
+
             case Gdk.KEY_F11, _:
                 self.activate_action("win.fullscreen")
+
             case Gdk.KEY_f, True:
                 self.active_headerbar.grab_focus()
             case Gdk.KEY_s, True:
                 self.active_headerbar.sheet_dropdown.grab_focus()
-            case (Gdk.KEY_Up, _) | (Gdk.KEY_k, True):
+
+            case (Gdk.KEY_Up, False) | (Gdk.KEY_k, True):
                 self.scroll(to_start=True, by_page=False)
-            case (Gdk.KEY_Down, _) | (Gdk.KEY_j, True):
+            case (Gdk.KEY_Down, False) | (Gdk.KEY_j, True):
                 self.scroll(to_start=False, by_page=False)
-            case Gdk.KEY_Page_Up, _:
+            case Gdk.KEY_Page_Up, False:
                 self.scroll(to_start=True, by_page=True)
-            case Gdk.KEY_Page_Down, _:
+            case Gdk.KEY_Page_Down, False:
                 self.scroll(to_start=False, by_page=True)
+
+            case (Gdk.KEY_Up, True):
+                self.cycle_sheets(direction="previous")
+            case (Gdk.KEY_Down, True):
+                self.cycle_sheets(direction="next")
 
     def on_about_action(self, _: Gio.SimpleAction, __: None) -> None:
         """Show modal 'About' dialog."""
@@ -589,7 +612,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         title = self.wm_class.lower().replace(" ", "")
         pad = 26 - len(title)
         template = f"""\
-            id = "{title}"{" " * pad } # Unique ID, used e.g. in cheatsheet dropdown
+            id = "{title}"{" " * pad} # Unique ID, used e.g. in cheatsheet dropdown
             url = ""                          # (Optional) URL to keybinding docs
 
             [match]

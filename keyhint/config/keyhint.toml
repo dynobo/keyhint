@@ -10,8 +10,12 @@ regex_title = ".*"
 F11 = "Toggle Fullscreen"
 "Ctrl + f" = "Focus search field"
 "Ctrl + Backspace / u" = "Clear search field"
-"Ctrl + s & Enter" = "Focus & open sheet selection dropdown"
 Esc = "Exit"
+
+[section."Switch Cheatsheet"]
+"Ctrl + Down" = "Next cheatsheet"
+"Ctrl + Up" = "Previous cheatsheet"
+"Ctrl + s & Enter" = "Focus & open sheet selection dropdown"
 
 [section.Scroll]
 "Down or Ctrl + j" = "Forward"

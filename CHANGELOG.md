@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.3 (2025-03-21)
+
+- Add shortcuts `Ctrl + Up`/`Down` to switch to next/previous cheatsheet:
+
 ## v0.5.2 (2024-10-04)
 
 - Add cheatsheet for Alacritty.
