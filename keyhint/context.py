@@ -137,8 +137,8 @@ def get_active_window_via_window_calls() -> tuple[str, str]:
     def _get_cmd_result(cmd: str) -> str:
         stdout_bytes: bytes = subprocess.check_output(cmd, shell=True)  # noqa: S602
         stdout = stdout_bytes.decode("utf-8")
-        if match := re.search(r"'(.+)'", stdout):
-            return match.groups()[0].strip('"')
+        if match := re.search(r"(\[.+\])", stdout):
+            return match.groups()[0].replace('\\"', '"')
         return ""
 
     cmd_windows_list = (
