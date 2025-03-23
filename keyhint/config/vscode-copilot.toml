@@ -17,6 +17,12 @@ regex_title = "^$"
 "Esc" = "Dismiss"
 
 [section.Chat]
+"Ctrl + Alt + i" = "Open chat in sidebar"
 "Ctrl + i" = "Open inline chat"
-"@" = "Add 'participants'"
+"@" = "Add experts a.k.a. 'participants'"
 "#" = "Add context"
+"/new" = "New conversation"
+"/fix" = "Propose fix for problem in selected code"
+"/clear" = "Clear conversation"
+"/delete" = "Delete conversation"
+"/help" = "GitHub Copilot quick reference"
