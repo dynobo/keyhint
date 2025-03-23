@@ -136,10 +136,7 @@ def get_active_window_via_window_calls() -> tuple[str, str]:
 
     def _get_cmd_result(cmd: str) -> str:
         stdout_bytes: bytes = subprocess.check_output(cmd, shell=True)  # noqa: S602
-        stdout = stdout_bytes.decode("utf-8")
-        if match := re.search(r"(\[.+\])", stdout):
-            return match.groups()[0].replace('\\"', '"')
-        return ""
+        return stdout_bytes.decode("utf-8").lstrip("('\n ").rstrip("),' \n")
 
     cmd_windows_list = (
         "gdbus call --session --dest org.gnome.Shell "
@@ -156,13 +153,18 @@ def get_active_window_via_window_calls() -> tuple[str, str]:
     focused_window = focused_windows[0]
     wm_class = focused_window["wm_class"]
 
-    cmd_windows_get_title = (
-        "gdbus call --session --dest org.gnome.Shell "
-        "--object-path /org/gnome/Shell/Extensions/Windows "
-        "--method org.gnome.Shell.Extensions.Windows.GetTitle "
-        f"{focused_window['id']}"
-    )
-    title = _get_cmd_result(cmd_windows_get_title)
+    if "title" in focused_window:
+        title = focused_window["title"]
+    else:
+        # Older versions of window calls doesn't expose the title in the List call,
+        # therefor we need to do a second:
+        cmd_windows_get_title = (
+            "gdbus call --session --dest org.gnome.Shell "
+            "--object-path /org/gnome/Shell/Extensions/Windows "
+            "--method org.gnome.Shell.Extensions.Windows.GetTitle "
+            f"{focused_window['id']}"
+        )
+        title = _get_cmd_result(cmd_windows_get_title)
 
     return wm_class, title
 
