@@ -9,6 +9,7 @@ import subprocess
 import tempfile
 import textwrap
 from datetime import datetime
+from functools import cache
 
 logger = logging.getLogger("keyhint")
 
@@ -84,7 +85,8 @@ def get_kde_version() -> str:
         return kde_version
 
 
-def get_desktop_environment_and_version() -> tuple[str, str]:
+@cache
+def get_desktop_environment() -> str:
     """Detect used desktop environment."""
     kde_full_session = os.environ.get("KDE_FULL_SESSION", "").lower()
     xdg_current_desktop = os.environ.get("XDG_CURRENT_DESKTOP", "").lower()
@@ -96,14 +98,11 @@ def get_desktop_environment_and_version() -> tuple[str, str]:
         gnome_desktop_session_id = ""
 
     de = "(DE not detected)"
-    version = "(version not detected)"
 
     if gnome_desktop_session_id or "gnome" in xdg_current_desktop:
         de = "Gnome"
-        version = get_gnome_version()
     if kde_full_session or "kde-plasma" in desktop_session:
         de = "KDE"
-        version = get_kde_version()
     if "sway" in xdg_current_desktop or "sway" in desktop_session:
         de = "Sway"
     if "unity" in xdg_current_desktop:
@@ -113,7 +112,7 @@ def get_desktop_environment_and_version() -> tuple[str, str]:
     if "awesome" in xdg_current_desktop:
         de = "Awesome"
 
-    return de, version
+    return de
 
 
 def has_window_calls_extension() -> bool:

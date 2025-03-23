@@ -123,7 +123,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         wm_class = wm_title = ""
 
         on_wayland = context.is_using_wayland()
-        desktop_environment = context.get_desktop_environment_and_version()[0].lower()
+        desktop_environment = context.get_desktop_environment().lower()
 
         match (on_wayland, desktop_environment):
             case True, "gnome":
@@ -833,7 +833,11 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         regex_title = sheet.get("match", {}).get("regex_title", "n/a")
         link = sheet.get("url", "")
         link_text = f"<span foreground='#00A6FF'>{link or 'n/a'}</span>"
-        desktop_environment = " ".join(context.get_desktop_environment_and_version())
+        desktop_environment = context.get_desktop_environment()
+        if desktop_environment.lower() == "gnome":
+            desktop_environment += " " + context.get_gnome_version()
+        elif desktop_environment.lower() == "kde":
+            desktop_environment += " " + context.get_kde_version()
 
         return textwrap.dedent(
             f"""
