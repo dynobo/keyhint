@@ -75,6 +75,7 @@ ciw = "Change inner word"
 "I & # & Esc" = "Comment selected visual block"
 "\"ayi\"" = "Yank inner \" to register a"
 "vi\"\"ap" = "Replace inner \" from register a"
+"V\"0p" = "Replace line with register 0 (w/o replacing R0)"
 
 [section.Registers]
 "`\"ay`" = "yank to regesiter a"
