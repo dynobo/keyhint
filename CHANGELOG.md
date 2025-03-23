@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.4 (2025-03-23)
+
+- Slightly speed up startup
+- Fix potential error when window titles contain single quotes
+
 ## v0.5.3 (2025-03-21)
 
 - Add shortcuts `Ctrl + Up`/`Down` to switch to next/previous cheatsheet:
