@@ -9,8 +9,8 @@
   min-height: 25px;
   margin-top: 2px;
   padding-bottom: 3px;
-  padding-left: 6px;
-  padding-right: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
   background-color: @bg_color;
   border: 1px solid;
   border-radius: 5px;
@@ -46,4 +46,8 @@
 .banner {
   background-color: @banner_bg_color;
   font-weight: bold;
+}
+
+.dim-label {
+  margin: 0px -2px;
 }

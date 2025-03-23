@@ -4,6 +4,8 @@
 
 - Slightly speed up startup
 - Fix potential error when window titles contain single quotes
+- Extend vscode cheatsheet
+- View bindings a bit more compact
 
 ## v0.5.3 (2025-03-21)
 
