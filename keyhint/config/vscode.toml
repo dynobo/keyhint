@@ -39,11 +39,13 @@ D = "Delete from cursor till end of line"
 [section."Language Editing"]
 "Ctrl + Space" = "Trigger suggestion"
 "Ctrl + Shift + Space" = "Trigger parameter suggestion"
-"Ctrl + K I" = "Show hover docs"
+"Ctrl + K & I" = "Show hover docs"
 F12 = "Go to definition"
-"Ctrl + K + F12" = "Open definition to the side"
+"Ctrl + K & F12" = "Open definition to the side"
 "Ctrl + Shift + F10" = "Peek definition"
 F2 = "Rename symbol"
+"Ctrl + K & C" = "Add line comment(s)"
+"Ctrl + K & U" = "Remove line comment(s)"
 
 [section.Navigation]
 "Ctrl + G" = "Go to line..."
@@ -66,3 +68,10 @@ F10 = "Step over"
 [section."File/Tab Management"]
 "Ctrl + Tab" = "Switch between tabs"
 "Ctrl + P" = "Quick open file"
+
+[section.Commands]
+"Ctrl + Shift + P" = "Open command palette"
+"Ctrl + ; & A" = "Run all tests"
+"Ctrl + ; & F" = "Run tests in current file"
+"Ctrl + ; & C" = "Run test at cursor"
+"Ctrl + ; & Ctrl + C" = "Debug test at cursor"
