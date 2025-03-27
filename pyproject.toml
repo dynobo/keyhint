@@ -22,7 +22,7 @@ classifiers = [
   "Intended Audience :: End Users/Desktop",
   "Operating System :: POSIX :: Linux",
 ]
-dependencies = ["PyGObject>=3.50.0"]
+dependencies = ["PyGObject>=3.48.2"]
 
 [project.urls]
 Documentation = "https://github.com/dynobo/keyhint#readme"

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.5 (2025-03-27)
+
+- Revert pygobject version bump to stay compatible with Ubuntu 22.04 LTS
+
 ## v0.5.4 (2025-03-23)
 
 - Slightly speed up startup
