@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.6 (2025-04-12)
+
+- Revert pygobject version bump to stay compatible with Ubuntu 22.04 LTS (last try wasn't enough)
+
 ## v0.5.5 (2025-03-27)
 
 - Revert pygobject version bump to stay compatible with Ubuntu 22.04 LTS
