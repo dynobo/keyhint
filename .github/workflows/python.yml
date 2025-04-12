@@ -25,7 +25,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install \
-             libgirepository1.0-dev \
+             girepository-2.0-dev \
              libcairo2-dev \
              python3-gi \
              gobject-introspection \
