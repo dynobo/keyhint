@@ -74,11 +74,11 @@ KeyHint reads those files from two locations:
 ### Customize or add cheatsheets
 
 - To **change built-in** cheatsheets, copy
-  [the corresponding .toml-file](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config)
+  [the corresponding .toml-file](https://github.com/dynobo/keyhint/tree/main/keyhint/config)
   into the config directory. Make your changes in a text editor. As long as you don't
   change the `id` it will overwrite the defaults.
 - To **create new** cheatsheets, I suggest you start with
-  [one of the existing .toml-file](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config):
+  [one of the existing .toml-file](https://github.com/dynobo/keyhint/tree/main/keyhint/config):
   - Place it in the config directory and give it a good file name.
   - Change the value `id` to something unique.
   - Adjust `regex_wmclass` and `regex_title` so it will be selected based on the active
@@ -166,7 +166,7 @@ gc = "Goto code tab"
 
 I'm happy about any contribution! Especially I would appreciate submissions to improve
 the
-[shipped cheatsheets](https://github.com/dynobo/keyhint/tree/main/src/keyhint/config).
+[shipped cheatsheets](https://github.com/dynobo/keyhint/tree/main/keyhint/config).
 (The current set are the cheatsheets I personally use).
 
 ## Design Principles
