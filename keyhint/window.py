@@ -19,12 +19,11 @@ TODO: Create Flatpak
 import logging
 import platform
 import subprocess
-import textwrap
 from collections.abc import Callable
 from pathlib import Path
 from typing import Literal, TypeVar, cast
 
-from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk, Pango
+from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk
 
 from keyhint import __version__, binding, config, context, css, headerbar, sheets
 
@@ -64,6 +63,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     container = cast(Gtk.Box, Gtk.Template.Child())
     sheet_container_box = cast(Gtk.FlowBox, Gtk.Template.Child())
 
+    # Should I move some of this to delayed init?
     shortcut_column_factory = Gtk.SignalListItemFactory()
     label_column_factory = Gtk.SignalListItemFactory()
 
@@ -85,6 +85,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.sheets = sheets.load_sheets()
         self.wm_class, self.window_title = self.init_last_active_window_info()
 
+        # TODO: can I move some of this to UI file?
         self.css_provider = css.new_provider(
             display=self.get_display(), css_file=RESOURCE_PATH / "style.css"
         )
@@ -588,7 +589,6 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         label.set_use_markup(True)
         label.set_wrap(True)
         label.set_selectable(True)
-        label.set_wrap_mode(Pango.WrapMode.WORD_CHAR)
         label.set_markup(self.get_debug_info_text())
         label.set_margin_start(24)
         label.set_margin_end(24)
@@ -613,22 +613,21 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     def on_create_new_sheet(self, _: Gio.SimpleAction, __: None) -> None:
         """Create a new text file with a template for a new cheatsheet."""
         title = self.wm_class.lower().replace(" ", "")
-        pad = 26 - len(title)
-        template = f"""\
-            id = "{title}"{" " * pad} # Unique ID, used e.g. in cheatsheet dropdown
-            url = ""                          # (Optional) URL to keybinding docs
-
-            [match]
-            regex_wmclass = "{self.wm_class}"
-            regex_title = ".*"                # Narrow down by window title if needed
-
-            [section]
-
-            [section."My Section Title"]      # Add as many sections you like ...
-            "Ctrl + c" = "Copy to clipboard"  # ... with keybinding + description
-            "Ctrl + v" = "Paste from clipboard"
-        """
-        template = textwrap.dedent(template)
+        template = (
+            f'id = "{title:<26}" # Unique ID, used e.g. in cheatsheet dropdown\n'
+            'url = ""                          # (Optional) URL to keybinding docs\n'
+            "\n"
+            "[match]\n"
+            f'regex_wmclass = "{self.wm_class}"\n'
+            'regex_title = ".*"                # (Optional) Narrow down by window title'
+            "\n"
+            "\n"
+            "[section]\n"
+            "\n"
+            '[section."My Section Title"]      # Add as many sections you like ...\n'
+            '"Ctrl + c" = "Copy to clipboard"  # ... with keybinding + description\n'
+            '"Ctrl + v" = "Paste from clipboard"\n'
+        )
 
         new_file = config.CONFIG_PATH / f"{title}.toml"
 
@@ -834,34 +833,34 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         )
         regex_wm_class = sheet.get("match", {}).get("regex_wmclass", "n/a")
         regex_title = sheet.get("match", {}).get("regex_title", "n/a")
-        link = sheet.get("url", "")
-        link_text = f"<span foreground='#00A6FF'>{link or 'n/a'}</span>"
-        desktop_environment = context.get_desktop_environment()
-        if desktop_environment.lower() == "gnome":
-            desktop_environment += " " + context.get_gnome_version()
-        elif desktop_environment.lower() == "kde":
-            desktop_environment += " " + context.get_kde_version()
+        url = sheet.get("url", "")
+        link = f"<span foreground='#00A6FF'>{url or 'n/a'}</span>"
+        desktop_env = context.get_desktop_environment()
+        if desktop_env.lower() == "gnome":
+            desktop_env += " " + context.get_gnome_version()
+        elif desktop_env.lower() == "kde":
+            desktop_env += " " + context.get_kde_version()
 
-        return textwrap.dedent(
-            f"""
-            <big>Last Active Application</big>
-
-            <span foreground='#FF2E88'>title:</span> {self.window_title}
-            <span foreground='#FF2E88'>wmclass:</span> {self.wm_class}
-
-            <big>Selected Cheatsheet</big>
-
-            <span foreground='#FF2E88'>ID:</span> {sheet_id}
-            <span foreground='#FF2E88'>regex_wmclass:</span> {regex_wm_class}
-            <span foreground='#FF2E88'>regex_title:</span> {regex_title}
-            <span foreground='#FF2E88'>source:</span> <a href='{link}'>{link_text}</a>
-
-            <big>System Information</big>
-
-            <span foreground='#FF2E88'>Platform:</span> {platform.platform()}
-            <span foreground='#FF2E88'>Desktop Environment:</span> {desktop_environment}
-            <span foreground='#FF2E88'>Wayland:</span> {context.is_using_wayland()}
-            <span foreground='#FF2E88'>Python:</span> {platform.python_version()}
-            <span foreground='#FF2E88'>Keyhint:</span> v{__version__}
-            <span foreground='#FF2E88'>Flatpak:</span> {context.is_flatpak_package()}"""
+        return (
+            "\n"
+            "<big>Last Active Application</big>\n"
+            "\n"
+            f"<span foreground='#FF2E88'>title:</span> {self.window_title}\n"
+            f"<span foreground='#FF2E88'>wmclass:</span> {self.wm_class}\n"
+            "\n"
+            "<big>Selected Cheatsheet</big>\n"
+            "\n"
+            f"<span foreground='#FF2E88'>ID:</span> {sheet_id}\n"
+            f"<span foreground='#FF2E88'>regex_wmclass:</span> {regex_wm_class}\n"
+            f"<span foreground='#FF2E88'>regex_title:</span> {regex_title}\n"
+            f"<span foreground='#FF2E88'>source:</span> <a href='{url}'>{link}</a>\n"
+            "\n"
+            "<big>System Information</big>\n"
+            "\n"
+            f"<span foreground='#FF2E88'>Platform:</span> {platform.platform()}\n"
+            f"<span foreground='#FF2E88'>Desktop Environment:</span> {desktop_env}\n"
+            f"<span foreground='#FF2E88'>Wayland:</span> {context.is_using_wayland()}\n"
+            f"<span foreground='#FF2E88'>Python:</span> {platform.python_version()}\n"
+            f"<span foreground='#FF2E88'>Keyhint:</span> v{__version__}\n"
+            f"<span foreground='#FF2E88'>Flatpak:</span> {context.is_flatpak_package()}"
         )
