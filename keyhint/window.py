@@ -85,7 +85,6 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.sheets = sheets.load_sheets()
         self.wm_class, self.window_title = self.init_last_active_window_info()
 
-        # TODO: can I move some of this to UI file?
         self.css_provider = css.new_provider(
             display=self.get_display(), css_file=RESOURCE_PATH / "style.css"
         )
@@ -398,13 +397,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
                 }}
                 """
 
-        if hasattr(self.zoom_css_provider, "load_from_string"):
-            # GTK 4.12+
-            self.zoom_css_provider.load_from_string(css_style)
-        else:
-            # ONHOLD: Remove once GTK 4.12+ is required
-            self.zoom_css_provider.load_from_data(css_style, len(css_style))
-
+        self.zoom_css_provider.load_from_string(css_style)
         self.config.set_persistent("main", "zoom", str(int(value)))
 
     @check_state
@@ -739,9 +732,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         return sheet_id
 
     def bind_shortcuts_callback(
-        self,
-        _: Gtk.SignalListItemFactory,
-        item,  # noqa: ANN001 # ONHOLD: Gtk.ColumnViewCell for GTK 4.12+
+        self, _: Gtk.SignalListItemFactory, item: Gtk.ColumnViewCell
     ) -> None:
         row = cast(binding.Row, item.get_item())
         shortcut = binding.create_shortcut(row.shortcut)
@@ -752,9 +743,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         item.set_child(shortcut)
 
     def bind_labels_callback(
-        self,
-        _: Gtk.SignalListItemFactory,
-        item,  # noqa: ANN001  # ONHOLD: Gtk.ColumnViewCell for GTK 4.12+
+        self, _: Gtk.SignalListItemFactory, item: Gtk.ColumnViewCell
     ) -> None:
         row = cast(binding.Row, item.get_item())
         if row.shortcut:
@@ -772,14 +761,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
     def show_sheet(self, sheet_id: str) -> None:
         """Clear sheet container and populate it with the selected sheet."""
-        if hasattr(self.sheet_container_box, "remove_all"):
-            # Only available in GTK 4.12+
-            self.sheet_container_box.remove_all()
-        else:
-            # ONHOLD: Remove once GTK 4.12+ is required
-            while child := self.sheet_container_box.get_first_child():
-                self.sheet_container_box.remove(child)
-
+        self.sheet_container_box.remove_all()
         self.max_shortcut_width = 0
 
         sheet = sheets.get_sheet_by_id(sheets=self.sheets, sheet_id=sheet_id)
@@ -813,6 +795,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             selection, shortcut_column, label_column
         )
 
+        # TODO: Fix Gtk-Critical caused by adding a ColumnView to FlowBoxChild
         section_child = Gtk.FlowBoxChild()
         section_child.set_vexpand(False)
         section_child.set_child(column_view)
