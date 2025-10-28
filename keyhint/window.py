@@ -75,12 +75,15 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         super().__init__()
 
         self.cli_args = cli_args
+        self.skip_search_changed: bool = False
+        self.search_text: str = ""
+
+        GLib.idle_add(self._finish_initialization)
+
+    def _finish_initialization(self) -> None:
         self.config = config.load()
         self.sheets = sheets.load_sheets()
         self.wm_class, self.window_title = self.init_last_active_window_info()
-
-        self.skip_search_changed: bool = False
-        self.search_text: str = ""
 
         self.css_provider = css.new_provider(
             display=self.get_display(), css_file=RESOURCE_PATH / "style.css"
