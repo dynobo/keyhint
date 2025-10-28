@@ -15,7 +15,7 @@ Linux._**
 ## Prerequisites
 
 - Python 3.11+
-- GTK 4.6+ (shipped since Ubuntu 22.04) + related dev packages:
+- GTK 4.12+ (shipped since Ubuntu 23.10) + related dev packages:
   ```sh
   sudo apt-get install \
      libgirepository1.0-dev \
