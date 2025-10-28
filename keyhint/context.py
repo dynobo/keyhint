@@ -42,7 +42,7 @@ def get_gnome_version() -> str:
         return "(n/a)"
 
     try:
-        output = subprocess.check_output(  # noqa: S603
+        output = subprocess.check_output(
             ["gnome-shell", "--version"],  # noqa: S607
             shell=False,
             text=True,
@@ -71,7 +71,7 @@ def get_kde_version() -> str:
         return "(n/a)"
 
     try:
-        output = subprocess.check_output(  # noqa: S603
+        output = subprocess.check_output(
             ["plasmashell", "--version"],  # noqa: S607
             shell=False,
             text=True,
