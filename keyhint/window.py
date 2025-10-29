@@ -492,10 +492,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
     def on_fullscreen_state_changed(self, _: Gtk.Widget, __: GObject.Parameter) -> None:
         """Toggle fullscreen header bar according to current window state."""
-        if self.is_fullscreen():
-            self.headerbars.fullscreen.set_visible(True)
-        else:
-            self.headerbars.fullscreen.set_visible(False)
+        self.headerbars.fullscreen.set_visible(self.is_fullscreen())
         self.focus_search_entry()
 
     def on_search_entry_changed(self, search_entry: Gtk.SearchEntry) -> None:
@@ -578,13 +575,14 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
     def on_debug_action(self, _: Gio.SimpleAction, __: None) -> None:
         """Show modal dialog with information useful for error reporting."""
-        label = Gtk.Label()
-        label.set_use_markup(True)
-        label.set_wrap(True)
-        label.set_selectable(True)
-        label.set_markup(self.get_debug_info_text())
-        label.set_margin_start(24)
-        label.set_margin_end(24)
+        label = Gtk.Label(
+            label=self.get_debug_info_text(),
+            wrap=True,
+            selectable=True,
+            margin_start=24,
+            margin_end=24,
+            use_markup=True,
+        )
 
         def _on_copy_clicked(button: Gtk.Button) -> None:
             if display := Gdk.Display.get_default():
@@ -593,9 +591,10 @@ class KeyhintWindow(Gtk.ApplicationWindow):
                 button.set_icon_name("object-select-symbolic")
                 button.set_tooltip_text("Copied!")
 
-        copy_button = Gtk.Button()
-        copy_button.set_icon_name("edit-copy")
-        copy_button.set_tooltip_text("Copy to clipboard")
+        copy_button = Gtk.Button(
+            icon_name="edit-copy",
+            tooltip_text="Copy to clipboard",
+        )
         copy_button.connect("clicked", _on_copy_clicked)
 
         dialog = Gtk.Dialog(title="Debug Info", transient_for=self, modal=True)
@@ -750,8 +749,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             child = Gtk.Label(label=row.label, xalign=0.0)
         else:
             # Section title
-            child = Gtk.Label(xalign=0.0)
-            child.set_markup(f"<b>{row.label}</b>")
+            child = Gtk.Label(label=f"<b>{row.label}</b>", xalign=0.0)
         item.set_child(child)
 
     def bindings_match_func(self, bindings_row: binding.Row) -> bool:
@@ -776,9 +774,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         for shortcut, label in bindings.items():
             ls.append(binding.Row(shortcut=shortcut, label=label, section=section))
 
-        filter_list = Gtk.FilterListModel(model=ls)
-        filter_list.set_filter(self.bindings_filter)
-
+        filter_list = Gtk.FilterListModel(model=ls, filter=self.bindings_filter)
         selection = Gtk.NoSelection.new(filter_list)
 
         # TODO: Dynamic width based on content
@@ -789,13 +785,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         label_column = binding.create_column_view_column(
             section, self.label_column_factory
         )
-        column_view = binding.create_column_view(
-            selection, shortcut_column, label_column
-        )
-
-        column_view.set_halign(Gtk.Align.START)
-        column_view.set_valign(Gtk.Align.START)
-        return column_view
+        return binding.create_column_view(selection, shortcut_column, label_column)
 
     def get_current_sheet_id(self) -> str:
         action = self.lookup_action("sheet")
