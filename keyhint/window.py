@@ -13,7 +13,6 @@ Naming Hierarchy:
 5. A "Binding" consists of a "Shortcut", which contains the key combination or command,
    and a "Label" which describes the combination/command.
 
-TODO: Create Flatpak
 """
 
 import logging
@@ -130,11 +129,14 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
         match (on_wayland, desktop_environment):
             case True, "gnome":
-                if context.has_window_calls_extension():
+                try:
                     wm_class, wm_title = context.get_active_window_via_window_calls()
-                else:
+                except Exception:
                     self.banner_window_calls.set_reveal_child(True)
-                    logger.error("Window Calls extension not found!")
+                    logger.exception(
+                        "Window Calls extension not installed or "
+                        "not working as expected."
+                    )
             case True, "kde":
                 wm_class, wm_title = context.get_active_window_via_kwin()
             case False, _:
@@ -831,5 +833,4 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             f"<span foreground='#FF2E88'>Wayland:</span> {context.is_using_wayland()}\n"
             f"<span foreground='#FF2E88'>Python:</span> {platform.python_version()}\n"
             f"<span foreground='#FF2E88'>Keyhint:</span> v{__version__}\n"
-            f"<span foreground='#FF2E88'>Flatpak:</span> {context.is_flatpak_package()}"
         )
