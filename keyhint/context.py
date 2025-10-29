@@ -11,6 +11,8 @@ import textwrap
 from datetime import datetime
 from functools import cache
 
+from gi.repository import Gio
+
 logger = logging.getLogger("keyhint")
 
 
@@ -54,11 +56,6 @@ def get_gnome_version() -> str:
         return "(n/a)"
     else:
         return gnome_version
-
-
-def is_flatpak_package() -> bool:
-    """Check if the application is running inside a flatpak package."""
-    return os.getenv("FLATPAK_ID") is not None
 
 
 def get_kde_version() -> str:
@@ -115,60 +112,45 @@ def get_desktop_environment() -> str:
     return de
 
 
-def has_window_calls_extension() -> bool:
-    cmd_introspect = (
-        "gdbus introspect --session --dest org.gnome.Shell "
-        "--object-path /org/gnome/Shell/Extensions/Windows "
-    )
-    stdout_bytes = subprocess.check_output(cmd_introspect, shell=True)  # noqa: S602
-    stdout = stdout_bytes.decode("utf-8")
-    return all(["List" in stdout, "GetTitle" in stdout])
-
-
 def get_active_window_via_window_calls() -> tuple[str, str]:
     """Retrieve active window class and active window title on Gnome + Wayland.
-
-    Inspired by https://gist.github.com/rbreaves/257c3edfa301786e66e964d7ac036269
 
     Returns:
         Tuple(str, str): window class, window title
     """
+    wm_class = ""
+    title = ""
 
-    def _get_cmd_result(cmd: str) -> str:
-        stdout_bytes: bytes = subprocess.check_output(cmd, shell=True)  # noqa: S602
-        return stdout_bytes.decode("utf-8").lstrip("('\n ").rstrip("),' \n")
-
-    cmd_windows_list = (
-        "gdbus call --session --dest org.gnome.Shell "
-        "--object-path /org/gnome/Shell/Extensions/Windows "
-        "--method org.gnome.Shell.Extensions.Windows.List"
+    bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+    proxy = Gio.DBusProxy.new_sync(
+        bus,
+        Gio.DBusProxyFlags.NONE,
+        None,
+        "org.gnome.Shell",
+        "/org/gnome/Shell/Extensions/Windows",
+        "org.gnome.Shell.Extensions.Windows",
+        None,
     )
-    stdout = _get_cmd_result(cmd_windows_list)
-    windows = json.loads(stdout)
+    result = proxy.call_sync(
+        "List",
+        None,
+        Gio.DBusCallFlags.NONE,
+        -1,
+        None,
+    )
 
-    focused_windows = list(filter(lambda x: x["focus"], windows))
-    if not focused_windows:
-        return "", ""
+    windows = json.loads(result.unpack()[0])
 
+    focused_windows = [w for w in windows if w.get("focus")]
     focused_window = focused_windows[0]
-    wm_class = focused_window["wm_class"]
 
-    if "title" in focused_window:
-        title = focused_window["title"]
-    else:
-        # Older versions of window calls doesn't expose the title in the List call,
-        # therefor we need to do a second:
-        cmd_windows_get_title = (
-            "gdbus call --session --dest org.gnome.Shell "
-            "--object-path /org/gnome/Shell/Extensions/Windows "
-            "--method org.gnome.Shell.Extensions.Windows.GetTitle "
-            f"{focused_window['id']}"
-        )
-        title = _get_cmd_result(cmd_windows_get_title)
+    wm_class = focused_window.get("wm_class", "")
+    title = focused_window.get("title", "")
 
     return wm_class, title
 
 
+# TODO: Migrate to using gtk dbus
 def get_active_window_via_kwin() -> tuple[str, str]:
     """Retrieve active window class and active window title on KDE + Wayland.
 
