@@ -771,9 +771,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             section_child.set_name(f"section-{index:03}")
             self.sheet_container_box.append(section_child)
 
-    def create_section(
-        self, section: str, bindings: dict[str, str]
-    ) -> Gtk.FlowBoxChild:
+    def create_section(self, section: str, bindings: dict[str, str]) -> Gtk.ColumnView:
         ls = Gio.ListStore()
         for shortcut, label in bindings.items():
             ls.append(binding.Row(shortcut=shortcut, label=label, section=section))
@@ -795,11 +793,9 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             selection, shortcut_column, label_column
         )
 
-        # TODO: Fix Gtk-Critical caused by adding a ColumnView to FlowBoxChild
-        section_child = Gtk.FlowBoxChild()
-        section_child.set_vexpand(False)
-        section_child.set_child(column_view)
-        return section_child
+        column_view.set_halign(Gtk.Align.START)
+        column_view.set_valign(Gtk.Align.START)
+        return column_view
 
     def get_current_sheet_id(self) -> str:
         action = self.lookup_action("sheet")
