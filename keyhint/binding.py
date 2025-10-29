@@ -2,7 +2,7 @@
 
 import logging
 
-from gi.repository import GLib, GObject, Gtk
+from gi.repository import GObject, Gtk
 
 logger = logging.getLogger("keyhint")
 
@@ -72,9 +72,7 @@ def create_shortcut(text: str) -> Gtk.Box:
     for k in keys:
         key = replace_keys(text=k.strip())
         key, css_classes = style_key(text=key)
-        label = Gtk.Label()
-        label.set_css_classes(css_classes)
-        label.set_markup(f"{GLib.markup_escape_text(key)}")
+        label = Gtk.Label(label=key, css_classes=css_classes)
         box.append(label)
     return box
 
@@ -95,10 +93,10 @@ def create_column_view(
     shortcut_column: Gtk.ColumnViewColumn,
     label_column: Gtk.ColumnViewColumn,
 ) -> Gtk.ColumnView:
-    column_view = Gtk.ColumnView()
+    column_view = Gtk.ColumnView(
+        hexpand=True, halign=Gtk.Align.START, valign=Gtk.Align.START, model=selection
+    )
     column_view.get_style_context().add_class("bindings-section")
-    column_view.set_hexpand(True)
-    column_view.set_model(selection)
     column_view.append_column(shortcut_column)
     column_view.append_column(label_column)
     return column_view
