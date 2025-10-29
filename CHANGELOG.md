@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.6.0 (2025-10-30)
+
+- Breaking: Drop support for GTK 4.11 and below.
+- Slightly speed up startup
+- Fix `GTK-Critical` warnings in terminal.
+
 ## v0.5.6 (2025-04-12)
 
 - Revert pygobject version bump to stay compatible with Ubuntu 22.04 LTS (last try wasn't enough)
