@@ -62,7 +62,6 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     container = cast(Gtk.Box, Gtk.Template.Child())
     sheet_container_box = cast(Gtk.FlowBox, Gtk.Template.Child())
 
-    # Should I move some of this to delayed init?
     shortcut_column_factory = Gtk.SignalListItemFactory()
     label_column_factory = Gtk.SignalListItemFactory()
 
@@ -663,20 +662,19 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self, child_a: Gtk.FlowBoxChild, child_b: Gtk.FlowBoxChild
     ) -> bool:
         """Sort function for the sections of the cheatsheet."""
-        sort_by = self.config["main"].get("sort_by", "size")
-
-        if sort_by == "native":
-            # The names use the format 'section-{INDEX}', so just sort by that
-            return child_a.get_name() > child_b.get_name()
-
         sub_child_a = child_a.get_child()
         sub_child_b = child_b.get_child()
 
-        # Satisfy type checker
         if not isinstance(sub_child_a, Gtk.ColumnView) or not isinstance(
             sub_child_b, Gtk.ColumnView
         ):
             raise TypeError("Child is not a ColumnView.")
+
+        sort_by = self.config["main"].get("sort_by", "size")
+
+        if sort_by == "native":
+            # The names use the format 'section-{INDEX}', so just sort by that
+            return sub_child_a.get_name() > sub_child_b.get_name()
 
         if sort_by == "size":
             # Sorts by number of bindings in the section
@@ -779,13 +777,19 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         filter_list = Gtk.FilterListModel(model=ls, filter=self.bindings_filter)
         selection = Gtk.NoSelection.new(filter_list)
 
-        # TODO: Dynamic width based on content
+        # The fixed width is needed to have unified width of the shortcut columns in
+        # all sections.
+        # TODO: Dynamically calculate fixed width based on widest shortcut
         shortcut_column_width = self.config["main"].getint("zoom", 100) * 1.1 + 135
+
         shortcut_column = binding.create_column_view_column(
-            "", self.shortcut_column_factory, shortcut_column_width
+            title="",
+            factory=self.shortcut_column_factory,
+            fixed_width=shortcut_column_width,
         )
         label_column = binding.create_column_view_column(
-            section, self.label_column_factory
+            title=section,
+            factory=self.label_column_factory,
         )
         return binding.create_column_view(selection, shortcut_column, label_column)
 
