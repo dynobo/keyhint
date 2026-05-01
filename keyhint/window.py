@@ -76,12 +76,15 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.skip_search_changed: bool = False
         self.search_text: str = ""
 
+        # Query the active window before GLib.idle_add so it runs synchronously,
+        # before window.present() transfers Wayland compositor focus to keyhint.
+        self.wm_class, self.window_title = self.init_last_active_window_info()
+
         GLib.idle_add(self._finish_initialization)
 
     def _finish_initialization(self) -> None:
         self.config = config.load()
         self.sheets = sheets.load_sheets()
-        self.wm_class, self.window_title = self.init_last_active_window_info()
 
         self.css_provider = css.new_provider(
             display=self.get_display(), css_file=RESOURCE_PATH / "style.css"
