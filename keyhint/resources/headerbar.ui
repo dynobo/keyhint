@@ -235,7 +235,7 @@
     <child type="start">
       <object class="GtkDropDown" id="sheet_dropdown">
         <property name="can-focus">True</property>
-        <property name="tooltip-text" translatable="yes">Switch cheatsheet</property>
+        <property name="tooltip-text" translatable="yes">Switch cheatsheet (filtered by search)</property>
         <property name="model">
           <object class="GtkStringList">
             <items />
@@ -245,8 +245,9 @@
     </child>
     <child type="title">
       <object class="GtkSearchEntry" id="search_entry">
-        <property name="placeholder-text" translatable="true">Ctrl+F to filter...</property>
+        <property name="placeholder-text" translatable="true">Filter cheatsheets and shortcuts...</property>
         <property name="width-request">400</property>
+        <property name="tooltip-text" translatable="yes">Filter the cheatsheet dropdown and shortcuts in the active sheet</property>
       </object>
     </child>
     <child type="end">
