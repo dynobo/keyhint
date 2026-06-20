@@ -74,7 +74,11 @@ class KeyhintWindow(Gtk.ApplicationWindow):
 
         self.cli_args = cli_args
         self.skip_search_changed: bool = False
+        self.skip_dropdown_changed: bool = False
         self.search_text: str = ""
+        self.binding_filter_terms: list[str] = []
+        self.sheet_ids: list[str] = []
+        self.initial_sheet_id: str = "keyhint"
 
         GLib.idle_add(self._finish_initialization)
 
@@ -98,6 +102,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.shortcut_column_factory.connect("bind", self.bind_shortcuts_callback)
         self.label_column_factory.connect("bind", self.bind_labels_callback)
 
+        self.sheet_ids = sorted([s["id"] for s in self.sheets])
         self.init_sheet_dropdown()
         self.init_action_sheet()
         self.init_action_fullscreen()
@@ -267,17 +272,11 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         action.connect("change-state", self.on_change_sheet)
         self.add_action(action)
 
-        for bar in self.headerbars:
-            bar.sheet_dropdown.connect(
-                "notify::selected-item",
-                lambda btn, param: self.change_action_state(
-                    "sheet", GLib.Variant("s", btn.get_selected_item().get_string())
-                ),
-            )
-
         self.change_action_state(
             "sheet", GLib.Variant("s", self.get_appropriate_sheet_id())
         )
+        self.initial_sheet_id = self.get_current_sheet_id()
+        self.update_sheet_dropdown()
 
     def init_search_entry(self) -> None:
         for bar in self.headerbars:
@@ -331,17 +330,35 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.headerbars.fullscreen.search_entry.add_controller(evk)
 
     def init_sheet_dropdown(self) -> None:
-        """Populate sheet dropdown with available sheet IDs."""
-        # Use the model from normal dropdown also for the fullscreen dropdown
+        """Wire up cheatsheet dropdowns on both header bars."""
         model = self.headerbars.normal.sheet_dropdown.get_model()
         self.headerbars.fullscreen.sheet_dropdown.set_model(model)
 
-        # Satisfy type checker
         if not isinstance(model, Gtk.StringList):
             raise TypeError("Sheet dropdown model is not a Gtk.StringList.")
 
-        for sheet_id in sorted([s["id"] for s in self.sheets]):
-            model.append(sheet_id)
+        self.sheet_dropdown_model = model
+
+        for bar in self.headerbars:
+            bar.sheet_dropdown.connect(
+                "notify::selected-item",
+                self.on_sheet_dropdown_changed,
+            )
+
+    def on_sheet_dropdown_changed(
+        self, dropdown: Gtk.DropDown, _: GObject.Parameter
+    ) -> None:
+        """Switch cheatsheet when the user picks an entry from the dropdown."""
+        if self.skip_dropdown_changed:
+            return
+
+        selected_item = dropdown.get_selected_item()
+        if not isinstance(selected_item, Gtk.StringObject):
+            return
+
+        self.change_action_state(
+            "sheet", GLib.Variant("s", selected_item.get_string())
+        )
 
     @property
     def active_headerbar(self) -> headerbar.HeaderBarBox:
@@ -365,23 +382,137 @@ class KeyhintWindow(Gtk.ApplicationWindow):
     @check_state
     def on_change_sheet(self, action: Gio.SimpleAction, state: GLib.Variant) -> None:
         """Get selected sheet and render it in the UI."""
-        dropdown_model = self.headerbars.normal.sheet_dropdown.get_model()
+        self.show_sheet(sheet_id=state.get_string())
 
-        # Satisfy type checker
-        if not dropdown_model:
-            raise TypeError("Sheet dropdown model is not a Gtk.StringList.")
+    def _normalized_sheet_queries(self, query: str) -> set[str]:
+        """Return normalized variants of a query for cheatsheet ID matching."""
+        normalized = query.lower()
+        return {normalized, normalized.replace(" ", "-"), normalized.replace(" ", "")}
 
-        dropdown_strings = [
-            s.get_string() for s in dropdown_model if isinstance(s, Gtk.StringObject)
+    def _sheet_ids_matching_query(self, query: str) -> list[str]:
+        """Return sheet IDs matching a cheatsheet selection query."""
+        if not query:
+            return self.sheet_ids
+
+        queries = self._normalized_sheet_queries(query)
+        return [
+            sheet_id
+            for sheet_id in self.sheet_ids
+            if any(part in sheet_id.lower() for part in queries)
         ]
 
-        sheet_id = state.get_string()
-        select_idx = dropdown_strings.index(sheet_id)
+    def _pick_best_sheet_id(self, query: str, matches: list[str]) -> str:
+        """Pick the best sheet ID from candidates for a selection query."""
+        normalized = query.lower()
+        for sheet_id in matches:
+            if sheet_id.lower() == normalized:
+                return sheet_id
+        for sheet_id in matches:
+            if sheet_id.lower().startswith(normalized):
+                return sheet_id
+        normalized_hyphen = normalized.replace(" ", "-")
+        for sheet_id in matches:
+            if sheet_id.lower().startswith(normalized_hyphen):
+                return sheet_id
+        return matches[0]
 
+    def parse_search(self) -> tuple[str | None, list[str]]:
+        """Split search text into cheatsheet selection and binding filter terms.
+
+        Examples:
+            "vim" -> ("vim", [])
+            "vim copy" -> ("vim", ["copy"])
+            "copy" -> (None, ["copy"])  # filter bindings on current sheet
+        """
+        terms = self.search_text.strip().split()
+        if not terms:
+            return None, []
+
+        best_sheet_id: str | None = None
+        consumed_terms = 0
+
+        for count in range(1, len(terms) + 1):
+            query = " ".join(terms[:count])
+            matches = self._sheet_ids_matching_query(query)
+            if matches:
+                best_sheet_id = self._pick_best_sheet_id(query, matches)
+                consumed_terms = count
+
+        binding_terms = [term.lower() for term in terms[consumed_terms:]]
+        return best_sheet_id, binding_terms
+
+    def get_matching_sheet_ids(self) -> list[str]:
+        """Return sheet IDs matching the cheatsheet portion of the search text."""
+        if not self.search_text:
+            return self.sheet_ids
+
+        sheet_id, binding_terms = self.parse_search()
+        terms = self.search_text.strip().split()
+
+        if binding_terms and sheet_id is not None:
+            sheet_term_count = len(terms) - len(binding_terms)
+            if sheet_term_count > 0:
+                return self._sheet_ids_matching_query(
+                    " ".join(terms[:sheet_term_count]).lower()
+                )
+
+        matches = self._sheet_ids_matching_query(self.search_text.strip().lower())
+        if matches:
+            return matches
+
+        return self.sheet_ids
+
+    def pick_sheet_id_for_search(self) -> str:
+        """Pick the sheet ID for the current search text."""
+        if not self.search_text:
+            return self.initial_sheet_id
+
+        sheet_id, _ = self.parse_search()
+        if sheet_id is not None:
+            return sheet_id
+        return self.get_current_sheet_id()
+
+    def select_sheet_by_id(self, sheet_id: str) -> None:
+        """Switch to the cheatsheet with the given ID."""
+        self.change_action_state("sheet", GLib.Variant("s", sheet_id))
+
+    def update_sheet_dropdown(self) -> None:
+        """Refresh cheatsheet dropdown entries to match the current search filter."""
+        matches = self.get_matching_sheet_ids()
+        current_sheet_id = self.get_current_sheet_id()
+
+        if current_sheet_id in matches:
+            selected_index = matches.index(current_sheet_id)
+        elif matches:
+            selected_index = 0
+        else:
+            selected_index = -1
+
+        self.skip_dropdown_changed = True
+
+        while self.sheet_dropdown_model.get_n_items() > 0:
+            self.sheet_dropdown_model.remove(0)
+        for sheet_id in matches:
+            self.sheet_dropdown_model.append(sheet_id)
+
+        if selected_index >= 0:
+            for bar in self.headerbars:
+                bar.sheet_dropdown.set_selected(selected_index)
+
+        self.skip_dropdown_changed = False
+
+    def clear_search(self) -> None:
+        """Clear the search field and restore the initial cheatsheet."""
+        self.skip_search_changed = True
         for bar in self.headerbars:
-            bar.sheet_dropdown.set_selected(select_idx)
-
-        self.show_sheet(sheet_id=sheet_id)
+            bar.search_entry.set_text("")
+        self.skip_search_changed = False
+        self.search_text = ""
+        self.binding_filter_terms = []
+        self.select_sheet_by_id(self.initial_sheet_id)
+        self.update_sheet_dropdown()
+        self.bindings_filter.changed(Gtk.FilterChange.DIFFERENT)
+        self.sheet_container_box.invalidate_filter()
 
     @check_state
     def on_change_zoom(self, action: Gio.SimpleAction, state: GLib.Variant) -> None:
@@ -464,19 +595,21 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         adj.set_value(adj.get_value() + distance)
 
     def cycle_sheets(self, direction: Literal["next", "previous"]) -> None:
-        dropdown = self.headerbars.normal.sheet_dropdown
-        dropdown_model = dropdown.get_model()
+        """Cycle through cheatsheets matching the current filter."""
+        matches = self.get_matching_sheet_ids() if self.search_text else self.sheet_ids
+        if not matches:
+            return
 
-        # Satisfy type checker
-        if not dropdown_model:
-            raise TypeError("Sheet dropdown model is not a Gtk.StringList.")
+        current_sheet_id = self.get_current_sheet_id()
+        if current_sheet_id not in matches:
+            current_index = 0
+        else:
+            current_index = matches.index(current_sheet_id)
 
         relative_change = 1 if direction == "next" else -1
-
-        new_position = dropdown.get_selected() + relative_change
-        new_position = max(0, new_position)
-        new_position = min(new_position, dropdown_model.get_n_items())
-        dropdown.set_selected(position=new_position)
+        new_index = max(0, min(current_index + relative_change, len(matches) - 1))
+        self.select_sheet_by_id(matches[new_index])
+        self.update_sheet_dropdown()
 
     def focus_search_entry(self) -> None:
         """Focus search entry of the active headerbar."""
@@ -497,7 +630,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         self.focus_search_entry()
 
     def on_search_entry_changed(self, search_entry: Gtk.SearchEntry) -> None:
-        """Execute on change of the sheet selection dropdown."""
+        """Update cheatsheet selection, dropdown filter, and binding filter."""
         if self.skip_search_changed:
             self.skip_search_changed = False
             return
@@ -506,6 +639,17 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             return
 
         self.search_text = search_entry.get_text()
+        self.binding_filter_terms = self.parse_search()[1]
+
+        if not self.search_text:
+            target_sheet_id = self.initial_sheet_id
+        else:
+            target_sheet_id = self.pick_sheet_id_for_search()
+
+        if target_sheet_id != self.get_current_sheet_id():
+            self.select_sheet_by_id(target_sheet_id)
+
+        self.update_sheet_dropdown()
         self.bindings_filter.changed(Gtk.FilterChange.DIFFERENT)
         self.sheet_container_box.invalidate_filter()
 
@@ -515,13 +659,26 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         keycode: int,
         keyval: int,
         modifier: Gdk.ModifierType,
-    ) -> None:
-        """Handle key press events in the search entry field.
+    ) -> bool | None:
+        """Handle key press events in the search entry field."""
+        ctrl_pressed = modifier == Gdk.ModifierType.CONTROL_MASK
 
-        Note: The search itself is triggered by the 'change' event, not by 'key-pressed'
-        """
         if keycode == Gdk.KEY_Escape:
+            if self.search_text:
+                self.clear_search()
+                return True
             self.close()
+            return True
+
+        if keycode in (Gdk.KEY_BackSpace, Gdk.KEY_Delete) and ctrl_pressed:
+            self.clear_search()
+            return True
+
+        if keycode == Gdk.KEY_u and ctrl_pressed:
+            self.clear_search()
+            return True
+
+        return None
 
     def on_key_pressed(  # noqa: C901
         self,
@@ -540,7 +697,7 @@ class KeyhintWindow(Gtk.ApplicationWindow):
                 self.activate_action("win.fullscreen")
 
             case Gdk.KEY_f, True:
-                self.active_headerbar.grab_focus()
+                self.focus_search_entry()
             case Gdk.KEY_s, True:
                 self.active_headerbar.sheet_dropdown.grab_focus()
 
@@ -721,12 +878,8 @@ class KeyhintWindow(Gtk.ApplicationWindow):
             logger.debug("Using provided fallback sheet-id: %s.", sheet_id)
             return sheet_id
 
-        # If that fallback sheet also does not exist, just use the first in dropdown
-        model = self.headerbars.normal.sheet_dropdown.get_model()
-        item = model.get_item(0) if model else None
-        sheet_id = (
-            item.get_string() if isinstance(item, Gtk.StringObject) else "keyhint"
-        )
+        # If that fallback sheet also does not exist, use the first available sheet
+        sheet_id = self.sheet_ids[0] if self.sheet_ids else "keyhint"
         logger.debug("No matching or fallback sheet found. Using first sheet.")
         return sheet_id
 
@@ -753,9 +906,11 @@ class KeyhintWindow(Gtk.ApplicationWindow):
         item.set_child(child)
 
     def bindings_match_func(self, bindings_row: binding.Row) -> bool:
-        if self.search_text:
-            return self.search_text.lower() in bindings_row.filter_text.lower()
-        return True
+        if not self.binding_filter_terms:
+            return True
+
+        filter_text = bindings_row.filter_text.lower()
+        return all(term in filter_text for term in self.binding_filter_terms)
 
     def show_sheet(self, sheet_id: str) -> None:
         """Clear sheet container and populate it with the selected sheet."""

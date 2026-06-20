@@ -13,9 +13,13 @@ F11 = "Toggle Fullscreen"
 Esc = "Exit"
 
 [section."Switch Cheatsheet"]
-"Ctrl + Down" = "Next cheatsheet"
-"Ctrl + Up" = "Previous cheatsheet"
-"Ctrl + s & Enter" = "Focus & open sheet selection dropdown"
+"Ctrl + Down" = "Next matching cheatsheet"
+"Ctrl + Up" = "Previous matching cheatsheet"
+"Ctrl + s" = "Focus cheatsheet dropdown"
+
+[section.Filter]
+"Type in search field" = "Filter cheatsheets in dropdown and shortcuts"
+"vim copy" = "Select vim cheatsheet, then filter for copy"
 
 [section.Scroll]
 "Down or Ctrl + j" = "Forward"
